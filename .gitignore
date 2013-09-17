@@ -1,0 +1,9 @@
+# Editor temp files
+*.swp
+*.bak
+*~
+
+# compiled
+*.o
+bin
+build
