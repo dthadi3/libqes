@@ -17,10 +17,10 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-#include <kmmatch.h>
-KMMATCH_INIT()
+#include "kmmatch.h"
+#include "kmseq.h"
 #include "kmtest.h"
-
+TEST_INIT()
 
 /*
  * ===  FUNCTION  ======================================================================
@@ -28,9 +28,39 @@ KMMATCH_INIT()
  *  Description:  Run all tests
  * =====================================================================================
  */
+
+static int test_kmseq_creation(const char * filename) {
+
+    kmfile *file = create_kmfile(filename);
+
+#ifdef  KMLIB_DEBUG
+    printf("kmfile at %x\n", file);
+#endif     /* -----  not KMLIB_DEBUG  ----- */
+
+    destroy_kmfile(file);
+    file = NULL;
+
+    return 0;
+
+}
 int
 main ( int argc, char *argv[] )
 {
-    TEST_INT(calc_hamming("ACTTG", "ACTGG"), 1, "calc_hamming")
+#ifdef  KMLIB_DEBUG
+    TEST_SELF();
+#endif     /* -----  not KMLIB_DEBUG  ----- */
+
+    /*  KMMATCH unit tests */
+
+    TEST_INT(hamming("ACTTG", "ACTGG"), 1, "hamming");
+    TEST_SIZET(hamming("ACTTG", "ACTGGA"), SIZE_MAX, "hamming seqlen not equal");
+
+    TEST_INT(hamming_max("ACTTG", "ACTGG", 1), 1, "hamming_max with max > hamming");
+    TEST_INT(hamming_max("ACTTG", "ACTGG", 0), 0, "hamming_max with max < hamming");
+    TEST_SIZET(hamming_max("ACTTG", "ACTGGA", 1), SIZE_MAX, "hamming_max seqlen not equal");
+
+    TEST_INT(test_kmseq_creation("./test/data/test.fastq"), 0, "test_kmseq_creation");
+
+    TEST_EXIT();
     return EXIT_SUCCESS;
 }                /* ----------  end of function main  ---------- */
