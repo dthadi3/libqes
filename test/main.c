@@ -17,8 +17,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-#include "kmmatch.h"
-#include "kmseq.h"
+#include "kmlib.h"
 #include "kmtest.h"
 TEST_INIT()
 
@@ -52,11 +51,11 @@ main ( int argc, char *argv[] )
 
     /*  KMMATCH unit tests */
 
-    TEST_INT(hamming("ACTTG", "ACTGG"), 1, "hamming");
+    TEST_SIZET(hamming("ACTTG", "ACTGG"), (size_t)1, "hamming");
     TEST_SIZET(hamming("ACTTG", "ACTGGA"), SIZE_MAX, "hamming seqlen not equal");
 
-    TEST_INT(hamming_max("ACTTG", "ACTGG", 1), 1, "hamming_max with max > hamming");
-    TEST_INT(hamming_max("ACTTG", "ACTGG", 0), 0, "hamming_max with max < hamming");
+    TEST_SIZET(hamming_max("ACTTG", "ACTGG", 1), (size_t)1, "hamming_max with max > hamming");
+    TEST_SIZET(hamming_max("ACTTG", "ACTGG", 0), (size_t)0, "hamming_max with max < hamming");
     TEST_SIZET(hamming_max("ACTTG", "ACTGGA", 1), SIZE_MAX, "hamming_max seqlen not equal");
 
     TEST_INT(test_kmseq_creation("./test/data/test.fastq"), 0, "test_kmseq_creation");
