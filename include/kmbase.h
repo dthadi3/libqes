@@ -25,7 +25,12 @@
 
 /* #####   EXPORTED MACROS   ############################################### */
 /* constants */
-/*#define	KMLIB_DEBUG*/
+
+/* Leave this undefined and define with with `gcc -DKMLIB_DEBUG`
+#define                     KMLIB_DEBUG
+*/
+#define                     KMLIB_LINEWIDTH     79
+
 
 /* helpers */
 #define __ERROR(MSG)        fprintf(stderr, MSG);
