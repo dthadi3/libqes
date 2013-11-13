@@ -5,5 +5,6 @@
 
 # compiled
 *.o
-bin
-build
+obj
+lib
+test/run
