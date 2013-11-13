@@ -19,11 +19,12 @@
 #define TEST(RETVAL, EXPECTED, NAME, FORMAT)                                                    \
     if (RETVAL != EXPECTED) {                                                                   \
         fprintf(stderr,                                                                         \
-                "%s failed:\n\tgot '" FORMAT "', expected '" FORMAT "' from '" #RETVAL "'\n",   \
+                "%-72s failed:\n\tgot '" FORMAT "', expected '" FORMAT "' from '" #RETVAL "'\n",\
                 NAME, RETVAL, EXPECTED);                                                        \
+        __kmtest_failures++;                                                                    \
     }                                                                                           \
     else {                                                                                      \
-        fprintf(stdout, "%s passed\n", NAME);                                                   \
+        fprintf(stdout, "%-72s passed\n", NAME);                                                \
     }
 
 
@@ -33,8 +34,9 @@
 #define TEST_STR(RETVAL, EXPECTED, NAME) TEST(RETVAL, EXPECTED, NAME, "%s")
 
 
-#define TEST_INIT                                                                               \
-void test_testers() {                                                                           \
+#define TEST_INIT()                                                                             \
+static int __kmtest_failures = 0;                                                               \
+static void test_testers() {                                                                    \
     printf("Testing kmtest macros. Every second test should fail\n\n");                         \
     /* test TEST macros */                                                                      \
                                                                                                 \
@@ -49,8 +51,20 @@ void test_testers() {                                                           
                                                                                                 \
     TEST_PTR(&"test", &"test", "TEST_PTR")                                                      \
     TEST_PTR(&"test", NULL, "TEST_PTR")                                                         \
-    TEST_SIZET((size_t)2, (size_t)1, "TEST_SIZET")                                              \
                                                                                                 \
+    printf("End of kmtest.h self testing. No more tests should fail\n");                        \
+    __kmtest_failures -= 4; /* UPDATE THIS NUMBER!!!!!  */                                      \
 }                                                                                               \
+
+
+#define	TEST_SELF() test_testers();
+
+#define	TEST_EXIT()                                                                             \
+   if (__kmtest_failures > 0) {                                                                 \
+       fprintf(stderr, "There were %i test failures\n");                                        \
+       exit(EXIT_FAILURE);                                                                      \
+   } else {                                                                                     \
+       fprintf(stderr, "All tests passed\n");                                                   \
+   }                                                                                            \
 
 #endif /* KMTEST_H */
