@@ -16,15 +16,19 @@
  * =====================================================================================
  */
 
+
+#include "kmbase.h"
+
 #define TEST(RETVAL, EXPECTED, NAME, FORMAT)                                                    \
+    __kmtest_tests++;                                                                           \
     if (RETVAL != EXPECTED) {                                                                   \
         fprintf(stderr,                                                                         \
-                "%-72s failed:\n\tgot '" FORMAT "', expected '" FORMAT "' from '" #RETVAL "'\n",\
-                NAME, RETVAL, EXPECTED);                                                        \
+                "%-*s failed:\n\tgot '" FORMAT "', expected '" FORMAT "' from '" #RETVAL "'\n", \
+                KMLIB_LINEWIDTH-7, NAME, RETVAL, EXPECTED);                                     \
         __kmtest_failures++;                                                                    \
     }                                                                                           \
     else {                                                                                      \
-        fprintf(stdout, "%-72s passed\n", NAME);                                                \
+        fprintf(stdout, "%-*s passed\n", KMLIB_LINEWIDTH-7, NAME);                              \
     }
 
 
@@ -34,8 +38,13 @@
 #define TEST_STR(RETVAL, EXPECTED, NAME) TEST(RETVAL, EXPECTED, NAME, "%s")
 
 
-#define TEST_INIT()                                                                             \
-static int __kmtest_failures = 0;                                                               \
+#define __TEST_VARS                                                                             \
+    static int __kmtest_failures = 0;                                                           \
+    static int __kmtest_tests = 0;                                                              \
+
+
+#ifdef  KMLIB_DEBUG
+#define	__TEST_SELFTEST                                                                       \
 static void test_testers() {                                                                    \
     printf("Testing kmtest macros. Every second test should fail\n\n");                         \
     /* test TEST macros */                                                                      \
@@ -54,17 +63,27 @@ static void test_testers() {                                                    
                                                                                                 \
     printf("End of kmtest.h self testing. No more tests should fail\n");                        \
     __kmtest_failures -= 4; /* UPDATE THIS NUMBER!!!!!  */                                      \
-}                                                                                               \
+}
+#else
+#define __TEST_SELFTEST
+#endif
+
+#define TEST_INIT()                                                                             \
+    __TEST_VARS                                                                                 \
+    __TEST_SELFTEST
 
 
 #define	TEST_SELF() test_testers();
 
 #define	TEST_EXIT()                                                                             \
-   if (__kmtest_failures > 0) {                                                                 \
-       fprintf(stderr, "There were %i test failures\n");                                        \
-       exit(EXIT_FAILURE);                                                                      \
-   } else {                                                                                     \
-       fprintf(stderr, "All tests passed\n");                                                   \
-   }                                                                                            \
+    for (int iii=0; iii<KMLIB_LINEWIDTH; iii++) {printf("%c",'=');}                             \
+    printf("\n\n");                                                                             \
+    fprintf(stderr, "Ran %i tests\n", __kmtest_tests);                                          \
+    if (__kmtest_failures > 0) {                                                                \
+        fprintf(stderr, "There were %i test failures\n", __kmtest_failures);                    \
+        exit(EXIT_FAILURE);                                                                     \
+    } else {                                                                                    \
+        fprintf(stderr, "All tests passed\n");                                                  \
+    }                                                                                           \
 
 #endif /* KMTEST_H */
