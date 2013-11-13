@@ -18,38 +18,16 @@
 #ifndef KMMATCH_H
 #define KMMATCH_H
 
+
+/* #####   HEADER FILE INCLUDES   ########################################## */
+
 #include <string.h>
 #include <stdint.h>
 
-/*  Everyone loves a maze. A lovely macro maze! */
-/*  Set tab to be 4 spaces or it will look like shit. Sorry Linus */
 
-#define	__KM_CALCHAMMING_INIT(SCOPE)                                            \
-SCOPE inline int calc_hamming(const char *seq1, const char *seq2) {             \
-    int ham = 0;                                                                \
-    int seqlen = 0;                                                             \
-    int iii = 0;                                                                \
-                                                                                \
-    if (strlen(seq1) == strlen(seq2)) return -1;                                \
-    seqlen = strlen(seq1);                                                      \
-                                                                                \
-    for (iii; iii < seqlen; iii++) {                                            \
-        if (seq1[iii] != seq2[iii]) {                                           \
-             ham++;                                                             \
-        }                                                                       \
-     }                                                                          \
-    return ham;                                                                 \
-}                                                                               \
+/* #####   EXPORTED FUNCTION DECLARATIONS   ################################ */
 
-/* 
-#define	__KM_FINDMISMATCH_INIT(SCOPE)                                           \
-SCOPE 
-
- */
-
-
-#define	KMMATCH_INIT(SCOPE)			                                            \
-    __KM_CALCHAMMING_INIT(SCOPE)                                                \
-
+extern inline size_t hamming (const char *seq1, const char *seq2);
+extern inline size_t hamming_max (const char *seq1, const char *seq2, size_t max);
 
 #endif /* KMMATCH_H */
