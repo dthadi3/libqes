@@ -1,6 +1,6 @@
 CC=gcc
 DEBUG=
-CFLAGS=-g -std=gnu99 -fgnu89-inline -O3 -I./include -L./lib $(DEBUG)
+CFLAGS=-g -Wall -Wpedantic -std=gnu99 -fgnu89-inline -O3 -I./include -L./lib $(DEBUG)
 LIBFLAGS=-shared
 OBJFLAGS=-c -fPIC
 BINFLAGS=-lz
@@ -18,6 +18,7 @@ lib: $(OBJ)
 
 test: $(OBJ)
 	$(CC) $(CFLAGS) $(BINFLAGS) -o test/run $(TEST_SRC) $(OBJ)
+	$(CC) $(CFLAGS) $(BINFLAGS) -lkm -o test/run.dynamic $(TEST_SRC)
 	./test/run
 
 clean:
