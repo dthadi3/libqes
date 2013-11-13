@@ -17,14 +17,14 @@
 #define KMLIB_H
 
 
-#define	KMLIB_DEBUG
+/* #####   HEADER FILE INCLUDES   ########################################## */
+
+#include "kmbase.h"
+
+#include "kmmatch.h"
+#include "kmseq.h"
 
 
-#include <stdlib.h>
-#include <stdio.h>
-
-#define ERROR(MSG) fprintf(stderr, MSG);
-#define FATAL_ERROR(MSG) ERROR(MSG) exit(EXIT_FAILURE);
 
 
 #endif /* KMLIB_H */
