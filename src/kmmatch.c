@@ -44,7 +44,7 @@ hamming_max (const char     *seq1,
         KM_ERROR("length of seq1 and seq2 not the same")
         fprintf(stderr, "\tseq1:\t'%s'\n", seq1);
         fprintf(stderr, "\tseq2:\t'%s'\n", seq2);
-        fprintf(stderr, "\tmax:\t'%s'\n", max);
+        fprintf(stderr, "\tmax:\t'%zu'\n", max);
 #endif     /* -----  not FDB_DEBUG  ----- */
         return(SIZE_MAX);
     }
