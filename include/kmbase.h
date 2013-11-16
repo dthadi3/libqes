@@ -37,6 +37,6 @@
 #define FATAL_ERROR(MSG)    ERROR(MSG) exit(EXIT_FAILURE);
 
 #define KM_ERROR(MSG)       fprintf(stderr, "%s\n\tIn %s at %i in %s\n",      \
-                                    __func__, __LINE__, __FILE__);
+                                    MSG, __func__, __LINE__, __FILE__);
 
 #endif /* KMBASE_H */
