@@ -20,11 +20,12 @@ lib: $(OBJ)
 test/run: $(OBJ)
 	$(CC) $(CFLAGS) $(BINFLAGS) -o test/run $(TEST_SRC) $(OBJ)
 
-test/run.dynamic: $(OBJ)
-	$(CC) $(CFLAGS) $(BINFLAGS) -lkm -o test/run.dynamic $(TEST_SRC)
+test/run.dynamic: $(OBJ) lib
+	$(CC) $(CFLAGS) -Xlinker -rpath -Xlinker "./lib" $(BINFLAGS) -lkm -o test/run.dynamic $(TEST_SRC)
 
 test: test/run test/run.dynamic
 	./test/run
+	./test/run.dynamic >/dev/null
 
 clean:
 	rm -vf obj/* test/run test/run.dynamic
