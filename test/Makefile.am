@@ -1,23 +1,26 @@
-#SUBDIRS = bin
+#AM_CFLAGS = ${kmlib_CFLAGS}
+
+#AM_CFLAGS = -std=gnu99 -Wall -Wpedantic -Werror
+AM_CFLAGS = @KMLIB_GLOBAL_CFLAGS@
+GZIP_FLAGS = -lz
+
+TESTS = rundynamic run
 
 bin_PROGRAMS = \
-	run \
-	run.dynamic
-
-run_CFLAGS = \
-	-I ../include
-
-run_LDADD = \
-	../lib/libkm.a
+	rundynamic \
+	run
 
 run_SOURCES = \
 	main.c
 
 
-run_dynamic_SOURCES = \
+rundynamic_SOURCES = \
 	main.c
 
-run_dynamic_CFLAGS = \
-	-lkm \
-	-L ../lib
+run_LDADD = \
+	../src/libkm.la \
+	$(GZIP_FLAGS)
 
+rundynamic_LDADD = \
+	../src/libkm.la \
+	$(GZIP_FLAGS)
