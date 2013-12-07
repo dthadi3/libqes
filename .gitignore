@@ -19,6 +19,7 @@ test/run.dynamic
 
 ar-lib
 autom4te.cache/
+build
 compile
 config.*
 configure
@@ -27,6 +28,5 @@ include/stamp-h1
 install-sh
 libtool
 ltmain.sh
-m4/
 missing
-src/.deps
+*.deps
