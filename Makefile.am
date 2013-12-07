@@ -1,4 +1,4 @@
-SUBDIRS = src
+SUBDIRS = src test
 
 AM_CFLAGS = \
 	-std=gnu99 \
