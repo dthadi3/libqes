@@ -1,9 +1,10 @@
 /*
- * =====================================================================================
+ * ============================================================================
  *
- *       Filename:  kmmatch.
+ *       Filename:  kmmatch.c
  *
- *    Description:  Sequence matching and finding functions used in bioinformatic tasks
+ *    Description:  Sequence matching and finding functions used in
+ *                  bioinformatic tasks
  *
  *        Version:  1.0
  *        Created:  11/08/13 21:34:38
@@ -11,16 +12,13 @@
  *        License:  GPLv3+
  *       Compiler:  gcc
  *
- *         Author:  Kevin Murray, spam@kdmurray.id.au [include word penguin in subject]
+ *         Author:  Kevin Murray, spam@kdmurray.id.au
+ *                                [include word penguin in subject]
  *
- * =====================================================================================
+ * ============================================================================
  */
-#include <stdlib.h>
-#include <string.h>
-#include <stddef.h>
 
 #include "kmmatch.h"
-#include "kmbase.h"
 
 /*
  * ===  FUNCTION  =============================================================
@@ -32,9 +30,9 @@
  */
 
 inline size_t
-hamming_max (const char     *seq1,
-            const char     *seq2,
-            size_t          max)
+hamming_max                    (const char     *seq1,
+                                const char     *seq2,
+                                size_t          max)
 {
     size_t      len = strlen(seq1);
 
@@ -78,8 +76,8 @@ hamming_max (const char     *seq1,
  */
 
 inline size_t
-hamming    (const char     *seq1,
-            const char     *seq2)
+hamming            (const char     *seq1,
+                    const char     *seq2)
 {
     size_t      len = strlen(seq1);
 
