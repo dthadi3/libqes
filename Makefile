@@ -1,7 +1,7 @@
 CC=gcc
 DEBUG=
 #DEBUG=-DKMLIB_DEBUG
-CFLAGS=-g -Wall -Wpedantic -std=gnu99 -fgnu89-inline -O3 -I./include -L./lib $(DEBUG)
+CFLAGS=-g -Wall -Wpedantic -std=gnu99 -fgnu89-inline -O3 -I./src -I. -L./build/lib $(DEBUG)
 LIBFLAGS=-shared
 OBJFLAGS=-c -fPIC
 BINFLAGS=-lz
@@ -9,26 +9,29 @@ SRCS=$(wildcard src/*.c)
 TEST_SRC=test/main.c
 
 SRC_NAMES=$(notdir $(SRCS))
-OBJ=$(patsubst %.c,./obj/%.o, $(SRC_NAMES))
-.PHONY: all test clean
+OBJ=$(patsubst %.c,./build/obj/%.o, $(SRC_NAMES))
+.PHONY: test clean
 
-all: lib test $(OBJ)
+all: setup lib test $(OBJ)
 
-lib: $(OBJ)
-	$(CC) $(CFLAGS) $(LIBFLAGS) -o ./lib/libkm.so $(OBJ)
+lib: setup $(OBJ)
+	$(CC) $(CFLAGS) $(LIBFLAGS) -o ./build/lib/libkm.so $(OBJ)
 
-test/run: $(OBJ)
+test/run: setup $(OBJ)
 	$(CC) $(CFLAGS) $(BINFLAGS) -o test/run $(TEST_SRC) $(OBJ)
 
-test/run.dynamic: $(OBJ) lib
-	$(CC) $(CFLAGS) -Xlinker -rpath -Xlinker "./lib" $(BINFLAGS) -lkm -o test/run.dynamic $(TEST_SRC)
+test/run.dynamic: setup $(OBJ) lib
+	$(CC) $(CFLAGS) -Xlinker -rpath -Xlinker "./build/lib" $(BINFLAGS) -lkm -o test/run.dynamic $(TEST_SRC)
 
-test: test/run test/run.dynamic
-	./test/run
-	./test/run.dynamic >/dev/null
+test: setup test/run test/run.dynamic
+	./test/run ./test
+	./test/run.dynamic ./test >/dev/null
 
 clean:
-	rm -vf obj/* test/run test/run.dynamic
+	rm -vf build/* test/run test/run.dynamic
 
-obj/%.o: src/%.c
+build/obj/%.o: src/%.c
 	$(CC) $(CFLAGS) $(OBJFLAGS) -o $@ $<
+
+setup:
+	mkdir -p ./build/lib ./build/obj ./build/bin
