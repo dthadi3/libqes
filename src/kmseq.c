@@ -1,179 +1,183 @@
 /*
- * =====================================================================================
+ * ============================================================================
  *
  *       Filename:  kmseq.c
  *
- *    Description:  
+ *    Description:  A kseq.h-like buffered sequence file parser
  *
  *        Version:  1.0
- *        Created:  31/07/13 19:53:26
+ *        Created:  11/08/13 21:34:38
  *       Revision:  none
+ *        License:  GPLv3+
  *       Compiler:  gcc
  *
+ *         Author:  Kevin Murray, spam@kdmurray.id.au
+ *                                [include word penguin in subject]
  *
- * =====================================================================================
+ * ============================================================================
  */
-#include <stdlib.h>
-#include <stdio.h>
-#include <string.h>
-#include <errno.h>
-#include <zlib.h>
 
 #include "kmseq.h"
 
-
-inline void __kmfile_fill_buffer(kmfile * file) {
-    /* work out how many bytes we need
-    * This needs a picture
-    *  At each time
-    *    BUFLEN = 14
-    *    buf = ^
-    *    bufiter = i
-    *    bufend = !
-    *    pos. of first record = R
-    *
-    * Before a read:
-    *  < >< >< >< >< >< >< >< >< >< >< >< >< >< > <- bytes
-    *   0  1  2  3  4  5  6  7  8  9 10 11 12 13
-    *   @  1 \n  A \n  + \n  # \n  @  2 \n  A \0
-    *  R^i                                     !
-    *
-    * After a read. Needs refilling, but have to shuffle first
-    *  < >< >< >< >< >< >< >< >< >< >< >< >< >< > <- bytes
-    *   0  1  2  3  4  5  6  7  8  9 10 11 12 13
-    *   @  1 \n  A \n  + \n  # \n  @  2 \n  A \0
-    *   ^                          Ri          !
-    *
-    * After a shuffle
-    *  < >< >< >< >< >< >< >< >< >< >< >< >< >< > <- bytes
-    *   0  1  2  3  4  5  6  7  8  9 10 11 12 13
-    *   @  2 \n  A \0  + \n  # \n  @  2 \n  A \0
-    *  R^i          !
-    *
-    *  bytes_to_read = 13 - 4
-    *                = buf + ((bufflen - 1) - strlen(buf))
-    * After a refill
-    *  < >< >< >< >< >< >< >< >< >< >< >< >< >< > <- bytes
-    *   0  1  2  3  4  5  6  7  8  9 10 11 12 13
-    *   @  2 \n  A \n  + \n  # \n  @  3 \n  G \0
-    *  R^i                                     !
-    *
-    */
-
-    size_t bytes_to_read;
-    bytes_to_read = KMFILE_BUFFER_LEN - (size_t)(file->bufferend - file->bufferiter) - 1;
-
-    if (bytes_to_read < 1) {
-        /*  Already full! */
-        return;
-    }
-
-    /* shuffle the buffer */
-    /* we don't do the customary bufflen -1 here, as we want to copy the \0 which
-    *  should always be the final char
-    */
-    size_t bytes_to_move = (KMFILE_BUFFER_LEN - (size_t) file->bufferiter);
-    printf("moving buffer. bf: %x, bi %x, btm, %i\n",
-            file->buffer, file->bufferiter, bytes_to_move);
-    memmove(file->buffer, file->bufferiter, bytes_to_move);
-
-    /* Refill the buffer */
-    int bytes_read = gzread(file->file, file->bufferiter, bytes_to_read);
-    if (bytes_read < bytes_to_read) { /* check for errors */
-        if (gzeof(file->file)) {
-            file->eof = 1;
-        }
-        else {
-            const char * err_str = gzerror(file->file, &file->err);
-            if (file->err) {
-                fprintf(stderr, "Error reading %s:\n%s\n",
-                        file->path, err_str);
-                exit(EXIT_FAILURE);
-            }
-        }
-    }
-
-    file->filepos += bytes_to_read;
-
-    /* reset pointers */
-    file->bufferiter = file->buffer;
-    file->bufferend = file->buffer + (KMFILE_BUFFER_LEN - 1);
-}
-
-
-kmfile *create_kmfile(const char * filename){
-    /* Make struct */
-    kmfile *file = (kmfile *) calloc(1, sizeof(*file));
-    CHECK_ALLOC(file);
-
-    /* init file */
-    file->file = gzopen(filename, "r");
-    if (!file->file) {
-        fprintf(stderr, "Opening file %s failed:\n%s\n", filename, strerror(errno));
-        exit(EXIT_FAILURE);
-    }
-
-    /* init eof */
-    file->eof = 0;
-
-    /* init path */
-    int fnlen = strlen(filename) + 1;
-    file->path = (char *) calloc(fnlen, sizeof(char));
-    CHECK_ALLOC(file->path);
-    strncpy(file->path, filename, fnlen - 1);
-
-    /* init buffer */
-    file->buffer = (char *) calloc(KMFILE_BUFFER_LEN, sizeof(char));
-    CHECK_ALLOC(file->buffer);
-
-    /* set iteration pointers */
-    file->bufferiter = file->buffer;
-    file->bufferend = file->buffer + (KMFILE_BUFFER_LEN - 1);
-
-    __kmfile_fill_buffer(file);
-    return(file);
-}
-
-void destroy_kmfile(kmfile *file) {
-    if(file){
-        FREE(file->buffer);
-        FREE(file->path);
-        FREE(file);
-    }
-}
-
-kmseq *read_seq_file(kmfile *file){
+#define	__READ_LINES	4
+kmseq *
+read_seq_file                   (kmfile *file)
+{
     /* in case someone tries to get seq from uninitialised kmfile */
     if (!file) return NULL;
     /* in case someone tries getting seqs from a file at EOF  */
-    if (file->eof) return NULL;
+    if (file->eof && file->bufferiter == file->bufferend) return NULL;
+    char **lines = NULL;
+    kmseq *seq = create_kmseq();
+    int line = 0;
+    int len_tmp = 0;
+    size_t bytes_read = 0;
+    size_t seqlen = 0;
+    size_t alloced_lines = 0;
+    int n_lines = 4;
 
-}
+    if (file->mode == '@') {
+        /* Fastq files always have 4 lines. A simple for loop will do. */
+        lines = calloc(n_lines, sizeof(*lines));
+        for (line = 0; line < n_lines; line++) {
+            /* work out how long it is,, calloc it  */
+            len_tmp = hint_line_length_kmfile(file);
+            lines[line] = calloc(len_tmp + 1, sizeof(**lines));
+            /* Read into the file's buffer, copying to our new string */
+            bytes_read = readline_kmfile(file, &lines[line], len_tmp);
+            /* Overwrite \n with another \0 */
+            lines[line][bytes_read-1] = '\0';
 
-kmseq *init_kmseq() {
-    kmseq *seq = (kmseq *) calloc(1, sizeof(*seq));
+            /* Special case: on the 2nd line is the seq, so seqlen = strlen */
+            if (line == 1) { seqlen = bytes_read - 1; } /* -1: i.e. - the \n */
+        }
+    } else if (file->mode == '>') {
+        /* Start with two lines, for shits and giggles. */
+        alloced_lines = 2;
+        lines = calloc(alloced_lines, sizeof(*lines));
 
-    seq->name = (char *) calloc(KMSEQ_HEADER_LEN, 1);
-    seq->seq = (char *) calloc(KMSEQ_SEQ_LEN, 1);
-#ifdef  KM_QUAL_H
-    seq->qual_h = (char *) calloc(KMSEQ_HEADER_LEN, 1);
-#endif     /* -----  not KM_QUAL_H  ----- */
-    seq->qual = (char *) calloc(KMSEQ_SEQ_LEN, 1);
+        /* Grab first line or next while loop conditional will be false. */
+        /* follows same pattern as above */
+        len_tmp = hint_line_length_kmfile(file);
+        lines[line] = calloc(len_tmp + 1, sizeof(**lines));
+        bytes_read = readline_kmfile(file, &lines[line], len_tmp);
+        lines[line][bytes_read-1] = '\0';
 
+        /* while the next char is not a '>', i.e. until next header line */
+        while (peek_ahead_kmfile(file) != file->mode) {
+            /* do the log-incrementation of array if need be */
+            if (line + 1 >= alloced_lines) {
+                /* printf("reallocing from %i to %i as %i is >=\n",
+                        alloced_lines, alloced_lines << 1, line +1); */
+                alloced_lines = alloced_lines << 1;
+                lines = realloc(lines, sizeof(*lines) * alloced_lines);
+            }
+
+            /* grab line, per above. You should be used to what this does by
+               now */
+            len_tmp = hint_line_length_kmfile(file);
+            lines[++line] = calloc(len_tmp + 1, sizeof(**lines));
+            bytes_read = readline_kmfile(file, &lines[line], len_tmp);
+            lines[line][bytes_read-1] = '\0';
+
+            /* we're always in sequence by the time it gets to here */
+            seqlen += bytes_read - 1; /* remove the \n from the count */
+        }
+        /* not +1 here, as the ++line above increments it after the final
+           cycle is done, so it acutally is the number of lines */
+        n_lines = line + 1;
+    }
+
+    if (file->mode == '@') {
+        /* This bit is simple, add the lines to the seq object.
+           It's lines[0]+1, as we want to get rid of the @/> */
+#ifdef KMSEQ_QUAL
+        fill_kmseq(seq, lines[0]+1, lines[1], lines[3]);
+#else
+        fill_kmseq(seq, lines[0]+1, lines[1], NULL);
+#endif
+        seq->seqlen = seqlen;
+    } else if (file->mode == '>') {
+        /* we need to have somewhere to hold the seq as we stick it together */
+        char *tmp = calloc(seqlen+1, sizeof(*tmp));
+        size_t copied = 0;
+
+        /* Process each line */
+        for (int iii = 1; iii < n_lines; iii++) {
+            /* printf("adding subseq '%s' to tmp (%s)\n", lines[iii], tmp);
+            printf("to %p, from %p, count %zu\n", tmp + copied - 1, lines[iii],
+                    seqlen - copied); */
+            strncpy(tmp + copied, lines[iii], seqlen - copied);
+            copied = strlen(tmp);
+            /* printf("tmp is now '%s'\n", tmp); */
+        }
+        /* fill in the seq as above. */
+        fill_kmseq(seq, lines[0]+1, tmp, NULL);
+
+        FREE(tmp);
+    }
+
+    if (lines != NULL ) {
+        for (int iii = 0; iii < n_lines; iii++) {
+            if (lines[iii] != NULL) { FREE(lines[iii]); }
+        }
+        FREE(lines);
+    }
     return seq;
 }
 
-void fill_kmseq(kmseq *seqref, const char *name, const char *seq, const char *qual_h, const char *qual) {
-    int name_l, seq_l, qual_h_l, qual_l;
-
-
+kmseq *
+create_kmseq                      ()
+{
+    kmseq *seq = calloc(1, sizeof(*seq));
+    return seq;
 }
-void destroy_kmseq(kmseq *seq) {
-    if (seq) {
+
+void
+print_kmseq                    (kmseq const     *seq,
+                                FILE            *stream)
+{
+    fprintf(stream, "kmseq at %p\n", (void *)seq);
+    fprintf(stream, "\t%s\n", seq->name);
+    fprintf(stream, "\t%s\n", seq->seq);
+#ifdef  KMSEQ_QUAL
+    fprintf(stream, "\t%s\n", seq->qual);
+#endif
+}
+
+int
+fill_kmseq                     (kmseq           *seqref,
+                                const char      *name,
+                                const char      *seq,
+                                const char      *qual)
+{
+    if (name) {seqref->name = strdup(name);}
+    if (seq) {seqref->seq = strdup(seq); seqref->seqlen = strlen(seq);}
+#ifdef  KMSEQ_QUAL
+    if (qual) {
+        seqref->qual = strdup(qual);
+        if (strlen(qual) != strlen(seq)) {
+            KM_ERROR("seq and qual lengths are not equal");
+            FREE(seqref->name);
+            FREE(seqref->seq);
+            return 1;
+        }
+    }
+#endif
+
+    return 0;
+}
+
+void
+destroy_kmseq                   (kmseq *seq)
+{
+    if (seq != NULL) {
         FREE(seq->name);
         FREE(seq->seq);
-        FREE(seq->qual_h);
+#ifdef  KMSEQ_QUAL
         FREE(seq->qual);
+#endif
         FREE(seq);
+        seq = NULL;
     }
 }
