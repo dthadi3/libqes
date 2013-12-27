@@ -56,15 +56,12 @@
 #define __ERROR(MSG)        fprintf(stderr, MSG);
 #define FATAL_ERROR(MSG)    __ERROR(MSG) exit(EXIT_FAILURE);
 
-#define KM_ERROR(MSG)       fprintf(stderr, "%s\n\tIn %s at %i in %s\n",      \
+#define KM_ERROR(MSG)       fprintf(stderr, "%s\n\tIn %s at line %i in %s\n", \
                                     MSG, __func__, __LINE__, __FILE__);
 
-#define ALLOC_ERROR fprintf(stderr, "Failed to allocate memory\n");           \
-    exit(EXIT_FAILURE);
 #define CHECK_ALLOC(pointer) if(pointer == NULL)                              \
-    { ALLOC_ERROR; printf("allocating bytes at ln %i\n", __LINE__);}
-#define FREE(pointer) if(pointer != NULL) {free(pointer); pointer = NULL;}    \
-    else {KM_ERROR("attempt to free null pointer")}
+    {fprintf(stderr, "Failed to allocate memory at ln %i\n", __LINE__);}
+#define FREE(pointer) if(pointer != NULL) {free(pointer); pointer = NULL;}
 
 
 #endif /* KMBASE_H */
