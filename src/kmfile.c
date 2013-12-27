@@ -21,7 +21,7 @@
 
 
 inline void
-__kmfile_fill_buffer            (kmfile         *file)
+__kmfile_fill_buffer           (kmfile         *file)
 {
     /* work out how many bytes we need
     * This needs a picture
@@ -129,7 +129,7 @@ __kmfile_fill_buffer            (kmfile         *file)
 
 
 kmfile *
-create_kmfile                   (const char * filename) {
+create_kmfile                  (const char     *filename) {
     size_t      fnlen;
     kmfile     *file;
 
@@ -142,6 +142,7 @@ create_kmfile                   (const char * filename) {
     if (file->file == NULL) {
         fprintf(stderr, "Opening file %s failed:\n%s\n",
                 filename, strerror(errno));
+        FREE(file);
         return(NULL);
     }
 
@@ -171,9 +172,10 @@ create_kmfile                   (const char * filename) {
 }
 
 void
-destroy_kmfile                  (kmfile *file) {
+destroy_kmfile                 (kmfile         *file)
+{
     if(file != NULL){
-        __FP_CLOSE(file->file);
+        if (file->file != NULL) { __FP_CLOSE(file->file); }
         FREE(file->buffer);
         FREE(file->path);
         FREE(file);
@@ -181,7 +183,10 @@ destroy_kmfile                  (kmfile *file) {
 }
 
 inline size_t
-__readline_kmfile_keep          (kmfile *file, char **dest, size_t maxlen) {
+__readline_kmfile_keep         (kmfile         *file,
+                                char          **dest,
+                                size_t maxlen)
+{
     char *newline = NULL;
     size_t len = 0;
 
@@ -209,7 +214,10 @@ __readline_kmfile_keep          (kmfile *file, char **dest, size_t maxlen) {
 }
 
 size_t
-readline_kmfile                 (kmfile *file, char **dest, size_t maxlen) {
+readline_kmfile                (kmfile         *file,
+                                char          **dest,
+                                size_t maxlen)
+{
     size_t bytes_taken;
 
     bytes_taken = __readline_kmfile_keep(file, dest, maxlen);
@@ -219,9 +227,16 @@ readline_kmfile                 (kmfile *file, char **dest, size_t maxlen) {
 }
 
 size_t
-hint_line_length_kmfile         (kmfile *file) {
+hint_line_length_kmfile        (kmfile *file)
+{
     size_t len = 0;
     char *tmp;
     tmp = strchr(file->bufferiter, '\n');
-    return tmp - file->bufferiter;
+    return tmp - file->bufferiter + 2;
+}
+
+char
+peek_ahead_kmfile              (kmfile         *file)
+{
+    return file->bufferiter[0];
 }
