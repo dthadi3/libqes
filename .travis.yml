@@ -1,0 +1,8 @@
+language: C
+
+compilers:
+ - gcc
+ - clang
+
+script:
+ - ./configure && make
