@@ -1,7 +1,7 @@
 CC=gcc
 DEBUG=
 #DEBUG=-DKMLIB_DEBUG
-CFLAGS=-g -Wall -Wpedantic -std=gnu99 -fgnu89-inline -O3 -I./src -I. -L./build/lib $(DEBUG)
+CFLAGS=-g -Wall -std=gnu99 -fgnu89-inline -O3 -I./src -I. -L./build/lib $(DEBUG)
 LIBFLAGS=-shared
 OBJFLAGS=-c -fPIC
 BINFLAGS=-lz
