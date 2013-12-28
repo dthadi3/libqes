@@ -28,11 +28,9 @@
 #include <stddef.h>
 #include <stdint.h>
 
-#include "kmlib_config.h"
 
 /* #####   EXPORTED MACROS   ############################################### */
 /* constants */
-
 #define	__FP_TYPE_GZIP			/*  */
 
 
