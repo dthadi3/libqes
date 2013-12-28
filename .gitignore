@@ -16,7 +16,6 @@ test/run.dynamic
 *.m4
 *.in
 *.lo
-
 ar-lib
 autom4te.cache/
 build
@@ -31,3 +30,9 @@ ltmain.sh
 missing
 *.deps
 *.libs
+
+# CMake Stuff
+**CMakeFiles/
+**CMakeCache.txt
+*.cmake
+Testing
