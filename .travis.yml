@@ -1,0 +1,11 @@
+language: C
+
+compiler:
+ - gcc
+ - clang
+
+install:
+ - sudo apt-get install zlib1g-dev cmake
+script:
+ - cmake .
+ - make && make test
