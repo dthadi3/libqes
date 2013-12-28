@@ -7,7 +7,7 @@ set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${kmlib_BINARY_DIR}/lib)
 enable_testing()
 
 # CC options
-add_definitions(-std=gnu11 -g -O3 -fgnu89-inline)
+add_definitions(-std=gnu99 -g -O3 -fgnu89-inline)
 include_directories(${kmlib_SOURCE_DIR}/src)
 link_directories(${kmlib_BINARY_DIR}/lib)
 
