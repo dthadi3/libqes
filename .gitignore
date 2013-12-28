@@ -10,27 +10,6 @@ lib
 test/run
 test/run.dynamic
 
-# autotools stuff
-*Makefile.in
-*Makefile
-*.m4
-*.in
-*.lo
-ar-lib
-autom4te.cache/
-build
-compile
-config.*
-configure
-depcomp
-include/stamp-h1
-install-sh
-libtool
-ltmain.sh
-missing
-*.deps
-*.libs
-
 # CMake Stuff
 **CMakeFiles/
 **CMakeCache.txt
