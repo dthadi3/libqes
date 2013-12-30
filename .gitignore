@@ -9,3 +9,9 @@ obj
 lib
 test/run
 test/run.dynamic
+
+# CMake Stuff
+**CMakeFiles/
+**CMakeCache.txt
+*.cmake
+Testing

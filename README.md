@@ -1,8 +1,10 @@
 kmlib
 =====
 
-A bunch of C libraries for various tasks
+A bunch of C libraries for various bioinformatics-y tasks.
 
+[![Build Status](https://travis-ci.org/kdmurray91/kmlib.png)](https://travis-ci.org/kdmurray91/kmlib)
+[![Bitdeli Badge](https://d2weczhvl823v0.cloudfront.net/kdmurray91/kmlib/trend.png)](https://bitdeli.com/free "Bitdeli Badge")
 
 License
 =======
