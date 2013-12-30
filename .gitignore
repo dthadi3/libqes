@@ -15,3 +15,4 @@ test/run.dynamic
 **CMakeCache.txt
 *.cmake
 Testing
+install_manifest.txt
