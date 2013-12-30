@@ -8,7 +8,7 @@ enable_testing()
 
 # CC options
 add_definitions(-std=gnu99 -g -O3 -fgnu89-inline)
-include_directories(${kmlib_SOURCE_DIR}/src)
+include_directories(${kmlib_SOURCE_DIR}/include)
 link_directories(${kmlib_BINARY_DIR}/lib)
 
 # Targets
