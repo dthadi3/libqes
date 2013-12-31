@@ -123,14 +123,14 @@ test/fast: test
 
 # The main all target
 all: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/kevin/prog/kmlib/CMakeFiles /home/kevin/prog/kmlib/CMakeFiles/progress.marks
-	$(MAKE) -f CMakeFiles/Makefile2 all
+	cd /home/kevin/prog/kmlib && $(CMAKE_COMMAND) -E cmake_progress_start /home/kevin/prog/kmlib/CMakeFiles /home/kevin/prog/kmlib/test/CMakeFiles/progress.marks
+	cd /home/kevin/prog/kmlib && $(MAKE) -f CMakeFiles/Makefile2 test/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /home/kevin/prog/kmlib/CMakeFiles 0
 .PHONY : all
 
 # The main clean target
 clean:
-	$(MAKE) -f CMakeFiles/Makefile2 clean
+	cd /home/kevin/prog/kmlib && $(MAKE) -f CMakeFiles/Makefile2 test/clean
 .PHONY : clean
 
 # The main clean target
@@ -139,116 +139,56 @@ clean/fast: clean
 
 # Prepare targets for installation.
 preinstall: all
-	$(MAKE) -f CMakeFiles/Makefile2 preinstall
+	cd /home/kevin/prog/kmlib && $(MAKE) -f CMakeFiles/Makefile2 test/preinstall
 .PHONY : preinstall
 
 # Prepare targets for installation.
 preinstall/fast:
-	$(MAKE) -f CMakeFiles/Makefile2 preinstall
+	cd /home/kevin/prog/kmlib && $(MAKE) -f CMakeFiles/Makefile2 test/preinstall
 .PHONY : preinstall/fast
 
 # clear depends
 depend:
-	$(CMAKE_COMMAND) -H$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR) --check-build-system CMakeFiles/Makefile.cmake 1
+	cd /home/kevin/prog/kmlib && $(CMAKE_COMMAND) -H$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR) --check-build-system CMakeFiles/Makefile.cmake 1
 .PHONY : depend
 
-#=============================================================================
-# Target rules for targets named km
+# Convenience name for target.
+test/CMakeFiles/run.dir/rule:
+	cd /home/kevin/prog/kmlib && $(MAKE) -f CMakeFiles/Makefile2 test/CMakeFiles/run.dir/rule
+.PHONY : test/CMakeFiles/run.dir/rule
 
-# Build rule for target.
-km: cmake_check_build_system
-	$(MAKE) -f CMakeFiles/Makefile2 km
-.PHONY : km
-
-# fast build rule for target.
-km/fast:
-	$(MAKE) -f CMakeFiles/km.dir/build.make CMakeFiles/km.dir/build
-.PHONY : km/fast
-
-#=============================================================================
-# Target rules for targets named run
-
-# Build rule for target.
-run: cmake_check_build_system
-	$(MAKE) -f CMakeFiles/Makefile2 run
+# Convenience name for target.
+run: test/CMakeFiles/run.dir/rule
 .PHONY : run
 
 # fast build rule for target.
 run/fast:
-	$(MAKE) -f test/CMakeFiles/run.dir/build.make test/CMakeFiles/run.dir/build
+	cd /home/kevin/prog/kmlib && $(MAKE) -f test/CMakeFiles/run.dir/build.make test/CMakeFiles/run.dir/build
 .PHONY : run/fast
 
-src/kmfile.o: src/kmfile.c.o
-.PHONY : src/kmfile.o
+main.o: main.c.o
+.PHONY : main.o
 
 # target to build an object file
-src/kmfile.c.o:
-	$(MAKE) -f CMakeFiles/km.dir/build.make CMakeFiles/km.dir/src/kmfile.c.o
-.PHONY : src/kmfile.c.o
+main.c.o:
+	cd /home/kevin/prog/kmlib && $(MAKE) -f test/CMakeFiles/run.dir/build.make test/CMakeFiles/run.dir/main.c.o
+.PHONY : main.c.o
 
-src/kmfile.i: src/kmfile.c.i
-.PHONY : src/kmfile.i
-
-# target to preprocess a source file
-src/kmfile.c.i:
-	$(MAKE) -f CMakeFiles/km.dir/build.make CMakeFiles/km.dir/src/kmfile.c.i
-.PHONY : src/kmfile.c.i
-
-src/kmfile.s: src/kmfile.c.s
-.PHONY : src/kmfile.s
-
-# target to generate assembly for a file
-src/kmfile.c.s:
-	$(MAKE) -f CMakeFiles/km.dir/build.make CMakeFiles/km.dir/src/kmfile.c.s
-.PHONY : src/kmfile.c.s
-
-src/kmmatch.o: src/kmmatch.c.o
-.PHONY : src/kmmatch.o
-
-# target to build an object file
-src/kmmatch.c.o:
-	$(MAKE) -f CMakeFiles/km.dir/build.make CMakeFiles/km.dir/src/kmmatch.c.o
-.PHONY : src/kmmatch.c.o
-
-src/kmmatch.i: src/kmmatch.c.i
-.PHONY : src/kmmatch.i
+main.i: main.c.i
+.PHONY : main.i
 
 # target to preprocess a source file
-src/kmmatch.c.i:
-	$(MAKE) -f CMakeFiles/km.dir/build.make CMakeFiles/km.dir/src/kmmatch.c.i
-.PHONY : src/kmmatch.c.i
+main.c.i:
+	cd /home/kevin/prog/kmlib && $(MAKE) -f test/CMakeFiles/run.dir/build.make test/CMakeFiles/run.dir/main.c.i
+.PHONY : main.c.i
 
-src/kmmatch.s: src/kmmatch.c.s
-.PHONY : src/kmmatch.s
-
-# target to generate assembly for a file
-src/kmmatch.c.s:
-	$(MAKE) -f CMakeFiles/km.dir/build.make CMakeFiles/km.dir/src/kmmatch.c.s
-.PHONY : src/kmmatch.c.s
-
-src/kmseq.o: src/kmseq.c.o
-.PHONY : src/kmseq.o
-
-# target to build an object file
-src/kmseq.c.o:
-	$(MAKE) -f CMakeFiles/km.dir/build.make CMakeFiles/km.dir/src/kmseq.c.o
-.PHONY : src/kmseq.c.o
-
-src/kmseq.i: src/kmseq.c.i
-.PHONY : src/kmseq.i
-
-# target to preprocess a source file
-src/kmseq.c.i:
-	$(MAKE) -f CMakeFiles/km.dir/build.make CMakeFiles/km.dir/src/kmseq.c.i
-.PHONY : src/kmseq.c.i
-
-src/kmseq.s: src/kmseq.c.s
-.PHONY : src/kmseq.s
+main.s: main.c.s
+.PHONY : main.s
 
 # target to generate assembly for a file
-src/kmseq.c.s:
-	$(MAKE) -f CMakeFiles/km.dir/build.make CMakeFiles/km.dir/src/kmseq.c.s
-.PHONY : src/kmseq.c.s
+main.c.s:
+	cd /home/kevin/prog/kmlib && $(MAKE) -f test/CMakeFiles/run.dir/build.make test/CMakeFiles/run.dir/main.c.s
+.PHONY : main.c.s
 
 # Help Target
 help:
@@ -260,20 +200,13 @@ help:
 	@echo "... install"
 	@echo "... install/local"
 	@echo "... install/strip"
-	@echo "... km"
 	@echo "... list_install_components"
 	@echo "... rebuild_cache"
-	@echo "... test"
 	@echo "... run"
-	@echo "... src/kmfile.o"
-	@echo "... src/kmfile.i"
-	@echo "... src/kmfile.s"
-	@echo "... src/kmmatch.o"
-	@echo "... src/kmmatch.i"
-	@echo "... src/kmmatch.s"
-	@echo "... src/kmseq.o"
-	@echo "... src/kmseq.i"
-	@echo "... src/kmseq.s"
+	@echo "... test"
+	@echo "... main.o"
+	@echo "... main.i"
+	@echo "... main.s"
 .PHONY : help
 
 
@@ -285,6 +218,6 @@ help:
 # No rule that depends on this can have commands that come from listfiles
 # because they might be regenerated.
 cmake_check_build_system:
-	$(CMAKE_COMMAND) -H$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR) --check-build-system CMakeFiles/Makefile.cmake 0
+	cd /home/kevin/prog/kmlib && $(CMAKE_COMMAND) -H$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR) --check-build-system CMakeFiles/Makefile.cmake 0
 .PHONY : cmake_check_build_system
 

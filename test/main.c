@@ -21,8 +21,8 @@
 #include <stdio.h>
 #include <strings.h>
 
-#include "kmlib.h"
-#include "kmtest.h"
+#include <kmlib.h>
+#include <kmtest.h>
 
 TEST_INIT()
 
