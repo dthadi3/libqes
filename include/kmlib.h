@@ -23,6 +23,7 @@
 
 /* #####   HEADER FILE INCLUDES   ########################################## */
 #include "kmbase.h"
+#include "kmutil.h"
 #include "kmmatch.h"
 #include "kmseq.h"
 #include "kmfile.h"
