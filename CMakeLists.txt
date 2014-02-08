@@ -12,7 +12,12 @@ include_directories(${kmlib_SOURCE_DIR}/include)
 link_directories(${kmlib_BINARY_DIR}/lib)
 
 # Targets
-add_library(km SHARED src/kmfile.c  src/kmmatch.c  src/kmseq.c)
+add_library(km SHARED
+	src/kmfile.c
+	src/kmmatch.c
+	src/kmseq.c
+	src/kmutil.c)
+
 add_subdirectory(test)
 
 INSTALL(TARGETS km DESTINATION "lib")
@@ -21,6 +26,7 @@ INSTALL(FILES
 	      	include/kmfile.h
 	      	include/kmlib.h
 		include/kmmatch.h
-	      	include/kmseq.h
-	      	include/kmtest.h
+		include/kmseq.h
+		include/kmtest.h
+		include/kmutil.h
 	DESTINATION "include")
