@@ -1,12 +1,20 @@
-language: C
+language: c
 
 compiler:
- - gcc
  - clang
+ - gcc
 
 install:
- - sudo apt-get install zlib1g-dev cmake
+ - git submodule update --init
+ - mkdir build
+ - mkdir target
+ - cd build
 
 script:
- - cmake .
- - make && make test
+ - cmake .. -DCMAKE_INSTALL_PREFIX=../target
+ - make
+ - make test
+ - make install
+ - test -f ../target/include/kmlib.h
+ - test -f ../target/lib/libkm.a
+ - test -f ../target/lib/libkm.so
