@@ -3,30 +3,18 @@ project(kmlib)
 
 # Cmake options
 set(CMAKE_BUILD_TYPE Debug)
-set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${kmlib_BINARY_DIR}/lib)
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
+set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 enable_testing()
 
 # CC options
-add_definitions(-std=gnu99 -g -O3 -fgnu89-inline)
-include_directories(${kmlib_SOURCE_DIR}/include)
-link_directories(${kmlib_BINARY_DIR}/lib)
+set(CMAKE_C_FLAGS "-std=gnu99 -Wall")
+set(CMAKE_C_FLAGS_DEBUG "-ggdb")
+set(CMAKE_C_FLAGS_RELEASE "-O3")
+include_directories(${CMAKE_SOURCE_DIR}/include)
+link_directories(${CMAKE_BINARY_DIR}/lib)
 
-# Targets
-add_library(km SHARED
-	src/kmfile.c
-	src/kmmatch.c
-	src/kmseq.c
-	src/kmutil.c)
-
+add_subdirectory(src)
 add_subdirectory(test)
 
-INSTALL(TARGETS km DESTINATION "lib")
-INSTALL(FILES
-		include/kmbase.h
-	      	include/kmfile.h
-	      	include/kmlib.h
-		include/kmmatch.h
-		include/kmseq.h
-		include/kmtest.h
-		include/kmutil.h
-	DESTINATION "include")
