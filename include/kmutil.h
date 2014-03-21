@@ -21,8 +21,8 @@
 
 #include "kmbase.h"
 
-extern inline char translate_codon(char *codon);
-extern inline char *revcomp(const char *seq, size_t len);
-extern inline void revcomp_inplace(char *seq, size_t len);
+extern char translate_codon(char *codon);
+extern char *revcomp(const char *seq, size_t len);
+extern void revcomp_inplace(char *seq, size_t len);
 
 #endif /* KMUTIL_H */

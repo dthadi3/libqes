@@ -45,9 +45,10 @@ typedef struct {
 
 kmfile *create_kmfile (const char * filename);
 void destroy_kmfile (kmfile *file);
-inline size_t __readline_kmfile_keep(kmfile *file, char **dest, size_t maxlen);
+extern size_t __readline_kmfile_keep (kmfile *file, char **dest, size_t maxlen);
+extern void __kmfile_fill_buffer (kmfile *file);
 size_t readline_kmfile (kmfile *file, char **dest, size_t maxlen);
-size_t hint_line_length_kmfile(kmfile *file);
-char peek_ahead_kmfile(kmfile *file);
+size_t hint_line_length_kmfile (kmfile *file);
+char peek_ahead_kmfile (kmfile *file);
 
 #endif /* KMFILE_H */
