@@ -17,4 +17,3 @@ link_directories(${CMAKE_BINARY_DIR}/lib)
 
 add_subdirectory(src)
 add_subdirectory(test)
-
