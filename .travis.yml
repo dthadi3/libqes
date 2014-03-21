@@ -13,7 +13,7 @@ install:
 script:
  - cmake .. -DCMAKE_INSTALL_PREFIX=../target
  - make
- - make test
+ - ctest
  - make install
  - test -f ../target/include/kmlib.h
  - test -f ../target/lib/libkm.so
