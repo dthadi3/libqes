@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 2.6)
+cmake_minimum_required(VERSION 2.8)
 project(kmlib)
 
 # Cmake options
@@ -17,3 +17,6 @@ link_directories(${CMAKE_BINARY_DIR}/lib)
 
 add_subdirectory(src)
 add_subdirectory(test)
+
+file(GLOB KMLIB_HEADERS ${CMAKE_SOURCE_DIR}/include/*.h)
+INSTALL(FILES ${KMLIB_HEADERS} DESTINATION "include")
