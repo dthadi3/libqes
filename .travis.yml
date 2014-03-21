@@ -17,3 +17,4 @@ script:
  - make install
  - test -f ../target/include/kmlib.h
  - test -f ../target/lib/libkm.so
+ - test -f ../target/lib/libkm_static.a
