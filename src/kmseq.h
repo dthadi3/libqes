@@ -28,41 +28,36 @@
 #include <kmbase.h>
 #include <kmfile.h>
 
+
 /*  CONSTANTS  */
-#define KMSEQ_STR_LEN (size_t)(1<<14)       /* 16384 */
-#define KMSEQ_SEQ_LEN (size_t)(1<<8)        /* 256 */
+typedef struct _kmqseq {
+    str_t *name;
+    str_t *seq;
+    str_t *qual;
+} qseq_t;
 
-#define	KMSEQ_QUAL
+typedef struct _kmseq {
+    str_t *name;
+    str_t *seq;
+} seq_t;
 
-typedef struct {
-    char *name;
-    char *seq;
-    char *qual;
-    size_t seqlen;
-#ifdef  KMSEQ_QUAL
-} kmseq;
-#else      /* -----  not KMSEQ_QUAL  ----- */
-} kmseq_q;
-#endif     /* -----  not KMSEQ_QUAL  ----- */
+typedef enum _seqfile_type {
+    FASTA,
+    FASTQ,
+} seqfile_type_t;
 
-
-typedef struct {
-    char *name;
-    char *seq;
-    size_t seqlen;
-#ifdef  KMSEQ_QUAL
-} kmseq_noq;
-#else      /* -----  not KMSEQ_QUAL  ----- */
-} kmseq;
-#endif     /* -----  not KMSEQ_QUAL  ----- */
-
+typedef struct _kmseqfile {
+    kmfile *file;
+    seqfile_type_t type;
+} seqfile_t;
 
 
 kmseq *create_kmseq();
+kmseqfile *create_kmseqfile();
 int fill_kmseq(kmseq *seqref, const char *name, const char *seq,
         const char *qual);
 void destroy_kmseq(kmseq *seq);
-kmseq *read_seq_file(kmfile *file);
+kmseq *read_seq_file(kmseqfile *file);
 void print_kmseq (kmseq const *seq, FILE *stream);
 
 
