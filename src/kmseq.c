@@ -21,7 +21,7 @@
 
 #define	__READ_LINES	4
 kmseq *
-read_seq_file                   (kmfile *file)
+read_seq_file (kmfile *file)
 {
     /* in case someone tries to get seq from uninitialised kmfile */
     if (!file) return NULL;
@@ -127,15 +127,14 @@ read_seq_file                   (kmfile *file)
 }
 
 kmseq *
-create_kmseq                      ()
+create_kmseq ()
 {
     kmseq *seq = calloc(1, sizeof(*seq));
     return seq;
 }
 
 void
-print_kmseq                    (kmseq const     *seq,
-                                FILE            *stream)
+print_kmseq (kmseq const *seq, FILE *stream)
 {
     fprintf(stream, "kmseq at %p\n", (void *)seq);
     fprintf(stream, "\t%s\n", seq->name);
@@ -146,10 +145,7 @@ print_kmseq                    (kmseq const     *seq,
 }
 
 int
-fill_kmseq                     (kmseq           *seqref,
-                                const char      *name,
-                                const char      *seq,
-                                const char      *qual)
+fill_kmseq (kmseq *seqref, const char *name, const char *seq, const char *qual)
 {
     if (name) {seqref->name = strdup(name);}
     if (seq) {seqref->seq = strdup(seq); seqref->seqlen = strlen(seq);}
@@ -169,7 +165,7 @@ fill_kmseq                     (kmseq           *seqref,
 }
 
 void
-destroy_kmseq                   (kmseq *seq)
+destroy_kmseq (kmseq *seq)
 {
     if (seq != NULL) {
         FREE(seq->name);
