@@ -13,7 +13,6 @@
  *       Compiler:  gcc
  *
  *         Author:  Kevin Murray, spam@kdmurray.id.au
- *                                [include word penguin in subject]
  *
  * ============================================================================
  */
