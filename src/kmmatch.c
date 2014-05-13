@@ -10,7 +10,7 @@
  *        Created:  11/08/13 21:34:38
  *       Revision:  none
  *        License:  GPLv3+
- *       Compiler:  gcc
+ *       Compiler:  gcc, clang
  *
  *         Author:  Kevin Murray, spam@kdmurray.id.au
  *                                [include word penguin in subject]
@@ -30,12 +30,9 @@
  */
 
 inline size_t
-hamming_max                    (const char     *seq1,
-                                const char     *seq2,
-                                size_t          max)
+hamming_max (const char *seq1, const char *seq2, size_t max)
 {
-    size_t      len = strlen(seq1);
-
+    size_t len = strlen(seq1);
     /* check seq lengths */
     if (len != strlen(seq2)) {
 #ifdef  KMLIB_DEBUG
@@ -64,7 +61,6 @@ hamming_max                    (const char     *seq1,
 }
 
 
-
 /*
  * ===  FUNCTION  =============================================================
  *         Name:    hamming
@@ -76,10 +72,9 @@ hamming_max                    (const char     *seq1,
  */
 
 inline size_t
-hamming            (const char     *seq1,
-                    const char     *seq2)
+hamming (const char *seq1, const char *seq2)
 {
-    size_t      len = strlen(seq1);
+    size_t len = strlen(seq1);
 
     /* check seq lengths */
     if (len != strlen(seq2)) {

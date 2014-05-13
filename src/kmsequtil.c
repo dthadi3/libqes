@@ -1,15 +1,15 @@
 /*
  * ============================================================================
  *
- *       Filename:  kmutil.c
+ *       Filename:  kmsequtil.c
  *
- *    Description:  Utility functions of kmlib
+ *    Description:  Sequence utility functions
  *
  *        Version:  1.0
  *        Created:  05/01/14 18:51:21
  *       Revision:  none
  *        License:  GPLv3+
- *       Compiler:  gcc
+ *       Compiler:  gcc, clang
  *
  *         Author:  Kevin Murray, spam@kdmurray.id.au
  *                                [include word penguin in subject]
@@ -17,8 +17,7 @@
  * ============================================================================
  */
 
-#include "kmutil.h"
-
+#include "kmsequtil.h"
 
 /*
  * ===  FUNCTION  =============================================================
@@ -28,10 +27,8 @@
  */
 
 inline char
-translate_codon                (char           *codon)
+translate_codon (char *codon)
 {
-    if (strlen(codon) != 3) return '\0';
-
     if (codon[0] == 'A') {
         if (codon[1] == 'A') {
             if (codon[2] == 'A') return 'K';
@@ -222,8 +219,7 @@ translate_codon                (char           *codon)
 
 
 inline char *
-revcomp                        (const char     *seq,
-                                size_t          len)
+revcomp (const char *seq, size_t len)
 {
 	int seqlen = strlen(seq);
     seqlen = seqlen < len ? seqlen : len - 1;
@@ -239,10 +235,10 @@ revcomp                        (const char     *seq,
 }
 
 inline void
-revcomp_inplace                (char           *seq,
-                                size_t          len)
+revcomp_inplace (char *seq, size_t len)
 {
 	int seqlen = strlen(seq);
+	int iii;
     seqlen = seqlen < len ? seqlen : len - 1;
 
 	if (seq[seqlen - 1] == '\n') {
@@ -250,8 +246,7 @@ revcomp_inplace                (char           *seq,
 		seqlen--;
 	}
 
-	int iii = 0;
-	for (iii; iii < seqlen; iii++) {
+	for (iii = 0; iii < seqlen; iii++) {
 		int endpos = seqlen - iii - 1;
         char endchar = seq[endpos];
 		if (seq[iii] == 'a' || seq[iii] == 'A') seq[endpos] = 'T';
