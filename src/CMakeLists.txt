@@ -1,5 +1,6 @@
+#file(GLOB KMLIB_SOURCES *.c)
+set(KMLIB_SOURCES kmutil.c kmmatch.c kmsequtil.c kmstr.c)
 
-file(GLOB KMLIB_SOURCES *.c)
 # Targets
 add_library(km SHARED ${KMLIB_SOURCES})
 add_library(km_static ${KMLIB_SOURCES})
