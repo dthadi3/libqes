@@ -34,7 +34,7 @@ get_test_filename (const char* file)
     else return NULL;
 }
 
-static char *km_test_err_msg;
+static const char *km_test_err_msg = NULL;
 
 static void
 test_err_handler(const char *msg,  const char *f, int l, ...)

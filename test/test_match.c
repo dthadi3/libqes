@@ -18,6 +18,8 @@
 
 #include "tests.h"
 
+#include <kmmatch.h>
+
 void
 test_hamming (void *p)
 {
