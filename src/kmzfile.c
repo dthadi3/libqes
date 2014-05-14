@@ -24,7 +24,6 @@ zfopen_ (const char *path, const char *mode, errhandler_t onerr, char *file,
 {
     /* create file struct */
     zfile_t *zf = km_calloc(1, sizeof(*zf), onerr);
-
     /* Open file, handling any errors */
     zf->fp = KM_ZOPEN(path, mode);
     if (zf->fp == NULL) {
@@ -54,11 +53,6 @@ zfclose (zfile_t *file)
     km_free(file);
 }
 
-/* Zero-copy `getline()`, with the added benefit of `realloc`-ing `buf` to
-    the next highest base-2 power, if we run out of space. If it is realloced,
-    (*size) is updated to the right size.
-    DON'T USE ON STACK BUFFERS.
-*/
 inline ssize_t
 zfreadline_realloc_ (zfile_t *file, char **buf, size_t *size,
               errhandler_t onerr, const char *src, const int line)
