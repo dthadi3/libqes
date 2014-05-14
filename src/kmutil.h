@@ -82,19 +82,25 @@
  * Error handling constants
  */
 
-#define KDM_ERR_ALLOC 1<<0
-#define KDM_ERR_FREE 1<<1
-
-#define KDM_ERR_FILE 1<<9
-
 
 /*
  * Error handling functions
  */
 
+/* use the stdlib exit function by default, during testing we can #define this
+   to some kind of error handler if we need to. */
 #ifndef  KM_EXIT_FN
-#define  KM_EXIT_FN exit /* use the stdlib exit function */
+#define  KM_EXIT_FN exit
 #endif
+
+
+/* By default, we use this error handler. At compile or include time, we can
+   chose another more appropriate one if we need to. */
+#ifndef  KM_DEFAULT_ERR_FN
+#define  KM_DEFAULT_ERR_FN errprintexit
+#endif
+
+
 /* Valid non-function to pass to libkdm functions */
 
 #define ERRFN_ARGS const char *msg,  const char *file, int line, ...
@@ -107,13 +113,35 @@ typedef void (*errhandler_t) (const char*, const char *, int, ...);
  */
 extern void *km_calloc_ (size_t n, size_t size, errhandler_t onerr,
         char *file, int line);
-#define km_calloc(n, sz, fn) km_calloc_(n, sz, fn, __FILE__, __LINE__)
+#define km_calloc(n, sz) \
+    km_calloc_(n, sz, KM_DEFAULT_ERR_FN, __FILE__, __LINE__)
+#define km_calloc_errnil(n, sz) \
+    km_calloc_(n, sz, errnil, __FILE__, __LINE__)
+#define km_calloc_errprint(n, sz) \
+    km_calloc_(n, sz, errprint, __FILE__, __LINE__)
+#define km_calloc_errprintexit(n, sz) \
+    km_calloc_(n, sz, errprintexit, __FILE__, __LINE__)
 extern void *km_malloc_ (size_t size, errhandler_t onerr, char *file,
         int line);
-#define km_malloc(sz, fn) km_malloc_(sz, fn, __FILE__, __LINE__)
+#define km_malloc(sz) \
+    km_malloc_(sz, KM_DEFAULT_ERR_FN, __FILE__, __LINE__)
+#define km_malloc_errnil(sz) \
+    km_malloc_(sz, errnil, __FILE__, __LINE__)
+#define km_malloc_errprint(sz) \
+    km_malloc_(sz, errprint, __FILE__, __LINE__)
+#define km_malloc_errprintexit(sz) \
+    km_malloc_(sz, errprintexit, __FILE__, __LINE__)
 extern void *km_realloc_ (void *data, size_t size, errhandler_t onerr,
         char *file, int line);
 #define km_realloc(ptr, sz, fn) km_realloc_(ptr, sz, fn, __FILE__, __LINE__)
+#define km_realloc(ptr, sz) \
+    km_realloc_(ptr, sz, KM_DEFAULT_ERR_FN, __FILE__, __LINE__)
+#define km_realloc_errnil(ptr, sz) \
+    km_realloc_(ptr, sz, errnil, __FILE__, __LINE__)
+#define km_realloc_errprint(ptr, sz) \
+    km_realloc_(ptr, sz, errprint, __FILE__, __LINE__)
+#define km_realloc_errprintexit(ptr, sz) \
+    km_realloc_(ptr, sz, errprintexit, __FILE__, __LINE__)
 #define km_free(data)               \
     STMT_BEGIN                      \
     if (data != NULL) {             \
