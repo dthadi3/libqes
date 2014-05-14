@@ -22,7 +22,7 @@ endif (FOUND_BZIP2)
 
 # CC options
 set(CMAKE_C_FLAGS "-std=gnu99 -Wall ${KMLIB_DEPENDS_CFLAGS}")
-set(CMAKE_C_FLAGS_DEBUG "-ggdb")
+set(CMAKE_C_FLAGS_DEBUG "-ggdb -Werror")
 set(CMAKE_C_FLAGS_RELEASE "-O3")
 
 include_directories(${CMAKE_SOURCE_DIR}/src ${CMAKE_SOURCE_DIR}/test ${CMAKE_SOURCE_DIR}/test/tinytest ${KMLIB_DEPENDS_INCLUDE_DIRS})
