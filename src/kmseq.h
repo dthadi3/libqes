@@ -29,36 +29,66 @@
 #include <kmfile.h>
 
 
-/*  CONSTANTS  */
+/*
+ *  Seq methods -- data structures to hold NGS sequences
+ */
+
+/********************************** Types ************************************/
+
+
 typedef struct _kmqseq {
     str_t *name;
+    str_t *comment;
     str_t *seq;
     str_t *qual;
-} qseq_t;
-
-typedef struct _kmseq {
-    str_t *name;
-    str_t *seq;
 } seq_t;
 
-typedef enum _seqfile_type {
-    FASTA,
-    FASTQ,
-} seqfile_type_t;
 
-typedef struct _kmseqfile {
-    kmfile *file;
-    seqfile_type_t type;
-} seqfile_t;
-
-
-kmseq *create_kmseq();
-kmseqfile *create_kmseqfile();
-int fill_kmseq(kmseq *seqref, const char *name, const char *seq,
+seq_t *create_seq();
+int fill_kmseq(kmseq *seqref, const char *header, const char *seq,
         const char *qual);
 void destroy_kmseq(kmseq *seq);
-kmseq *read_seq_file(kmseqfile *file);
-void print_kmseq (kmseq const *seq, FILE *stream);
 
+
+/*---------------------------------------------------------------------------
+  |  Seqfile methods -- seamless reading & writing of FASTA & FASTQ         |
+  ---------------------------------------------------------------------------*/
+
+typedef enum _seqfile_format {
+    FASTA = 1,
+    FASTQ = 2,
+    UNKNOWN = 0,
+} seqfile_format_t;
+
+typedef struct __seqfile_flags {
+    unsigned int format     :2;
+    unsigned int writing    :1;
+} seqfile_flags_t;
+
+typedef struct _kmseqfile {
+    zfile_t *zf;
+    seqfile_type_t type;
+    size_t n_records;
+    seqfile_flags_t flags;
+} seqfile_t;
+
+/* Function pointer that takes a seq_t and a pointer to arbitrary data and
+   returns a success/failure value */
+typedef int (*seqfile_iter_func_t)(const seq_t*, void *);
+
+/*
+ * Collection of options to a seqfile_iter function.
+ */
+typedef struct __seqfile_iter_flags {
+    int die_quickly         :1;
+    int                     :7; /* Fill to byte */
+    int num_threads         :8; /* Don't know of anything w/ > 255 threads */
+} seqfile_iter_flags;
+
+kmseqfile *create_seqfile(const char *path, const char *mode);
+int seqfile_iter_parallel(seqfile_t *file, seqfile_iter_func_t func,
+        void *data, seqfile_iter_flags flags);
+int seqfile_iter(seqfile_t *file, seqfile_iter_func_t func, void *data,
+        seqfile_iter_flags flags);
 
 #endif /* KMSEQ_H */

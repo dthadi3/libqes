@@ -20,36 +20,26 @@
 #include "kmseq.h"
 
 #define	__READ_LINES	4
-kmseq *
-read_seq_file (kmfile *file)
+seq_t *
+read_seq_file (seqfile_t *file)
 {
-    /* in case someone tries to get seq from uninitialised kmfile */
-    if (!file) return NULL;
-    /* in case someone tries getting seqs from a file at EOF  */
-    if (file->eof && file->bufferiter == file->bufferend) return NULL;
-    char **lines = NULL;
-    kmseq *seq = create_kmseq();
-    int line = 0;
+    seq_t *seq = NULL;
     int len_tmp = 0;
     size_t bytes_read = 0;
     size_t seqlen = 0;
     size_t alloced_lines = 0;
-    int n_lines = 4;
+    /* in case someone tries to get seq from uninitialised kmfile */
+    if (file == NULL) return NULL;
+    /* in case someone tries getting seqs from a file at EOF  */
+    if (file->zf->eof) return NULL;
 
-    if (file->mode == '@') {
+    if (file->flags->format == FASTQ) {
         /* Fastq files always have 4 lines. A simple for loop will do. */
-        lines = calloc(n_lines, sizeof(*lines));
-        for (line = 0; line < n_lines; line++) {
-            /* work out how long it is,, calloc it  */
-            len_tmp = hint_line_length_kmfile(file);
-            lines[line] = calloc(len_tmp + 1, sizeof(**lines));
-            /* Read into the file's buffer, copying to our new string */
-            bytes_read = readline_kmfile(file, &lines[line], len_tmp);
-            /* Overwrite \n with another \0 */
-            lines[line][bytes_read-1] = '\0';
-
-            /* Special case: on the 2nd line is the seq, so seqlen = strlen */
-            if (line == 1) { seqlen = bytes_read - 1; } /* -1: i.e. - the \n */
+        char *lines[4];
+        size_t line = 0;
+        for (line = 0; line < 4; line++) {
+            lines[line] = km_calloc(__INIT_LINE_LEN, sizeof(*buf));
+            zfreadline_realloc(
         }
     } else if (file->mode == '>') {
         /* Start with two lines, for shits and giggles. */
