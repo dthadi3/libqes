@@ -16,8 +16,7 @@
  * ============================================================================
  */
 #include "tests.h"
-#define KM_EXIT_FN (void)
-#include "kmutil.h"
+#include <kmutil.h>
 
 /* Constants */
 static const size_t bufsize = 1<<10;
@@ -34,17 +33,6 @@ get_test_filename (const char* file)
     else return NULL;
 }
 
-static const char *km_test_err_msg = NULL;
-
-static void
-test_err_handler(const char *msg,  const char *f, int l, ...)
-{
-    km_test_err_msg = msg;
-    (void) (f);
-    (void) (l);
-}
-
-
 /* Actual tests */
 void
 test_km_calloc(void *ptr)
@@ -52,14 +40,13 @@ test_km_calloc(void *ptr)
     void *res = NULL;
     bzero(zeros, bufsize);
     /* This should work, and the buffer should be zero throughout */
-    res = km_calloc(1, 1, &errnil);
+    res = km_calloc(1, 1);
     tt_ptr_op(res, !=, NULL);
     tt_int_op(memcmp(res, zeros, 1), ==, 0);
     free(res);
     /* This should fail */
-    res = km_calloc(SIZE_MAX, 1, &test_err_handler);
+    res = km_calloc(SIZE_MAX, 1);
     tt_ptr_op(res, ==, NULL);
-
 end:
     if (res != NULL) free(res);
     ;
@@ -70,12 +57,12 @@ test_km_malloc(void *ptr)
 {
     void *res = NULL;
 
-    res = km_malloc(1, &errnil);
+    res = km_malloc(1);
     tt_ptr_op(res, !=, NULL);
     free(res);
 
     /* This should fail */
-    res = km_malloc(SIZE_MAX, &test_err_handler);
+    res = km_malloc(SIZE_MAX);
     tt_ptr_op(res, ==, NULL);
 
 end:
@@ -90,12 +77,12 @@ test_km_realloc(void *ptr)
     const char *str = "test";
     char *dat = strdup(str);
     /* Test resizing buffer */
-    res = km_realloc(dat, 10, &errnil);
+    res = km_realloc(dat, 10);
     tt_ptr_op(res, !=, NULL);
     tt_int_op(memcmp(res, str, 5), ==, 0);
     free(res);
     /* This should fail */
-    res = km_realloc(dat, SIZE_MAX, &test_err_handler);
+    res = km_realloc(dat, SIZE_MAX);
     tt_ptr_op(res, ==, NULL);
 end:
     if (res != NULL) free(res);
