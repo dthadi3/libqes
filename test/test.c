@@ -21,21 +21,43 @@
 
 char *data_prefix;
 char *out_prefix;
+char *text_file;
+char *gz_text_file;
 char *fasta_file;
 char *fastq_file;
 char *gzfastq_file;
 char *bzfastq_file;
+const size_t n_loremipsum_lines = 11;
+const size_t loremipsum_line_lens[] = {
+    80, 76, 80, 75, 80, 79, 77, 75, 69, 1, 20
+};
+const char *loremipsum_lines[] = {
+    "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec ornare tortor et\n",
+    "rhoncus iaculis. Sed suscipit, arcu nec elementum vestibulum, tortor tortor\n",
+    "dictum dui, eu sodales magna orci eu libero. Cras commodo, ligula tempor auctor\n",
+    "vulputate, eros urna gravida eros, eget congue leo quam quis mi. Curabitur\n",
+    "luctus augue nibh, eget vehicula augue commodo eget. Donec condimentum molestie\n",
+    "adipiscing. In non purus lacus. Nam nec mollis mauris. Donec rhoncus, diam sit\n",
+    "amet rhoncus viverra, lectus risus tincidunt ipsum, in dignissim justo purus\n",
+    "eget enim. Fusce congue nulla egestas est auctor faucibus. Integer feugiat\n",
+    "molestie leo, a interdum neque pretium nec. Etiam sit amet nibh leo.\n",
+    "\n",
+    "End of lorem ipsum.\n",
+};
 
 struct testgroup_t kmlib_tests[] = {
     {"util/", util_tests},
     {"match/", match_tests},
+    {"zfile/", zfile_tests},
     END_OF_GROUPS
 };
 
-void
-__setup_test_env ()
+static int
+setup_test_env ()
 {
-    char buf[1<<12];
+    size_t buflen = 1<<12;
+    int len = 0;
+    char buf[buflen];
     char *tmp = NULL;
     tmp = getenv("KMLIB_TEST_DATA_DIR");
     if (tmp == NULL) {
@@ -43,33 +65,49 @@ __setup_test_env ()
     } else {
         data_prefix = strdup(tmp);
     }
+    /* find plaintext file */
+    len = snprintf(buf, buflen, "%s/data/loremipsum.txt", data_prefix);
+    text_file = strdup(buf);
+    buf[len] = '\0';
+    /* Check we can access the file. If not, we won't be able to access the
+       rest, and vice versa, so we don't bother checking below. */
+    if (access(text_file, F_OK) != 0) {
+        return 0;
+    }
+    /* find gziped text file */
+    len = snprintf(buf, buflen, "%s/data/loremipsum.txt.gz", data_prefix);
+    gz_text_file = strdup(buf);
+    buf[len] = '\0';
 
-    sprintf(buf, "%s/data/test.fastq", data_prefix);
+    len = snprintf(buf, buflen,  "%s/data/test.fastq", data_prefix);
     fastq_file = strdup(buf);
-    bzero(buf, 1<<12);
+    buf[len] = '\0';
 
-    sprintf(buf, "%s/data/test.fastq.gz", data_prefix);
+    len = snprintf(buf, buflen, "%s/data/test.fastq.gz", data_prefix);
     gzfastq_file = strdup(buf);
-    bzero(buf, 1<<12);
+    buf[len] = '\0';
 
-    sprintf(buf, "%s/data/test.fastq.bz2", data_prefix);
+    len = snprintf(buf, buflen, "%s/data/test.fastq.bz2", data_prefix);
     bzfastq_file = strdup(buf);
-    bzero(buf, 1<<12);
+    buf[len] = '\0';
 
-    sprintf(buf, "%s/data/test.fasta", data_prefix);
+    len = snprintf(buf, buflen, "%s/data/test.fasta", data_prefix);
     fasta_file = strdup(buf);
-    bzero(buf, 1<<12);
+    buf[len] = '\0';
 
-    sprintf(buf, "%s/data/out", data_prefix);
+    len = snprintf(buf, buflen, "%s/data/out", data_prefix);
     out_prefix = strdup(buf);
-    bzero(buf, 1<<12);
+    buf[len] = '\0';
+    return 1;
 }
 
-void
-__destroy_test_env ()
+static void
+destroy_test_env ()
 {
     if(data_prefix != NULL) {free(data_prefix);}
     if(out_prefix != NULL) {free(out_prefix);}
+    if(text_file != NULL) {free(text_file);}
+    if(gz_text_file != NULL) {free(gz_text_file);}
     if(fasta_file != NULL) {free(fasta_file);}
     if(fastq_file != NULL) {free(fastq_file);}
     if(gzfastq_file != NULL) {free(gzfastq_file);}
@@ -86,8 +124,13 @@ int
 main (int argc, const char *argv[])
 {
     int res;
-    __setup_test_env ();
+    if (!setup_test_env()) {
+        fprintf(stderr, "Could not access data prefix dir '%s' or dir doesn't contain expected files\n", data_prefix);
+        fprintf(stderr, "Please set the KMLIB_TEST_DATA_DIR environmental variable appropriately\n");
+        free(data_prefix);
+        exit(EXIT_FAILURE);
+    }
     res = tinytest_main(argc, argv, kmlib_tests);
-    __destroy_test_env ();
+    destroy_test_env();
     return res;
 }
