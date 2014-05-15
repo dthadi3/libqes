@@ -85,7 +85,8 @@ errprintexit (ERRFN_ARGS)
  * Memory allocation/deallocation
  */
 inline void *
-km_calloc_ (size_t n, size_t size, errhandler_t onerr, char *file, int line)
+km_calloc_ (size_t n, size_t size, errhandler_t onerr, const char *file,
+        int line)
 {
     void *ret = calloc(n, size);
     if (ret == NULL) {
@@ -97,7 +98,7 @@ km_calloc_ (size_t n, size_t size, errhandler_t onerr, char *file, int line)
 }
 
 inline void *
-km_malloc_ (size_t size, errhandler_t onerr, char *file, int line)
+km_malloc_ (size_t size, errhandler_t onerr, const char *file, int line)
 {
     void *ret = malloc(size);
     if (ret == NULL) {
@@ -109,7 +110,8 @@ km_malloc_ (size_t size, errhandler_t onerr, char *file, int line)
 }
 
 inline void *
-km_realloc_ (void *data, size_t size, errhandler_t onerr, char *file, int line)
+km_realloc_ (void *data, size_t size, errhandler_t onerr, const char *file,
+        int line)
 {
     void *ret = realloc(data, size);
     if (ret == NULL) {

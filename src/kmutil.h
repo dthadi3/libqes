@@ -20,13 +20,14 @@
 #define KMUTIL_H
 
 /* #####   HEADER FILE INCLUDES   ########################################## */
-#include <stdlib.h>
+#include <errno.h>
 #include <stdarg.h>
-#include <stdio.h>
-#include <string.h>
-#include <strings.h>
 #include <stddef.h>
 #include <stdint.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <strings.h>
 
 
 /*
@@ -44,7 +45,9 @@
 /*
  * Misc constants
  */
-#define KM_MAX_FN_LEN = 1<<16
+#define KM_MAX_FN_LEN 1<<16
+
+#define	KM_FILEBUFFER_LEN 1<<20 /* Size of buffers for file IO */
 #define	__INIT_LINE_LEN 128 /* Starting point for allocing a str_t */
 /*
  * Macro helpers from tor
@@ -78,10 +81,6 @@
 #define km_unlikely(x)    __builtin_expect(!!(x), 0)
 
 
-/*
- * Error handling constants
- */
-
 
 /*
  * Error handling functions
@@ -112,7 +111,7 @@ typedef void (*errhandler_t) (const char*, const char *, int, ...);
  * Memory allocation/deallocation
  */
 extern void *km_calloc_ (size_t n, size_t size, errhandler_t onerr,
-        char *file, int line);
+        const char *file, int line);
 #define km_calloc(n, sz) \
     km_calloc_(n, sz, KM_DEFAULT_ERR_FN, __FILE__, __LINE__)
 #define km_calloc_errnil(n, sz) \
@@ -121,7 +120,7 @@ extern void *km_calloc_ (size_t n, size_t size, errhandler_t onerr,
     km_calloc_(n, sz, errprint, __FILE__, __LINE__)
 #define km_calloc_errprintexit(n, sz) \
     km_calloc_(n, sz, errprintexit, __FILE__, __LINE__)
-extern void *km_malloc_ (size_t size, errhandler_t onerr, char *file,
+extern void *km_malloc_ (size_t size, errhandler_t onerr, const char *file,
         int line);
 #define km_malloc(sz) \
     km_malloc_(sz, KM_DEFAULT_ERR_FN, __FILE__, __LINE__)
@@ -132,8 +131,7 @@ extern void *km_malloc_ (size_t size, errhandler_t onerr, char *file,
 #define km_malloc_errprintexit(sz) \
     km_malloc_(sz, errprintexit, __FILE__, __LINE__)
 extern void *km_realloc_ (void *data, size_t size, errhandler_t onerr,
-        char *file, int line);
-#define km_realloc(ptr, sz, fn) km_realloc_(ptr, sz, fn, __FILE__, __LINE__)
+        const char *file, int line);
 #define km_realloc(ptr, sz) \
     km_realloc_(ptr, sz, KM_DEFAULT_ERR_FN, __FILE__, __LINE__)
 #define km_realloc_errnil(ptr, sz) \
@@ -198,6 +196,7 @@ extern void *km_realloc_ (void *data, size_t size, errhandler_t onerr,
         )
 extern size_t kmroundupz(size_t sz);
 
+/* IO helpers */
 
 #define	KM_ZTYPE_GZIP			/*  we default to zlib.h */
 
@@ -237,5 +236,12 @@ extern size_t kmroundupz(size_t sz);
 #   define	KM_ZOPEN fopen
 #   define	KM_ZCLOSE fclose
 #endif
+
+typedef enum __rwmode {
+    RW_UNKNOWN,
+    RW_READ,
+    RW_WRITE,
+    RW_READWRITE,
+} rwmode_t;
 
 #endif /* KMUTIL_H */
