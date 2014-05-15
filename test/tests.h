@@ -35,6 +35,9 @@
 #include "tinytest_macros.h"
 #include "testdata.h"
 
+#define	KM_DEFAULT_ERR_FN errnil
+#define KM_EXIT_FN (void)
+
 /* List of tests format is:
    { name, fn, flags, testcase_setup_t *ptr, void * for testcase_setup_t }
  */
