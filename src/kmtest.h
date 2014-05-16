@@ -9,7 +9,7 @@
  *        Created:  10/11/13 21:41:32
  *       Revision:  none
  *        License:  GPLv3+
- *       Compiler:  gcc
+ *       Compiler:  gcc, clang
  *
  *         Author:  Kevin Murray, spam@kdmurray.id.au
  *
