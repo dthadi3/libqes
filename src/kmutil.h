@@ -215,26 +215,34 @@ extern size_t kmroundupz(size_t sz);
 #   define	KM_ZFPUTC gzputc
 #   define	KM_ZFGETS gzgets
 #   define	KM_ZFGETC gzgetc
+#   define	KM_ZFUNGETC gzungetc
 #   define	KM_ZERR gzerror
 #   define	KM_ZEOF gzeof
 #   define	KM_ZBUFFER gzbuffer
 #   define	KM_ZSEEK gzseek
 #   define	KM_ZTELL gztell
 #   define	KM_ZREWIND gzrewind
-#elif defined(KM_ZTYPE_BZIP)
-#   include <bzlib.h>
-#   define	KM_ZTYPE BZFILE*
-#   define	KM_ZREAD bzread
-#   define	KM_ZWRITE bzwrite
-#   define	KM_ZERR bzerror
-#   define	KM_ZOPEN bzopen
-#   define	KM_ZCLOSE bzclose
 #elif defined(KM_ZTYPE_NONE)
 #   define	KM_ZTYPE FILE*
-#   define	KM_ZREAD fread
-#   define	KM_ZERR ferror
 #   define	KM_ZOPEN fopen
 #   define	KM_ZCLOSE fclose
+#   define	KM_ZDOPEN fdopen
+#   define	KM_ZCLOSE fclose
+#   define	KM_ZREAD fread
+#   define	KM_ZWRITE fwrite
+#   define	KM_ZFLUSH fflush
+#   define	KM_ZFPRINTF fprintf
+#   define	KM_ZFPUTS fputs
+#   define	KM_ZFPUTC fputc
+#   define	KM_ZFGETS fgets
+#   define	KM_ZFGETC fgetc
+#   define	KM_ZFUNGETC fungetc
+#   define	KM_ZERR ferror
+#   define	KM_ZEOF feof
+#   define	KM_ZBUFFER fbuffer
+#   define	KM_ZSEEK fseek
+#   define	KM_ZTELL ftell
+#   define	KM_ZREWIND frewind
 #endif
 
 typedef enum __rwmode {
