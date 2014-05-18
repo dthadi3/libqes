@@ -37,6 +37,7 @@
 #include "tinytest.h"
 #include "tinytest_macros.h"
 #include "testdata.h"
+#include <kmutil.h>
 
 #define	KM_DEFAULT_ERR_FN errnil
 #define KM_EXIT_FN (void)
