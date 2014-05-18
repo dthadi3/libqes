@@ -30,14 +30,13 @@
 
 #define	__FASTQ_READ_LINES__ 4
 typedef enum _seqfile_format {
-    FASTA = 1,
-    FASTQ = 2,
-    SF_UNKNOWN = 0,
+    UNKNOWN_FMT = 0,
+    FASTA_FMT = 1,
+    FASTQ_FMT = 2,
 } seqfile_format_t;
 
 typedef struct __seqfile_flags {
     unsigned int format     :2;
-    unsigned int writing    :1;
 } seqfile_flags_t;
 
 typedef struct _kmseqfile {
@@ -60,9 +59,17 @@ typedef struct __seqfile_iter_flags {
 } seqfile_iter_flags;
 
 seqfile_t *create_seqfile (const char *path, const char *mode);
+extern int seqfile_ok(const seqfile_t *file);
+int seqfile_guess_format(seqfile_t *file);
 int seqfile_iter_parallel (seqfile_t *file, seqfile_iter_func_t func,
         void *data, seqfile_iter_flags flags);
 int seqfile_iter (seqfile_t *file, seqfile_iter_func_t func, void *data,
         seqfile_iter_flags flags);
 seq_t *read_seq_file (seqfile_t *file);
 void print_seq_seqfile (seqfile_t * file, const seq_t *seq);
+void destroy_seqfile_(seqfile_t *seqfile);
+
+#define destroy_seqfile(seqfile) do {       \
+            destroy_seqfile_(seqfile);      \
+            seqfile = NULL;             \
+        } while(0)

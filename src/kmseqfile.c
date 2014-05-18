@@ -24,7 +24,7 @@ read_seqfile (seqfile_t *file, seq_t *seq)
     if (!zfile_ok(file->zf)) return -2;
     if (file->zf->eof) return -1;
 
-    if (file->flags.format == FASTQ) {
+    if (file->flags.format == FASTQ_FMT) {
         size_t size = __INIT_LINE_LEN;
         char *header = km_calloc(size, sizeof(*header));
         size_t len = 0;
@@ -64,7 +64,7 @@ read_seqfile (seqfile_t *file, seq_t *seq)
             return -2; /* Error out on different len qual/seq entries */
         }
         return len; /* return seq/qual len */
-    } else if (file->flags.format == FASTA) {
+    } else if (file->flags.format == FASTA_FMT) {
         size_t size = __INIT_LINE_LEN;
         char *buf = km_calloc(size, sizeof(*buf));
         size_t len = 0;
@@ -95,4 +95,52 @@ read_seqfile (seqfile_t *file, seq_t *seq)
         return len;
     }
     return -2; /* If we reach here, bail out with an error */
+}
+
+seqfile_t *
+create_seqfile (const char *path, const char *mode)
+{
+    seqfile_t *sf = NULL;
+    if (km_unlikely(path == NULL || mode == NULL)) return NULL;
+    sf = km_calloc(1, sizeof(*sf));
+    sf->zf = zfopen(path, mode);
+    sf->n_records = 0llu;
+    if (km_unlikely(sf->zf == NULL)) return NULL;
+    seqfile_guess_format(sf);
+    return sf;
+}
+int
+seqfile_guess_format (seqfile_t *file)
+{
+    int first_char = '\0';
+    if (km_unlikely(!seqfile_ok(file))) return UNKNOWN_FMT;
+    if (km_unlikely(file->zf->filepos != 0)) return UNKNOWN_FMT;
+    first_char = zfpeek(file->zf);
+    switch (first_char) {
+        case FASTQ_DELIM:
+            file->flags.format = FASTQ_FMT;
+            return FASTQ_FMT;
+            break;
+        case FASTA_DELIM:
+            file->flags.format = FASTA_FMT;
+            return FASTA_FMT;
+            break;
+        default:
+            file->flags.format = UNKNOWN_FMT;
+            return UNKNOWN_FMT;
+    }
+}
+
+inline int
+seqfile_ok(const seqfile_t *file)
+{
+    return (file != NULL && zfile_ok(file->zf));
+}
+
+void
+destroy_seqfile_(seqfile_t *seqfile)
+{
+    if (seqfile != NULL) {
+        zfclose(seqfile->zf);
+    }
 }
