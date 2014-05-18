@@ -9,7 +9,7 @@
  *        Created:  31/07/13 12:51:02
  *       Revision:  none
  *        License:  GPLv3+
- *       Compiler:  gcc
+ *       Compiler:  gcc, clang
  *
  *         Author:  Kevin Murray, spam@kdmurray.id.au
  *
@@ -19,16 +19,8 @@
 #ifndef KMSEQ_H
 #define KMSEQ_H
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <string.h>
-#include <errno.h>
-#include <zlib.h>
-
-#include <kmbase.h>
-#include <kmfile.h>
-
-
+#include <kmutil.h>
+#include <kmstr.h>
 /*
  *  Seq methods -- data structures to hold NGS sequences
  */

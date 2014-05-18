@@ -9,7 +9,7 @@
  *        Created:  02/12/13 17:21:50
  *       Revision:  none
  *        License:  GPLv3+
- *       Compiler:  gcc
+ *       Compiler:  gcc, clang
  *
  *         Author:  Kevin Murray, spam@kdmurray.id.au
  *
@@ -24,7 +24,8 @@
 #include <errno.h>
 #include <zlib.h>
 
-#include <kmbase.h>
+#include <kmutil.h>
+#include <kmstr.h>
 
 /*  CONSTANTS  */
 #define KMFILE_BUFFER_LEN (size_t)(1<<20)   /* 1Mb */
