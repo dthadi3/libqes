@@ -20,6 +20,7 @@
 #define TESTDATA_H
 
 extern const size_t n_loremipsum_lines;
+extern const size_t loremipsum_fsize;
 extern const size_t loremipsum_line_lens[];
 extern const char *loremipsum_lines[];
 extern char *data_prefix;

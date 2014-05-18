@@ -19,6 +19,7 @@
 #include "tests.h"
 
 
+
 char *data_prefix;
 char *out_prefix;
 char *text_file;
@@ -27,7 +28,9 @@ char *fasta_file;
 char *fastq_file;
 char *gzfastq_file;
 char *bzfastq_file;
+char *writable_file;
 const size_t n_loremipsum_lines = 11;
+const size_t loremipsum_fsize = 80+76+80+75+80+79+77+75+69+1+20;
 const size_t loremipsum_line_lens[] = {
     80, 76, 80, 75, 80, 79, 77, 75, 69, 1, 20
 };
@@ -49,6 +52,7 @@ struct testgroup_t kmlib_tests[] = {
     {"util/", util_tests},
     {"match/", match_tests},
     {"zfile/", zfile_tests},
+    {"seqfile/", seqfile_tests},
     END_OF_GROUPS
 };
 
@@ -57,6 +61,7 @@ setup_test_env ()
 {
     size_t buflen = 1<<12;
     int len = 0;
+    int res = 0;
     char buf[buflen];
     char *tmp = NULL;
     tmp = getenv("KMLIB_TEST_DATA_DIR");
@@ -78,25 +83,35 @@ setup_test_env ()
     len = snprintf(buf, buflen, "%s/data/loremipsum.txt.gz", data_prefix);
     gz_text_file = strdup(buf);
     buf[len] = '\0';
-
+    /* find unzipped FASTQ */
     len = snprintf(buf, buflen,  "%s/data/test.fastq", data_prefix);
     fastq_file = strdup(buf);
     buf[len] = '\0';
-
+    /* find gzipped FASTQ */
     len = snprintf(buf, buflen, "%s/data/test.fastq.gz", data_prefix);
     gzfastq_file = strdup(buf);
     buf[len] = '\0';
-
+    /* find bzipped FASTQ */
     len = snprintf(buf, buflen, "%s/data/test.fastq.bz2", data_prefix);
     bzfastq_file = strdup(buf);
     buf[len] = '\0';
-
+    /* find unzipped FASTA */
     len = snprintf(buf, buflen, "%s/data/test.fasta", data_prefix);
     fasta_file = strdup(buf);
     buf[len] = '\0';
-
+    /* Find and if we need to make the data output dir */
     len = snprintf(buf, buflen, "%s/data/out", data_prefix);
     out_prefix = strdup(buf);
+    if (access(out_prefix, W_OK | X_OK) != 0) {
+        res = mkdir(out_prefix, S_IRUSR | S_IWUSR | S_IXUSR);
+        if (!res || access(out_prefix, W_OK | X_OK) != 0) {
+            if (errno) {
+                fprintf(stderr, "Error making output dir '%s'\n", out_prefix);
+                fprintf(stderr, "%s\n", strerror(errno));
+            }
+            return 0;
+        }
+    }
     buf[len] = '\0';
     return 1;
 }
