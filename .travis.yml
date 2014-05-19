@@ -12,6 +12,7 @@ install:
  - ./configure
  - make
  - sudo make install
+ - cd ../..
  - git submodule update --init
  - mkdir build
  - mkdir target
