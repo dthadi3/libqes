@@ -64,11 +64,13 @@ setup_test_env ()
     int res = 0;
     char buf[buflen];
     char *tmp = NULL;
-    tmp = getenv("KMLIB_TEST_DATA_DIR");
-    if (tmp == NULL) {
-        data_prefix = strdup(".");
-    } else {
-        data_prefix = strdup(tmp);
+    if (data_prefix == NULL) {
+        tmp = getenv("KMLIB_TEST_DATA_DIR");
+        if (tmp == NULL) {
+            data_prefix = strdup(".");
+        } else {
+            data_prefix = strdup(tmp);
+        }
     }
     /* find plaintext file */
     len = snprintf(buf, buflen, "%s/data/loremipsum.txt", data_prefix);
@@ -139,13 +141,17 @@ int
 main (int argc, const char *argv[])
 {
     int res;
+    if (argc>1) {
+       data_prefix = strdup(argv[1]);
+    }
+
     if (!setup_test_env()) {
         fprintf(stderr, "Could not access data prefix dir '%s' or dir doesn't contain expected files\n", data_prefix);
         fprintf(stderr, "Please set the KMLIB_TEST_DATA_DIR environmental variable appropriately\n");
         free(data_prefix);
         exit(EXIT_FAILURE);
     }
-    res = tinytest_main(argc, argv, kmlib_tests);
+    res = tinytest_main(argc-1, argv+1, kmlib_tests);
     destroy_test_env();
     return res;
 }
