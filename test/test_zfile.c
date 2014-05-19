@@ -138,8 +138,8 @@ test_zfgetuntil (void *ptr)
     off_t our_filepos = 0;
     int iii;
     const size_t n_delims = 5;
-    const int delims[n_delims] = {' ', ',', '.', '\n', '\n'};
-    const char *delim_words[n_delims] = {
+    const int delims[] = {' ', ',', '.', '\n', '\n'};
+    const char *delim_words[] = {
         "Lorem ",
         "ipsum dolor sit amet,",
         " consectetur adipiscing elit.",
