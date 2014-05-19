@@ -17,7 +17,6 @@
  */
 #include <stdlib.h>
 
-#include "tests.h"
 #include "kseq.h"
 
 #include <kmzfile.h>
