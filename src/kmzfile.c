@@ -79,38 +79,60 @@ zfclose_ (zfile_t *file)
 
 inline ssize_t
 zfreadline_realloc_ (zfile_t *file, char **buf, size_t *size,
-              errhandler_t onerr, const char *src, const int line)
+        errhandler_t onerr, const char *src, const int line)
 {
-    size_t len = 0;
-    if (buf == NULL || file == NULL || size == NULL) {
-        return -2; /* EOF is normally == -1, so use -2 to differentiate them */
-    }
-    if (*buf == NULL) {
-        *buf = km_malloc_(__INIT_LINE_LEN * sizeof(*buf), onerr, src, line);
-        *size = __INIT_LINE_LEN;
-    }
-    while(((*buf)[len] = KM_ZFGETC(file->fp)) != EOF && (*buf)[len++] != '\n') {
-        while (len + 1 >= (*size) - 1) {
-            *size = kmroundupz((*size) + 1);
-            char *newbuf = km_realloc_(*buf, sizeof(**buf) * (*size), onerr,
-                    src, line);
-            if (newbuf == NULL) { /* In case we only print the error */
-                return -2;
-            } else {
-                (*buf) = newbuf;
-            }
-        }
-    }
-    (*buf)[len] = '\0';
-    file->filepos += len;
-    if (KM_ZEOF(file->fp)) {
-        file->eof = 1;
-        return EOF;
-    } else {
-        return len;
-    }
+    return zfgetuntil_realloc_(file, '\n', buf, size, onerr, src, line);
 }
 
+inline ssize_t
+zfgetuntil_realloc_ (zfile_t *file, int delim, char **bufref, size_t *sizeref,
+        errhandler_t onerr, const char *src, const int line)
+{
+    size_t len = 0;
+    int next = 0;
+    char *buf = NULL;
+    size_t size = 0;
+    if (bufref == NULL || file == NULL || sizeref == NULL) {
+        return -2; /* eof is normally == -1, so use -2 to differentiate them */
+    }
+    if (file->eof) return EOF;
+    buf = *bufref;
+    size = *sizeref;
+    /* Alloc the buffer if it's NULL */
+    if (buf == NULL) {
+        buf = km_malloc_(__INIT_LINE_LEN * sizeof(*buf), onerr, src, line);
+        size = __INIT_LINE_LEN;
+    }
+    while((next = KM_ZFGETC(file->fp)) != EOF) {
+        /* Make sure we have space for both ``next``, the char we just read,
+         * and a terminating '\0' (hence len + 2) */
+        while (len + 2 >= size) {
+            size = kmroundupz((size) + 1);
+            buf = km_realloc_(buf, sizeof(*buf) * size, onerr, src, line);
+            if (buf == NULL) {
+                /* We bail out here, and *bufref is untouched. This means we
+                 * can check for errors, and free *bufref from the calling
+                 * function */
+                return -2;
+            }
+        }
+        buf[len++] = next;
+        if (next == delim) break;
+    }
+    buf[len] = '\0';
+    file->filepos += len;
+    *bufref = buf;
+    *sizeref = size;
+    if (len) {
+        if (KM_ZEOF(file->fp)) {
+            file->eof = 1;
+        }
+        return len;
+    } else {
+        file->eof = 1;
+        return EOF;
+    }
+}
 inline ssize_t
 zfgetuntil (zfile_t *file, const int delim, char *dest, size_t maxlen)
 {
