@@ -21,66 +21,40 @@
 
 #include <kmutil.h>
 #include <kmstr.h>
-/*
- *  Seq methods -- data structures to hold NGS sequences
- */
-
-/********************************** Types ************************************/
-
-
-typedef struct _kmqseq {
-    str_t *name;
-    str_t *comment;
-    str_t *seq;
-    str_t *qual;
-} seq_t;
-
-
-seq_t *create_seq();
-int fill_kmseq(kmseq *seqref, const char *header, const char *seq,
-        const char *qual);
-void destroy_kmseq(kmseq *seq);
 
 
 /*---------------------------------------------------------------------------
-  |  Seqfile methods -- seamless reading & writing of FASTA & FASTQ         |
+  | kmseq module -- data structures to hold NGS sequences                   |
   ---------------------------------------------------------------------------*/
 
-typedef enum _seqfile_format {
-    FASTA = 1,
-    FASTQ = 2,
-    UNKNOWN = 0,
-} seqfile_format_t;
+/* TYPE DEFINITIONS */
+typedef struct _seq {
+    str_t name;
+    str_t comment;
+    str_t seq;
+    str_t qual;
+} seq_t;
 
-typedef struct __seqfile_flags {
-    unsigned int format     :2;
-    unsigned int writing    :1;
-} seqfile_flags_t;
+/* PROTOTYPES */
+seq_t *create_seq ();
+seq_t *create_seq_no_qual ();
 
-typedef struct _kmseqfile {
-    zfile_t *zf;
-    seqfile_type_t type;
-    size_t n_records;
-    seqfile_flags_t flags;
-} seqfile_t;
+extern int seq_ok(const seq_t *seq);
+extern int seq_ok_no_qual(const seq_t *seq);
+extern int seq_ok_no_comment(const seq_t *seq);
+extern int seq_ok_no_comment_or_qual(const seq_t *seq);
+extern int seq_fill_header(seq_t *seqobj, const char *header, size_t len);
+extern int seq_fill_seq(seq_t *seqobj, const char *seq, size_t len);
+extern int seq_fill_qual(seq_t *seqobj, const char *qual);
+extern int seq_fill_name(seq_t *seqt, const char *name, size_t len);
+extern int seq_fill_comment(seq_t *seqt, const char *comment, size_t len);
+void destroy_seq_(seq_t *seq);
+#define destroy_seq(seq) do {       \
+            destroy_seq_(seq);      \
+            seq = NULL;             \
+        } while(0)
 
-/* Function pointer that takes a seq_t and a pointer to arbitrary data and
-   returns a success/failure value */
-typedef int (*seqfile_iter_func_t)(const seq_t*, void *);
 
-/*
- * Collection of options to a seqfile_iter function.
- */
-typedef struct __seqfile_iter_flags {
-    int die_quickly         :1;
-    int                     :7; /* Fill to byte */
-    int num_threads         :8; /* Don't know of anything w/ > 255 threads */
-} seqfile_iter_flags;
 
-kmseqfile *create_seqfile(const char *path, const char *mode);
-int seqfile_iter_parallel(seqfile_t *file, seqfile_iter_func_t func,
-        void *data, seqfile_iter_flags flags);
-int seqfile_iter(seqfile_t *file, seqfile_iter_func_t func, void *data,
-        seqfile_iter_flags flags);
 
 #endif /* KMSEQ_H */
