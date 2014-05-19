@@ -63,6 +63,8 @@ void zfclose_ (zfile_t *file);
     most `maxlen` charachters into `*buf` INCLUDING the terminating '\0'.
  */
 extern ssize_t zfreadline (zfile_t *file, char *dest, size_t maxlen);
+extern ssize_t zfgetuntil (zfile_t *file, const int delim, char *dest,
+        size_t maxlen);
 extern ssize_t zfreadline_str (zfile_t *file, str_t *str);
 
 /* ===  FUNCTION  =============================================================

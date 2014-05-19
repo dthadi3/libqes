@@ -116,9 +116,10 @@ void test_zfopen(void *);
 void test_zfclose(void *);
 void test_zfreadline(void *);
 void test_zfreadline_realloc(void *);
-void test_zfile_guess_mode (void *ptr);
-void test_zfpeek (void *ptr);
-void test_zfrewind (void *ptr);
+void test_zfile_guess_mode (void *);
+void test_zfpeek (void *);
+void test_zfrewind (void *);
+void test_zfgetuntil (void *);
 static struct testcase_t zfile_tests[] = {
     { "zfopen", test_zfopen,},
     { "zfpeek", test_zfpeek,},
@@ -127,6 +128,7 @@ static struct testcase_t zfile_tests[] = {
     { "zfile_guess_mode", test_zfile_guess_mode, },
     { "zfclose", test_zfclose,},
     { "zfrewind", test_zfrewind,},
+    { "zfgetuntil", test_zfgetuntil,},
     END_OF_TESTCASES
 };
 

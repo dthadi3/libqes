@@ -112,27 +112,38 @@ zfreadline_realloc_ (zfile_t *file, char **buf, size_t *size,
 }
 
 inline ssize_t
-zfreadline (zfile_t *file, char *dest, size_t maxlen)
+zfgetuntil (zfile_t *file, const int delim, char *dest, size_t maxlen)
 {
     size_t len = 0;
     int next = 0;
-    if (dest == NULL || file == NULL || maxlen < 1) {
+    if (dest == NULL || file == NULL || maxlen < 1 || delim > 255) {
         /* EOF is normally == -1, so use -2 to differentiate them */
         return -2;
     }
-
+    /* Get out early if we're at EOF already */
+    if (file->eof) return EOF;
+    /* maxlen - 1 because we always leave space for \0 */
     while ( (next = KM_ZFGETC(file->fp)) != EOF && len < maxlen - 1) {
         dest[len++] = next;
-        if (next == '\n') break;
+        if (next == delim) break;
     }
     dest[len] = '\0';
     file->filepos += len;
-    if (KM_ZEOF(file->fp)) {
+    if (len) {
+        if (KM_ZEOF(file->fp)) {
+            file->eof = 1;
+        }
+        return len;
+    } else {
         file->eof = 1;
         return EOF;
-    } else {
-        return len;
     }
+}
+
+inline ssize_t
+zfreadline (zfile_t *file, char *dest, size_t maxlen)
+{
+    return zfgetuntil(file, '\n', dest, maxlen);
 }
 
 inline ssize_t

@@ -127,6 +127,70 @@ end:
 }
 
 void
+test_zfgetuntil (void *ptr)
+{
+    zfile_t *file = NULL;
+    const size_t bufsize = 1<<10;
+    char buffer[bufsize];
+    ssize_t res_len = 0;
+    size_t expt_len = 0;
+    off_t orig_filepos = 0;
+    off_t our_filepos = 0;
+    int iii;
+    const size_t n_delims = 5;
+    const int delims[n_delims] = {' ', ',', '.', '\n', '\n'};
+    const char *delim_words[n_delims] = {
+        "Lorem ",
+        "ipsum dolor sit amet,",
+        " consectetur adipiscing elit.",
+        " Donec ornare tortor et\n",
+        "rhoncus iaculis. Sed suscipit, arcu nec elementum vestibulum, tortor tortor\n",
+    };
+    (void) ptr;
+    our_zfopen(file, text_file, "r");
+    /* Check each token is of the right length, that the length is returned,
+     * that the string is as expected, and that file->filepos is updated.
+     */
+    for (iii = 0; iii < n_delims; iii++) {
+        orig_filepos = file->filepos;
+        res_len = zfgetuntil(file, delims[iii], buffer, bufsize);
+        our_filepos += res_len;
+        expt_len = strnlen(delim_words[iii], bufsize);
+        tt_int_op(res_len, ==, strnlen(buffer, bufsize));
+        tt_int_op(res_len, ==, expt_len);
+        tt_str_op(buffer, ==, delim_words[iii]);
+        tt_int_op(file->filepos - orig_filepos, ==, expt_len);
+        tt_int_op(file->filepos, ==, our_filepos);
+    }
+    /* Check we can give EOF as the char and make it give us the remainder of
+       the file */
+    orig_filepos = file->filepos;
+    res_len = zfgetuntil(file, EOF, buffer, bufsize);
+    expt_len = loremipsum_fsize - our_filepos;
+    our_filepos += res_len;
+    tt_int_op(res_len, ==, strnlen(buffer, bufsize));
+    tt_int_op(res_len, ==, expt_len);
+    tt_int_op(file->filepos - orig_filepos, ==, expt_len);
+    tt_int_op(file->filepos, ==, our_filepos);
+    tt_assert(file->eof)
+    tt_int_op(file->filepos, ==, loremipsum_fsize);
+    /* Check that a file at EOF returns EOF. */
+    tt_int_op(file->filepos, ==, loremipsum_fsize);
+    tt_int_op(zfgetuntil(file, '\n', buffer, bufsize), ==, EOF);
+    tt_assert(file->eof)
+    /* Test with bad parameters */
+    KM_ZREWIND(file->fp);
+    file->eof = 0;
+    file->filepos = 0;
+    tt_int_op(zfgetuntil(NULL, '\n', buffer, bufsize), ==, -2);
+    tt_int_op(zfgetuntil(file, 256, buffer, bufsize), ==, -2);
+    tt_int_op(zfgetuntil(file, '\n', NULL, bufsize), ==, -2);
+    tt_int_op(zfgetuntil(file, '\n', buffer, 0), ==, -2);
+end:
+    our_zfclose(file);
+}
+
+void
 test_zfpeek (void *ptr)
 {
     int res = 0;
