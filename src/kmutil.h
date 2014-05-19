@@ -198,10 +198,8 @@ extern size_t kmroundupz(size_t sz);
 
 /* IO helpers */
 
-#define	KM_ZTYPE_GZIP			/*  we default to zlib.h */
-
 /* Definitions to make changing fp type easy */
-#ifdef  KM_ZTYPE_GZIP
+#ifdef HAVE_ZLIB
 #   include <zlib.h>
 #   define	KM_ZTYPE gzFile
 #   define	KM_ZOPEN gzopen
@@ -222,7 +220,7 @@ extern size_t kmroundupz(size_t sz);
 #   define	KM_ZSEEK gzseek
 #   define	KM_ZTELL gztell
 #   define	KM_ZREWIND gzrewind
-#elif defined(KM_ZTYPE_NONE)
+#else
 #   define	KM_ZTYPE FILE*
 #   define	KM_ZOPEN fopen
 #   define	KM_ZCLOSE fclose
