@@ -18,6 +18,29 @@
 
 #include "kmzfile.h"
 
+inline int
+__zfile_fill_buffer (zfile_t *file)
+{
+    ssize_t res = 0;
+    if (file == NULL || file->buffer == NULL || file->eof) {
+        return 0;
+    }
+    if (KM_ZEOF(file->fp)) {
+        file->feof = 1;
+        return EOF;
+    }
+    res = KM_ZREAD(file->fp, file->buffer, (KM_FILEBUFFER_LEN) - 1);
+    if (res < 0) return 0; /* Errored */
+    if (res < (KM_FILEBUFFER_LEN) - 1) {
+        /* At file EOF */
+        file->feof = 1;
+    }
+    file->bufiter = file->buffer;
+    file->bufend = file->buffer + res;
+    file->bufend[0] = '\0';
+    return 1;
+}
+
 zfile_t *
 zfopen_ (const char *path, const char *mode, errhandler_t onerr,
         const char *file, int line)
@@ -35,8 +58,43 @@ zfopen_ (const char *path, const char *mode, errhandler_t onerr,
         return(NULL);
     }
     zf->mode = zfile_guess_mode(mode);
-    /* Use a larger than default IO buffer, speeds things up */
-    KM_ZBUFFER(zf->fp, KM_FILEBUFFER_LEN);
+    if (zf->mode == RW_UNKNOWN) {
+        KM_ZCLOSE(zf->fp);
+        km_free(zf);
+        return NULL;
+    }
+    /* Use a larger than default IO buffer, speeds things up.
+     * Using 2x our buffer len for no particular reason. */
+    KM_ZBUFFER(zf->fp, (KM_FILEBUFFER_LEN) << 1);
+    if (zf->mode == RW_READ || zf-> mode == RW_READWRITE) {
+#ifdef HAVE_POSIX_MEMALIGN
+        posix_memalign((void *)&(zf->buffer), getpagesize(),
+                (KM_FILEBUFFER_LEN * sizeof(*zf->buffer)));
+        if (zf->buffer == NULL) {
+            KM_ZCLOSE(zf->fp);
+            km_free(zf);
+            (*onerr)("Coudn't allocate aligned memory", file, line);
+            return NULL;
+        }
+#else
+        zf->buffer = km_malloc_((KM_FILEBUFFER_LEN * sizeof(*zf->buffer)),
+                onerr, file, line);
+        if (zf->buffer == NULL) {
+            KM_ZCLOSE(zf->fp);
+            km_free(zf);
+            (*onerr)("Coudn't allocate aligned memory", file, line);
+            return NULL;
+        }
+#endif
+        zf->bufiter = zf->buffer;
+        zf->buffer[0] = '\0';
+        zf->bufend = zf->buffer;
+        if (__zfile_fill_buffer(zf) == 0) {
+            km_free(zf->buffer);
+            km_free(zf);
+            return NULL;
+        }
+    }
     /* init struct fields */
     zf->eof = 0;
     zf->filepos = 0;
@@ -62,6 +120,9 @@ zfrewind (zfile_t *file)
         KM_ZSEEK(file->fp, 0, SEEK_SET);
         file->filepos = 0;
         file->eof = 0;
+        file->feof = 0;
+        file->bufiter = file->buffer;
+        file->bufend = file->buffer;
     }
 }
 
@@ -73,6 +134,9 @@ zfclose_ (zfile_t *file)
             KM_ZCLOSE(file->fp);
         }
         km_free(file->path);
+        km_free(file->buffer);
+        file->bufiter = NULL;
+        file->bufend = NULL;
         km_free(file);
     }
 }
@@ -89,13 +153,19 @@ zfgetuntil_realloc_ (zfile_t *file, int delim, char **bufref, size_t *sizeref,
         errhandler_t onerr, const char *src, const int line)
 {
     size_t len = 0;
-    int next = 0;
+    size_t tocpy = 0;
     char *buf = NULL;
+    char *nextbuf = NULL;
+    char *end = NULL;
     size_t size = 0;
-    if (bufref == NULL || file == NULL || sizeref == NULL) {
-        return -2; /* eof is normally == -1, so use -2 to differentiate them */
+    int ret = 0;
+    if (bufref == NULL || !zfile_ok(file) || sizeref == NULL) {
+        return -2;
     }
-    if (file->eof) return EOF;
+    if (file->eof) {
+        return EOF;
+    }
+    /* store local copies to stop dereferencing every time we need them */
     buf = *bufref;
     size = *sizeref;
     /* Alloc the buffer if it's NULL */
@@ -103,11 +173,15 @@ zfgetuntil_realloc_ (zfile_t *file, int delim, char **bufref, size_t *sizeref,
         buf = km_malloc_(__INIT_LINE_LEN * sizeof(*buf), onerr, src, line);
         size = __INIT_LINE_LEN;
     }
-    while((next = KM_ZFGETC(file->fp)) != EOF) {
-        /* Make sure we have space for both ``next``, the char we just read,
-         * and a terminating '\0' (hence len + 2) */
-        while (len + 2 >= size) {
-            size = kmroundupz((size) + 1);
+    /* Set nextbuf AFTER we may/may not have alloced buf above */
+    nextbuf = buf;
+    /* Read until delim is in file->buffer, filling buffer */
+    while ((end = strchr(file->bufiter, delim)) == NULL) {
+        /* copy the remainder of the buffer */
+        tocpy = file->bufend - file->bufiter;
+        len += tocpy;
+        while (len + 1 >= size) {
+            size = kmroundupz(size);
             buf = km_realloc_(buf, sizeof(*buf) * size, onerr, src, line);
             if (buf == NULL) {
                 /* We bail out here, and *bufref is untouched. This means we
@@ -116,49 +190,132 @@ zfgetuntil_realloc_ (zfile_t *file, int delim, char **bufref, size_t *sizeref,
                 return -2;
             }
         }
-        buf[len++] = next;
-        if (next == delim) break;
+        /* set to the correct position in the NEW buf, maybe after realloc */
+        nextbuf = buf + len - tocpy;
+        memcpy(nextbuf, file->bufiter, tocpy);
+        /* Update pointers to point to their respective heads */
+        nextbuf += tocpy;
+        file->bufiter += tocpy;
+        /* Null-terminate buf */
+        buf[len] = '\0';
+        /* file->buffer should now be empty, so fill 'er up! */
+        ret = __zfile_fill_buffer(file);
+        if (ret == 0) {
+            /* Couln't fill, error out */
+            return -2;
+        } else if (ret == EOF) {
+            /* EOF time */
+            break;
+        }
     }
-    buf[len] = '\0';
-    file->filepos += len;
+    if (end != NULL) {
+        /* We've got the delimter in the buffer */
+        tocpy = end + 1 - file->bufiter; /* +1 includes the delimiter */
+    } else if (file->bufiter < file->bufend) {
+        /* No delimiter, but we return what we have. */
+        tocpy = file->bufend - file->bufiter;
+    } else {
+        /* Nothign left at all */
+        file->eof = 1;
+        goto done;
+    }
+    /* we need to ensure that we still have enough room.
+     * This happens as above */
+    len += tocpy;
+    while (len + 1 >= size) {
+        size = kmroundupz(size + 1);
+        buf = km_realloc_(buf, sizeof(*buf) * size, onerr, src, line);
+        if (buf == NULL) {
+            /* We bail out here, and *bufref is untouched. This means we
+             * can check for errors, and free *bufref from the calling
+             * function */
+            return -2;
+        }
+    }
+    nextbuf = buf + len - tocpy;
+    memcpy(nextbuf, file->bufiter, tocpy);
+    file->bufiter += tocpy;
+    /* We don't bother updating nextbuf, as this was our final copy to buf */
+    goto done;
+done:
+    /* restore/update referred values */
     *bufref = buf;
     *sizeref = size;
-    if (len) {
-        if (KM_ZEOF(file->fp)) {
-            file->eof = 1;
-        }
+    if (len > 0) {
+        /* We have something to return, so return its length */
+        file->filepos += len;
+        buf[len] = '\0';
         return len;
-    } else {
-        file->eof = 1;
+    } else if (file->eof) {
         return EOF;
+    } else {
+        /* Shouldn't reach here! */
+        return -2;
     }
 }
+
 inline ssize_t
 zfgetuntil (zfile_t *file, const int delim, char *dest, size_t maxlen)
 {
     size_t len = 0;
-    int next = 0;
-    if (dest == NULL || file == NULL || maxlen < 1 || delim > 255) {
+    char *nextbuf = dest;
+    size_t tocpy = 0;
+    char *end = NULL;
+    int ret = 0 ;
+    if (dest == NULL || !zfile_ok(file) || maxlen < 1 || delim > 255) {
         /* EOF is normally == -1, so use -2 to differentiate them */
         return -2;
     }
+    /* For detailed commentary, see zfgetuntil_realloc */
     /* Get out early if we're at EOF already */
-    if (file->eof) return EOF;
-    /* maxlen - 1 because we always leave space for \0 */
-    while ( (next = KM_ZFGETC(file->fp)) != EOF && len < maxlen - 1) {
-        dest[len++] = next;
-        if (next == delim) break;
-    }
-    dest[len] = '\0';
-    file->filepos += len;
-    if (len) {
-        if (KM_ZEOF(file->fp)) {
-            file->eof = 1;
-        }
-        return len;
-    } else {
-        file->eof = 1;
+    if (file->eof) {
         return EOF;
+    }
+    while ((end = strchr(file->bufiter, delim)) == NULL) {
+        tocpy = file->bufend - file->bufiter;
+        if (len + tocpy >= maxlen) {
+            /* maxlen - 1 because we always leave space for \0 */
+            tocpy -= len - maxlen - 1;
+        }
+        len += tocpy;
+        memcpy(nextbuf, file->bufiter, tocpy);
+        nextbuf += tocpy;
+        file->bufiter += tocpy;
+        dest[len] = '\0'; /* Null-terminate buf */
+        ret = __zfile_fill_buffer(file);
+        if (ret == 0) {
+            return -2;
+        } else if (ret == EOF) {
+            break;
+        }
+    }
+    if (end != NULL) {
+        tocpy = end + 1 - file->bufiter; /* +1 includes the delimiter */
+    } else if (file->bufiter < file->bufend) {
+        tocpy = file->bufend - file->bufiter;
+    } else {
+        /* Nothign left at all */
+        file->eof = 1;
+        goto done;
+    }
+    len += tocpy;
+    if (len + tocpy >= maxlen) {
+        /* maxlen - 1 because we always leave space for \0 */
+        tocpy -= len - maxlen - 1;
+    }
+    nextbuf = dest + len - tocpy;
+    memcpy(nextbuf, file->bufiter, tocpy);
+    file->bufiter += tocpy;
+    goto done;
+done:
+    if (len > 0) {
+        file->filepos += len;
+        dest[len] = '\0';
+        return len;
+    } else if (file->eof) {
+        return EOF;
+    } else {
+        return -2;
     }
 }
 
@@ -174,7 +331,7 @@ zfreadline_str (zfile_t *file, str_t *str)
     if (file == NULL || str_ok(str)) {
         return -2; /* ERROR, not EOF */
     }
-    return zfreadline_realloc(file, &str->s, &str->m);
+    return zfreadline_realloc(file, &(str->s), &(str->m));
 }
 
 inline void
@@ -186,23 +343,33 @@ zfprint_str (zfile_t *stream, const str_t *str)
 inline int
 zfile_ok(const zfile_t *zf)
 {
+    /* zfile_ok just check we won't dereference NULLs, so we check pointer
+     * NULLness for all pointers we care about in current modes. Which, unless
+     * we're Write-only, is all of them */
     return  zf != NULL && \
-            zf->fp != NULL;
+            zf->fp != NULL && \
+            (zf->mode == RW_WRITE || \
+                (zf->bufiter != NULL && \
+                 zf->buffer != NULL)
+            );
 }
 
 inline int
 zfile_readable(const zfile_t *zf)
 {
-    return zfile_ok(zf) && !zf->eof;
-
+    /* Here we check that reads won't fail */
+    return zfile_ok(zf) && \
+        !zf->eof && \
+        zf->mode != RW_WRITE && \
+        zf->mode != RW_UNKNOWN &&\
+        zf->bufiter[0] != '\0';
 }
 
 inline int
 zfpeek (zfile_t *file)
 {
-    int chr = '\0';
-    if (km_unlikely(!zfile_ok(file))) return -2;
-    chr = KM_ZFGETC(file->fp);
-    KM_ZFUNGETC(chr, file->fp);
-    return chr;
+    if (!zfile_readable(file)) {
+        return -2;
+    }
+    return file->bufiter[0];
 }

@@ -83,10 +83,13 @@ test_zfrewind (void *ptr)
         res = zfreadline(file, buffer, bufsize);
     }
     tt_int_op(file->filepos, ==, loremipsum_fsize);
-    tt_int_op(file->eof, ==, 1);
+    tt_int_op(KM_ZTELL(file->fp), ==, loremipsum_fsize);
+    tt_assert(file->eof);
+    tt_assert(file->feof);
     zfrewind(file);
     tt_int_op(file->filepos, ==, 0);
-    tt_int_op(file->eof, ==, 0);
+    tt_assert(!file->eof);
+    tt_assert(!file->feof);
     tt_int_op(KM_ZTELL(file->fp), ==, 0);
 end:
     our_zfclose(file);
@@ -276,10 +279,12 @@ test_zfreadline_realloc (void *ptr)
     ret = zfreadline_realloc(file, &buf, &tmpsz);
     tt_assert(file->eof);
     tt_int_op(ret, ==, EOF);
+    our_zfclose(file);
+    /*
+     *                  Test w/ small buffer
+     */
     /* Do the same checks, but with a buffer that needs resizing */
-    KM_ZREWIND(file->fp);
-    file->eof = 0;
-    file->filepos = 0;
+    file = zfopen(text_file, "r");
     tmpsz = smallbuf_len;
     fpos = 0;
     for (line_num = 0; line_num < n_loremipsum_lines; line_num++) {
@@ -294,19 +299,20 @@ test_zfreadline_realloc (void *ptr)
         tt_int_op(smallbuf[ret], ==, '\0');
     }
     tt_int_op(file->filepos, ==, loremipsum_fsize);
-    /* Naughty tests that try and make it fail */
     /* Test with EOF file */
     tmpsz = buf_len;
     ret = zfreadline_realloc(file, &buf, &tmpsz);
-    tt_assert(file->eof)
     tt_int_op(ret, ==, EOF);
     tt_str_op(buf, ==,  "");
     tt_int_op(strlen(buf), ==, 0);
     tt_int_op(tmpsz, ==, buf_len);
+    tt_assert(file->eof)
+    our_zfclose(file);
+    /*
+     *                     Test bad things
+     */
     /* Null buf. Should alloc a buffer and fill it */
-    KM_ZREWIND(file->fp);
-    file->eof = 0;
-    file->filepos = 0;
+    file = zfopen(text_file, "r");
     line_num = 0;
     ret = zfreadline_realloc(file, &nulcp, &tmpsz);
     tt_int_op(ret, ==, loremipsum_line_lens[line_num]);
@@ -329,3 +335,25 @@ end:
     if (file != NULL) our_zfclose(file);
 }
 
+void test_zfile_ok (void *ptr)
+{
+    zfile_t *file;
+    char writeable[KM_MAX_FN_LEN];
+    snprintf(writeable, KM_MAX_FN_LEN, "%s/%s_%d.file", out_prefix, __func__,
+            0);
+    file = zfopen(text_file, "r");
+    tt_assert(zfile_ok(file));
+    tt_assert(zfile_readable(file));
+    our_zfclose(file);
+    file = zfopen("nosuchfile", "r");
+    tt_assert(!zfile_ok(file));
+    tt_assert(!zfile_readable(file));
+    our_zfclose(file);
+    file = zfopen(writeable, "w");
+    tt_assert(zfile_ok(file));
+    tt_assert(!zfile_readable(file));
+    our_zfclose(file);
+end:
+    if (file != NULL) our_zfclose(file);
+
+}
