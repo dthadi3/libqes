@@ -47,18 +47,24 @@
 
 /* Use to avoid calling zfopen except when testing zfopen */
 
-#define	our_zfopen(var, pth, mode) do {             \
+#define	our_zfopen(var, pth, mde) do {             \
     (var) = calloc(1, sizeof(*(var)));              \
-    (var)->fp = KM_ZOPEN(pth, mode);                \
+    (var)->fp = KM_ZOPEN(pth, mde);                \
     if ((var)->fp == NULL) {                        \
         free((var));                                \
         (var) = NULL;                               \
         break; /* from do {} while,  i.e return*/   \
     }                                               \
     KM_ZBUFFER((var)->fp, KM_FILEBUFFER_LEN);       \
+    (var)->buffer = malloc(KM_FILEBUFFER_LEN);      \
+    (var)->bufiter = (var)->buffer;                 \
+    (var)->bufend = (var)->buffer + KM_FILEBUFFER_LEN;  \
     (var)->eof = 0;                                 \
+    (var)->feof = 1;                                \
     (var)->filepos = 0;                             \
+    (var)->mode = zfile_guess_mode(mde);           \
     (var)->path = strndup(pth, KM_MAX_FN_LEN);      \
+    __zfile_fill_buffer(var);                       \
     } while(0)
 
 
@@ -69,10 +75,14 @@
     } while (0)
 
 #define	our_zfclose(f) do { \
-    if (f != NULL) {        \
-        KM_ZCLOSE(f->fp);   \
-        free(f->path);      \
-        free(f); f = NULL;  \
+    if ((f) != NULL) {        \
+        KM_ZCLOSE((f)->fp);   \
+        free((f)->path);      \
+        free((f)->buffer);    \
+        (f)->buffer = NULL;   \
+        (f)->bufiter = NULL;  \
+        (f)->bufend = NULL;   \
+        free(f); (f) = NULL;  \
     }} while(0)
 
 #define our_destroy_seqfile(sf) do {        \
@@ -120,6 +130,7 @@ void test_zfile_guess_mode (void *);
 void test_zfpeek (void *);
 void test_zfrewind (void *);
 void test_zfgetuntil (void *);
+void test_zfile_ok (void *ptr);
 static struct testcase_t zfile_tests[] = {
     { "zfopen", test_zfopen,},
     { "zfpeek", test_zfpeek,},
@@ -129,6 +140,7 @@ static struct testcase_t zfile_tests[] = {
     { "zfclose", test_zfclose,},
     { "zfrewind", test_zfrewind,},
     { "zfgetuntil", test_zfgetuntil,},
+    { "zfile_ok", test_zfile_ok,},
     END_OF_TESTCASES
 };
 
