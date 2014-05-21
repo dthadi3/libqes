@@ -45,9 +45,9 @@
 /*
  * Misc constants
  */
-#define KM_MAX_FN_LEN 1<<16
+#define KM_MAX_FN_LEN (1<<16)
 
-#define	KM_FILEBUFFER_LEN 1<<20 /* Size of buffers for file IO */
+#define	KM_FILEBUFFER_LEN (1<<20) /* Size of buffers for file IO */
 #define	__INIT_LINE_LEN 128 /* Starting point for allocing a str_t */
 /*
  * Macro helpers from tor
