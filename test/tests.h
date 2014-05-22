@@ -102,24 +102,12 @@ void test_km_realloc(void *);
 void test_km_free(void *);
 void test_kmroundup32(void *);
 void test_kmroundup64(void *);
-static struct testcase_t util_tests[] = {
-    { "km_calloc", test_km_calloc,},
-    { "km_malloc", test_km_malloc,},
-    { "km_realloc", test_km_realloc,},
-    { "km_free", test_km_free,},
-    { "kmroundup32", test_kmroundup32,},
-    { "kmroundup64", test_kmroundup64,},
-    END_OF_TESTCASES
-};
+extern struct testcase_t util_tests[];
 
 /* test_match tests */
 void test_hamming(void *);
 void test_hamming_max(void *);
-static struct testcase_t match_tests[] = {
-    { "hamming", test_hamming,},
-    { "hamming_max", test_hamming_max,},
-    END_OF_TESTCASES
-};
+extern struct testcase_t match_tests[];
 
 /* test_zfile tests */
 void test_zfopen(void *);
@@ -131,28 +119,12 @@ void test_zfpeek (void *);
 void test_zfrewind (void *);
 void test_zfgetuntil (void *);
 void test_zfile_ok (void *ptr);
-static struct testcase_t zfile_tests[] = {
-    { "zfopen", test_zfopen,},
-    { "zfpeek", test_zfpeek,},
-    { "zfreadline", test_zfreadline,},
-    { "zfreadline_realloc", test_zfreadline_realloc,},
-    { "zfile_guess_mode", test_zfile_guess_mode, },
-    { "zfclose", test_zfclose,},
-    { "zfrewind", test_zfrewind,},
-    { "zfgetuntil", test_zfgetuntil,},
-    { "zfile_ok", test_zfile_ok,},
-    END_OF_TESTCASES
-};
+extern struct testcase_t zfile_tests[];
 
 /* test_seqfile tests */
 void test_create_seqfile (void *);
 void test_seqfile_guess_format (void *ptr);
 void test_destroy_seqfile (void *ptr);
-static struct testcase_t seqfile_tests[] = {
-    { "create_seqfile", test_create_seqfile,},
-    { "seqfile_guess_format", test_seqfile_guess_format,},
-    { "destroy_seqfile", test_destroy_seqfile,},
-    END_OF_TESTCASES
-};
+extern struct testcase_t seqfile_tests[];
 
 #endif /* TESTS_H */

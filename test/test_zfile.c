@@ -357,3 +357,16 @@ end:
     if (file != NULL) our_zfclose(file);
 
 }
+
+struct testcase_t zfile_tests[] = {
+    { "zfopen", test_zfopen,},
+    { "zfpeek", test_zfpeek,},
+    { "zfreadline", test_zfreadline,},
+    { "zfreadline_realloc", test_zfreadline_realloc,},
+    { "zfile_guess_mode", test_zfile_guess_mode, },
+    { "zfclose", test_zfclose,},
+    { "zfrewind", test_zfrewind,},
+    { "zfgetuntil", test_zfgetuntil,},
+    { "zfile_ok", test_zfile_ok,},
+    END_OF_TESTCASES
+};

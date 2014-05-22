@@ -151,3 +151,12 @@ end:
     ;
 }
 
+struct testcase_t util_tests[] = {
+    { "km_calloc", test_km_calloc,},
+    { "km_malloc", test_km_malloc,},
+    { "km_realloc", test_km_realloc,},
+    { "km_free", test_km_free,},
+    { "kmroundup32", test_kmroundup32,},
+    { "kmroundup64", test_kmroundup64,},
+    END_OF_TESTCASES
+};

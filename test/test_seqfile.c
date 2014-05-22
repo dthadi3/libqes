@@ -103,3 +103,10 @@ end:
     our_destroy_seqfile(sf);
 
 }
+
+struct testcase_t seqfile_tests[] = {
+    { "create_seqfile", test_create_seqfile,},
+    { "seqfile_guess_format", test_seqfile_guess_format,},
+    { "destroy_seqfile", test_destroy_seqfile,},
+    END_OF_TESTCASES
+};
