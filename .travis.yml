@@ -21,7 +21,9 @@ install:
 script:
  - cmake .. -DCMAKE_INSTALL_PREFIX=../target
  - make
- - ctest --verbose
+ - ./bin/test_kmlib
+ - ./bin/test_kmlib_static
+ - ./bin/bench_kmlib
  - make install
  - test -f ../target/include/kmlib.h
  - test -f ../target/lib/libkm.so
