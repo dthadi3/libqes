@@ -106,7 +106,7 @@ setup_test_env ()
     out_prefix = strdup(buf);
     if (access(out_prefix, W_OK | X_OK) != 0) {
         res = mkdir(out_prefix, S_IRUSR | S_IWUSR | S_IXUSR);
-        if (!res || access(out_prefix, W_OK | X_OK) != 0) {
+        if (res != 0 || access(out_prefix, W_OK | X_OK) != 0) {
             if (errno) {
                 fprintf(stderr, "Error making output dir '%s'\n", out_prefix);
                 fprintf(stderr, "%s\n", strerror(errno));
