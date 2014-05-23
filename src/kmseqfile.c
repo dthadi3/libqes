@@ -18,81 +18,137 @@
 
 #include "kmseqfile.h"
 
+static inline ssize_t
+read_fastq_seqfile(seqfile_t *file, seq_t *seq)
+{
+    /* Convenience macro, this happens a lot */
+#define CHECK_AND_TRIM(subrec) if (len < 1) { \
+            goto error;     \
+        } else {        \
+            subrec.s[--len] = '\0'; \
+            subrec.l = len; \
+        }
+    ssize_t len = 0;
+    int next = '\0';
+    /* Fast-forward past the delimiter '@', ensuring it exists */
+    next = zfgetc(file->zf);
+    if (next == EOF) {
+        return EOF;
+    } else if (next != FASTQ_DELIM) {
+        /* This ain't a fastq! WTF! */
+        goto error;
+    }
+    /* Get until the first space, which is the seq name */
+    len = zfgetuntil_realloc(file->zf, ' ', &seq->name.s, &seq->name.m);
+    CHECK_AND_TRIM(seq->name)
+    /* Fill the comment, from first space to EOL */
+    len = zfreadline_realloc(file->zf, &seq->comment.s, &seq->comment.m);
+    CHECK_AND_TRIM(seq->comment)
+    /* Fill the actual sequence directly */
+    len = zfreadline_str(file->zf, &seq->seq);
+    CHECK_AND_TRIM(seq->seq)
+    /* read the qual header, but don't store it. */
+    next = zfgetc(file->zf);
+    if (next != FASTQ_QUAL_DELIM) {
+        goto error;
+    }
+    while ((next = zfgetc(file->zf)) != '\n') {
+        if (next == EOF) {
+            goto error;
+        }
+    }
+    /* Fill the qual score string directly */
+    len = zfreadline_str(file->zf, &seq->qual);
+    CHECK_AND_TRIM(seq->qual)
+    if (len != seq->seq.l) {
+        /* Error out on different len qual/seq entries */
+        goto error;
+    }
+    /* return seq/qual len */
+    return seq->seq.l;
+error:
+    str_nullify(&seq->name);
+    str_nullify(&seq->comment);
+    str_nullify(&seq->seq);
+    str_nullify(&seq->qual);
+    return -2;
+#undef CHECK_AND_TRIM
+}
+
+static inline ssize_t
+read_fasta_seqfile(seqfile_t *file, seq_t *seq)
+{
+    /* Convenience macro, this happens a lot */
+#define CHECK_AND_TRIM(subrec) if (len < 1) { \
+            goto error;     \
+        } else {        \
+            subrec.s[--len] = '\0'; \
+            subrec.l = len; \
+        }
+    ssize_t len = 0;
+    int next = '\0';
+    /* This bit is basically a copy-paste from above */
+    /* Fast-forward past the delimiter '>', ensuring it exists */
+    next = zfgetc(file->zf);
+    if (next == EOF) {
+        return EOF;
+    } else if (next != FASTA_DELIM) {
+        /* This ain't a fasta! WTF! */
+        goto error;
+    }
+    /* Get until the first space, which is the seq name */
+    len = zfgetuntil_realloc(file->zf, ' ', &seq->name.s, &seq->name.m);
+    CHECK_AND_TRIM(seq->name)
+    /* Fill the comment, from first space to EOL */
+    len = zfreadline_realloc(file->zf, &seq->comment.s, &seq->comment.m);
+    CHECK_AND_TRIM(seq->comment)
+    /* End fastq parser copypaste */
+    /* we need to nullify seq, as we rely on seq.l being 0 as we enter this
+     *  while loop */
+    str_nullify(&seq->seq);
+    /* While the next char is not a '>', i.e. until next header line */
+    while ((next = zfpeek(file->zf)) != EOF && next != FASTA_DELIM) {
+        len = zfreadline(file->zf, seq->seq.s + seq->seq.l,
+                seq->seq.m - seq->seq.l - 1);
+        if (len < 0) {
+            goto error;
+        }
+        seq->seq.l += len - 1;
+        seq->seq.s[seq->seq.l] = '\0';
+        if (seq->seq.m -  1 <= seq->seq.l) {
+            seq->seq.m = kmroundupz(seq->seq.m);
+            seq->seq.s = km_realloc(seq->seq.s,
+                    sizeof(*seq->seq.s) * seq->seq.m);
+            if (seq->seq.s == NULL) {
+                goto error;
+            }
+        }
+    }
+    seq->seq.s[seq->seq.l] = '\0';
+    /* return seq len */
+    str_nullify(&seq->qual);
+    return seq->seq.l;
+error:
+    str_nullify(&seq->name);
+    str_nullify(&seq->comment);
+    str_nullify(&seq->seq);
+    str_nullify(&seq->qual);
+    return -2;
+#undef CHECK_AND_TRIM
+}
 inline ssize_t
 read_seqfile (seqfile_t *file, seq_t *seq)
 {
-    if (!zfile_ok(file->zf)) return -2;
-    if (file->zf->eof) return -1;
-
+    if (!zfile_ok(file->zf) || !seq_ok(seq)) {
+        return -2;
+    }
+    if (file->zf->eof) {
+        return EOF;
+    }
     if (file->flags.format == FASTQ_FMT) {
-        size_t size = __INIT_LINE_LEN;
-        char *header = km_calloc(size, sizeof(*header));
-        size_t len = 0;
-        ssize_t seqlen = 0;
-        len = zfreadline_realloc(file->zf, &header, &size);
-        if (len < 1) {
-            km_free(header);
-            return len; /* deal with error/EOF */
-        }
-        /* Fill name and comment of seq, dealing w/ errors */
-        if (header[0] != FASTQ_DELIM) return -2;
-        if (!seq_fill_header(seq, header, len)) return -2;
-        /* Fill the actual sequence directly */
-        len = zfreadline_str(file->zf, &seq->seq);
-        if (len < 1) {
-            km_free(header);
-            return len; /* deal with error/EOF */
-        }
-        seq->seq.s[--len] = '\0'; /* remove newline AND --len */
-        seqlen = len;
-        /* read the qual header into `header` */
-        len = zfreadline_realloc(file->zf, &header, &size);
-        if (len < 1) {
-            km_free(header);
-            return len; /* deal with error/EOF */
-        }
-        if (header[0] != FASTQ_QUAL_DELIM) return -2;
-        /* Fill the actual sequence directly */
-        len = zfreadline_str(file->zf, &seq->qual);
-        if (len < 1) {
-            km_free(header);
-            return len; /* deal with error/EOF */
-        }
-        seq->qual.s[--len] = '\0'; /* remove newline AND --len */
-        km_free(header);
-        if (km_unlikely(len != seqlen)) {
-            return -2; /* Error out on different len qual/seq entries */
-        }
-        return len; /* return seq/qual len */
+        return read_fastq_seqfile(file, seq);
     } else if (file->flags.format == FASTA_FMT) {
-        size_t size = __INIT_LINE_LEN;
-        char *buf = km_calloc(size, sizeof(*buf));
-        size_t len = 0;
-        int next = '\0';
-        /* Read in header line */
-        len = zfreadline_realloc(file->zf, &buf, &size);
-        if (len < 1) {
-            km_free(buf);
-            return len; /* deal with error/EOF */
-        }
-        /* Fill name and comment of seq, dealing w/ errors */
-        if (buf[0] != FASTA_DELIM) return -2;
-        if (!seq_fill_header(seq, buf, len)) return -2;
-        /* While the next char is not a '>', i.e. until next header line */
-        len = 0;
-        while ((next = KM_ZFGETC(file->zf->fp)) != FASTA_DELIM && next != EOF) {
-            if (next != '\n') {
-                if (km_unlikely(len + 1 >= size - 1)) {
-                    size = kmroundupz(size);
-                    buf = km_realloc(buf, sizeof(*buf) * size);
-                }
-                buf[len++] = next;
-            }
-        }
-        buf[len] = '\0';
-        seq_fill_seq(seq, buf, len);
-        km_free(buf);
-        return len;
+        return read_fasta_seqfile(file, seq);
     }
     return -2; /* If we reach here, bail out with an error */
 }
@@ -101,11 +157,15 @@ seqfile_t *
 create_seqfile (const char *path, const char *mode)
 {
     seqfile_t *sf = NULL;
-    if (km_unlikely(path == NULL || mode == NULL)) return NULL;
+    if (path == NULL || mode == NULL) return NULL;
     sf = km_calloc(1, sizeof(*sf));
     sf->zf = zfopen(path, mode);
-    sf->n_records = 0llu;
-    if (km_unlikely(sf->zf == NULL)) return NULL;
+    sf->n_records = 0;
+    if (sf->zf == NULL) {
+        km_free(sf->zf);
+        km_free(sf);
+        return NULL;
+    }
     seqfile_guess_format(sf);
     return sf;
 }
@@ -113,8 +173,8 @@ int
 seqfile_guess_format (seqfile_t *file)
 {
     int first_char = '\0';
-    if (km_unlikely(!seqfile_ok(file))) return UNKNOWN_FMT;
-    if (km_unlikely(file->zf->filepos != 0)) return UNKNOWN_FMT;
+    if (!seqfile_ok(file)) return UNKNOWN_FMT;
+    if (!zfile_readable(file->zf)) return UNKNOWN_FMT;
     first_char = zfpeek(file->zf);
     switch (first_char) {
         case FASTQ_DELIM:
@@ -142,5 +202,6 @@ destroy_seqfile_(seqfile_t *seqfile)
 {
     if (seqfile != NULL) {
         zfclose(seqfile->zf);
+        km_free(seqfile);
     }
 }

@@ -65,10 +65,11 @@ int seqfile_iter_parallel (seqfile_t *file, seqfile_iter_func_t func,
         void *data, seqfile_iter_flags flags);
 int seqfile_iter (seqfile_t *file, seqfile_iter_func_t func, void *data,
         seqfile_iter_flags flags);
-seq_t *read_seq_file (seqfile_t *file);
-void print_seq_seqfile (seqfile_t * file, const seq_t *seq);
-void destroy_seqfile_(seqfile_t *seqfile);
+extern ssize_t read_seqfile (seqfile_t *file, seq_t *seq);
 
+void print_seq_seqfile (seqfile_t * file, const seq_t *seq);
+
+void destroy_seqfile_(seqfile_t *seqfile);
 #define destroy_seqfile(seqfile) do {       \
             destroy_seqfile_(seqfile);      \
             seqfile = NULL;             \
