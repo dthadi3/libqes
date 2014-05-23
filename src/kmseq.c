@@ -103,44 +103,48 @@ print_seq (const seq_t *seq, FILE *stream)
     fprintf(stream, "\n");
 }
 
-int
-fill_name (seq_t *seqt, const char *name, size_t len)
+inline int
+seq_fill_name (seq_t *seqt, const char *name, size_t len)
 {
     if (name != NULL) {
         str_fill_charptr_len(&seqt->name, name, len);
         return 1;
-    } return 0;
+    }
+    return 0;
 }
 
-int
-fill_comment (seq_t *seqt, const char *comment, size_t len)
+inline int
+seq_fill_comment (seq_t *seqt, const char *comment, size_t len)
 {
     if (comment != NULL) {
         str_fill_charptr_len(&seqt->comment, comment, len);
         return 1;
-    } return 0;
+    }
+    return 0;
 }
 
-int
-fill_seq (seq_t *seqt, const char *seq, size_t len)
+inline int
+seq_fill_seq (seq_t *seqt, const char *seq, size_t len)
 {
     if (seq != NULL) {
         str_fill_charptr_len(&seqt->seq, seq, len);
         return 1;
-    } return 0;
+    }
+    return 0;
 }
 
-int
-fill_qual (seq_t *seqt, const char *qual, size_t len)
+inline int
+seq_fill_qual (seq_t *seqt, const char *qual, size_t len)
 {
     if (qual != NULL) {
         str_fill_charptr_len(&seqt->qual, qual, len);
         return 1;
-    } return 0;
+    }
+    return 0;
 }
 
-int
-fill_header (seq_t *seqt, const char *header, size_t len)
+inline int
+seq_fill_header (seq_t *seqt, const char *header, size_t len)
 {
     if (header != NULL) {
         char *tmp = strchr(header, ' ');

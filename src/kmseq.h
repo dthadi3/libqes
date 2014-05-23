@@ -45,7 +45,7 @@ extern int seq_ok_no_comment(const seq_t *seq);
 extern int seq_ok_no_comment_or_qual(const seq_t *seq);
 extern int seq_fill_header(seq_t *seqobj, const char *header, size_t len);
 extern int seq_fill_seq(seq_t *seqobj, const char *seq, size_t len);
-extern int seq_fill_qual(seq_t *seqobj, const char *qual);
+extern int seq_fill_qual(seq_t *seqobj, const char *qual, size_t len);
 extern int seq_fill_name(seq_t *seqt, const char *name, size_t len);
 extern int seq_fill_comment(seq_t *seqt, const char *comment, size_t len);
 void destroy_seq_(seq_t *seq);
