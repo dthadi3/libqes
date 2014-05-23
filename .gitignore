@@ -5,3 +5,7 @@
 
 # compiled
 build
+*.o
+*.a
+*.so
+tags
