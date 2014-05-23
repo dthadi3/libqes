@@ -54,6 +54,7 @@ zfile_t *zfopen_ (const char *path, const char *mode, errhandler_t onerr,
 
 extern int zfile_guess_mode (const char *mode);
 extern int zfpeek (zfile_t *file);
+extern int zfgetc (zfile_t *file);
 extern void zfrewind (zfile_t *file);
 
 /*===  FUNCTION  ============================================================*
@@ -159,6 +160,6 @@ extern ssize_t zfreadline_realloc_ (zfile_t *file, char **buf, size_t *size,
 
 extern void zfprint_str (zfile_t *stream, const str_t *str);
 extern int zfile_ok(const zfile_t *zf);
-extern int zfile_readable(const zfile_t *zf);
+extern int zfile_readable(zfile_t *zf);
 extern int __zfile_fill_buffer (zfile_t *file);
 #endif /* KMZFILE_H */

@@ -22,16 +22,23 @@ inline int
 __zfile_fill_buffer (zfile_t *file)
 {
     ssize_t res = 0;
-    if (file == NULL || file->buffer == NULL || file->eof) {
+    if (!zfile_ok(file)) {
         return 0;
     }
-    if (KM_ZEOF(file->fp)) {
-        file->feof = 1;
+    if (file->feof || file->eof) {
+        file->eof = 1;
         return EOF;
     }
     res = KM_ZREAD(file->fp, file->buffer, (KM_FILEBUFFER_LEN) - 1);
-    if (res < 0) return 0; /* Errored */
-    if (res < (KM_FILEBUFFER_LEN) - 1) {
+    if (res < 0) {
+        /* Errored */
+        return 0;
+    } else if (res == 0) {
+        /* At both buffer & file EOF */
+        file->eof = 1;
+        file->feof = 1;
+        return EOF;
+    } else if (res < (KM_FILEBUFFER_LEN) - 1) {
         /* At file EOF */
         file->feof = 1;
     }
@@ -328,7 +335,7 @@ zfreadline (zfile_t *file, char *dest, size_t maxlen)
 inline ssize_t
 zfreadline_str (zfile_t *file, str_t *str)
 {
-    if (file == NULL || str_ok(str)) {
+    if (file == NULL || !str_ok(str)) {
         return -2; /* ERROR, not EOF */
     }
     return zfreadline_realloc(file, &(str->s), &(str->m));
@@ -355,21 +362,46 @@ zfile_ok(const zfile_t *zf)
 }
 
 inline int
-zfile_readable(const zfile_t *zf)
+zfile_readable(zfile_t *file)
 {
-    /* Here we check that reads won't fail */
-    return zfile_ok(zf) && \
-        !zf->eof && \
-        zf->mode != RW_WRITE && \
-        zf->mode != RW_UNKNOWN &&\
-        zf->bufiter[0] != '\0';
+    /* Here we check that reads won't fail. We refil if we need to. */
+    /* Can we possibly read from this file? */
+    if (!zfile_ok(file) || file->mode == RW_UNKNOWN || \
+            file->mode == RW_WRITE || file->eof) {
+        return 0;
+    }
+    /* We can read from buffer */
+    if (file->bufiter < file->bufend && file->bufiter[0] != '\0') {
+        return 1;
+    }
+    /* Buffer needs a refil */
+    if (__zfile_fill_buffer(file) != 0) {
+        /* we either successfully refilled, or are at EOF */
+        return file->eof ? EOF : 1;
+    } else {
+        /* No, we can't rea */
+        return 0;
+    }
 }
 
 inline int
 zfpeek (zfile_t *file)
 {
-    if (!zfile_readable(file)) {
+    if (!zfile_ok(file) || zfile_readable(file) == 0) {
         return -2;
+    } else if (file->eof) {
+        return EOF;
     }
     return file->bufiter[0];
+}
+
+inline int
+zfgetc (zfile_t *file)
+{
+    if (!zfile_ok(file) || zfile_readable(file) == 0) {
+        return -2;
+    } else if (file->eof) {
+        return EOF;
+    }
+    return (file->bufiter++)[0];
 }
