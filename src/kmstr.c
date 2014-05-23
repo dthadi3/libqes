@@ -50,7 +50,7 @@ inline int
 str_nullify (str_t *str)
 {
     if (km_unlikely(str == NULL)) return 0;
-    bzero(str->s, str->m);
+    str->s[0] = '\0';
     str->l = 0;
     return 1;
 }
