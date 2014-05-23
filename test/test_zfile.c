@@ -44,10 +44,10 @@ test_zfopen (void *ptr)
     badfile = zfopen("non/existant.file", "r");
     tt_ptr_op(badfile, ==, NULL);
 end:
-    our_zfclose(file);
-    our_zfclose(fafile);
-    our_zfclose(zfile);
-    our_zfclose(badfile);
+    zfclose(file);
+    zfclose(fafile);
+    zfclose(zfile);
+    zfclose(badfile);
 }
 
 void
@@ -57,7 +57,7 @@ test_zfclose (void *ptr)
     zfile_t *nullfile = NULL;
     (void) ptr;
     /* Open file and save pos */
-    our_zfopen(file, text_file, "r");
+    file = zfopen(text_file, "r");
     tt_assert(file);
     zfclose(file);
     tt_ptr_op(file, ==, NULL);
@@ -65,7 +65,7 @@ test_zfclose (void *ptr)
     zfclose(nullfile);
     tt_ptr_op(nullfile, ==, NULL);
 end:
-    our_zfclose(file);
+    zfclose(file);
 }
 
 
@@ -77,7 +77,7 @@ test_zfrewind (void *ptr)
     char buffer[bufsize];
     ssize_t res = 0;
     (void) ptr;
-    our_zfopen(file, text_file, "r");
+    file = zfopen(text_file, "r");
     tt_assert(file);
     while (res != EOF) {
         res = zfreadline(file, buffer, bufsize);
@@ -92,7 +92,7 @@ test_zfrewind (void *ptr)
     tt_assert(!file->feof);
     tt_int_op(KM_ZTELL(file->fp), ==, 0);
 end:
-    our_zfclose(file);
+    zfclose(file);
 }
 
 void
@@ -105,7 +105,7 @@ test_zfreadline (void *ptr)
     off_t orig_filepos = 0;
     int iii;
     (void) ptr;
-    our_zfopen(file, text_file, "r");
+    file = zfopen(text_file, "r");
     /* Check each line is of the right length, that the length is returned,
      * that the string is as expected, and that file->filepos is updated.
      */
@@ -126,7 +126,7 @@ test_zfreadline (void *ptr)
     tt_int_op(zfreadline(file, NULL, bufsize), ==, -2);
     tt_int_op(zfreadline(file, buffer, 0), ==, -2);
 end:
-    our_zfclose(file);
+    zfclose(file);
 }
 
 void
@@ -150,7 +150,7 @@ test_zfgetuntil (void *ptr)
         "rhoncus iaculis. Sed suscipit, arcu nec elementum vestibulum, tortor tortor\n",
     };
     (void) ptr;
-    our_zfopen(file, text_file, "r");
+    file = zfopen(text_file, "r");
     /* Check each token is of the right length, that the length is returned,
      * that the string is as expected, and that file->filepos is updated.
      */
@@ -190,7 +190,7 @@ test_zfgetuntil (void *ptr)
     tt_int_op(zfgetuntil(file, '\n', NULL, bufsize), ==, -2);
     tt_int_op(zfgetuntil(file, '\n', buffer, 0), ==, -2);
 end:
-    our_zfclose(file);
+    zfclose(file);
 }
 
 void
@@ -201,7 +201,7 @@ test_zfpeek (void *ptr)
     off_t orig_filepos = 0;
     (void) ptr;
     /* Open file and save pos */
-    our_zfopen(file, text_file, "r");
+    file = zfopen(text_file, "r");
     orig_filepos = file->filepos;
     /* Peek a char */
     res = zfpeek(file);
@@ -215,7 +215,7 @@ test_zfpeek (void *ptr)
     /* And that it returns an error on being given a null pointer  */
     tt_int_op(zfpeek(NULL), ==, -2);
 end:
-    our_zfclose(file);
+    zfclose(file);
 }
 
 void
@@ -279,7 +279,7 @@ test_zfreadline_realloc (void *ptr)
     ret = zfreadline_realloc(file, &buf, &tmpsz);
     tt_assert(file->eof);
     tt_int_op(ret, ==, EOF);
-    our_zfclose(file);
+    zfclose(file);
     /*
      *                  Test w/ small buffer
      */
@@ -307,7 +307,7 @@ test_zfreadline_realloc (void *ptr)
     tt_int_op(strlen(buf), ==, 0);
     tt_int_op(tmpsz, ==, buf_len);
     tt_assert(file->eof)
-    our_zfclose(file);
+    zfclose(file);
     /*
      *                     Test bad things
      */
@@ -332,7 +332,7 @@ end:
     if (buf != NULL) free(buf);
     if (smallbuf != NULL) free(smallbuf);
     if (nulcp != NULL) free(nulcp);
-    if (file != NULL) our_zfclose(file);
+    if (file != NULL) zfclose(file);
 }
 
 void test_zfile_ok (void *ptr)
@@ -344,17 +344,17 @@ void test_zfile_ok (void *ptr)
     file = zfopen(text_file, "r");
     tt_assert(zfile_ok(file));
     tt_assert(zfile_readable(file));
-    our_zfclose(file);
+    zfclose(file);
     file = zfopen("nosuchfile", "r");
     tt_assert(!zfile_ok(file));
     tt_assert(!zfile_readable(file));
-    our_zfclose(file);
+    zfclose(file);
     file = zfopen(writeable, "w");
     tt_assert(zfile_ok(file));
     tt_assert(!zfile_readable(file));
-    our_zfclose(file);
+    zfclose(file);
 end:
-    if (file != NULL) our_zfclose(file);
+    if (file != NULL) zfclose(file);
 
 }
 
