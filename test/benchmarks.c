@@ -17,10 +17,15 @@
  */
 #include <stdlib.h>
 
+#include <kmzfile.h>
+#include <kmseqfile.h>
+#include <time.h>
+#include <zlib.h>
+
 #include "kseq.h"
 
-#include <kmzfile.h>
-#include <time.h>
+KSEQ_INIT(gzFile, gzread)
+
 static const char *infile;
 
 
@@ -76,10 +81,55 @@ gnu_getline_file(int silent)
         printf("[getline]\t\tFile of %zu chars\n", flen);
     fclose(file);
 }
+
+void
+seqfile_parse_fq(int silent)
+{
+    seq_t *seq = create_seq();
+    seqfile_t *sf = create_seqfile(infile, "r");
+    ssize_t res = 0;
+    size_t n_recs = 0;
+    size_t seq_len = 0;
+    while (res != EOF) {
+        res = read_seqfile(sf, seq);
+        if (res < 1) {
+            break;
+        }
+        seq_len += res;
+        n_recs++;
+    }
+    if (!silent) {
+        printf("[seqfile_fq] Total seq len %zu\n", seq_len);
+    }
+    destroy_seqfile(sf);
+    destroy_seq(seq);
+}
+
+void
+kseq_parse_fq(int silent)
+{
+    gzFile fp = gzopen(infile, "r");
+    kseq_t *seq = kseq_init(fp);
+    ssize_t res = 0;
+    size_t n_recs = 0;
+    size_t seq_len = 0;
+    while ((res = kseq_read(seq)) >= 0) {
+        seq_len += res;
+        n_recs++;
+    }
+    if (!silent) {
+        printf("[kseq_fq] Total seq len %zu\n", seq_len);
+    }
+    kseq_destroy(seq);
+    gzclose(fp);
+}
+
 static const bench_t benchmarks[] = {
     { "zfreadline", &zfreadline_file},
     { "zfreadline_realloc", &zfreadline_realloc_file},
     { "gnu_getline", &gnu_getline_file},
+    { "seqfile_parse_fq", &seqfile_parse_fq},
+    { "kseq_parse_fq", &kseq_parse_fq},
     { NULL, NULL}
 };
 
