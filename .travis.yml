@@ -1,5 +1,8 @@
 language: c
 
+env:
+ - BUILD_TYPE=Release
+ - BUILD_TYPE=Debug
 compiler:
  - clang
  - gcc
@@ -19,7 +22,7 @@ install:
  - cd build
 
 script:
- - cmake .. -DCMAKE_INSTALL_PREFIX=../target
+ - cmake .. -DCMAKE_INSTALL_PREFIX=../target -DCMAKE_BUILD_TYPE=$BUILD_TYPE
  - make
  - ctest --verbose
  - make install
