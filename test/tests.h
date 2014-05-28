@@ -79,4 +79,8 @@ void test_read_seqfile_vs_kseq (void *);
 void test_read_seqfile (void *);
 extern struct testcase_t seqfile_tests[];
 
+/* test_seq tests */
+void test_create_seq (void *);
+extern struct testcase_t seq_tests[];
+
 #endif /* TESTS_H */
