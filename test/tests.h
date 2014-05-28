@@ -76,6 +76,7 @@ void test_create_seqfile (void *);
 void test_seqfile_guess_format (void *);
 void test_destroy_seqfile (void *);
 void test_read_seqfile_vs_kseq (void *);
+void test_read_seqfile (void *);
 extern struct testcase_t seqfile_tests[];
 
 #endif /* TESTS_H */

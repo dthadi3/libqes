@@ -48,6 +48,15 @@ const char *loremipsum_lines[] = {
     "End of lorem ipsum.\n",
 };
 
+const char *first_fastq_read[] = {
+    "HWI-ST960:105:D10GVACXX:2:1101:1151:2158",
+    "1:N:0: bcd:RPI9 seq:CACGATCAGATC",
+    "CACGATCAGATCAANGACATTGAATCTATATGT",
+    "JJJJJJJIJHIJCC#4ADFFHHHGHJJJJIJJJ",
+};
+
+const size_t first_fastq_len = 33;
+
 struct testgroup_t kmlib_tests[] = {
     {"util/", util_tests},
     {"match/", match_tests},

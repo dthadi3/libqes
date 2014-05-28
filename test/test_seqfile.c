@@ -108,6 +108,35 @@ end:
     destroy_seqfile(sf);
 }
 
+
+
+/*===  FUNCTION  ============================================================*
+Name:           test_read_seqfile
+Description:    Tests the read_seqfile function from kmseqfile.c
+ *===========================================================================*/
+void
+test_read_seqfile (void *ptr)
+{
+    seq_t *seq = create_seq();
+    seqfile_t *sf = create_seqfile(gzfastq_file, "r");
+    ssize_t res = 0;
+    /* Test with a good seqfile */
+    res = read_seqfile(sf, seq);
+    tt_int_op(res, ==, first_fastq_len);
+    tt_str_op(seq->name.s, ==, first_fastq_read[0]);
+    tt_str_op(seq->comment.s, ==, first_fastq_read[1]);
+    tt_str_op(seq->seq.s, ==, first_fastq_read[2]);
+    tt_str_op(seq->qual.s, ==, first_fastq_read[3]);
+    /* Check with bad params that it returns -2 */
+    res = read_seqfile(NULL, seq);
+    tt_int_op(res, ==, -2);
+    res = read_seqfile(sf, NULL);
+    tt_int_op(res, ==, -2);
+end:
+    destroy_seqfile(sf);
+    destroy_seq(seq);
+}
+
 void
 test_read_seqfile_vs_kseq (void *ptr)
 {
@@ -160,11 +189,11 @@ end:
     gzclose(fp);
 }
 
-
 struct testcase_t seqfile_tests[] = {
     { "create_seqfile", test_create_seqfile,},
     { "seqfile_guess_format", test_seqfile_guess_format,},
     { "destroy_seqfile", test_destroy_seqfile,},
     { "read_seqfile_vs_kseq", test_read_seqfile_vs_kseq,},
+    { "read_seqfile", test_read_seqfile,},
     END_OF_TESTCASES
 };

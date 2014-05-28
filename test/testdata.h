@@ -23,6 +23,8 @@ extern const size_t n_loremipsum_lines;
 extern const size_t loremipsum_fsize;
 extern const size_t loremipsum_line_lens[];
 extern const char *loremipsum_lines[];
+extern const char *first_fastq_read[];
+extern const size_t first_fastq_len;
 extern char *data_prefix;
 extern char *out_prefix;
 extern char *text_file;
