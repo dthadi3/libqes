@@ -139,7 +139,7 @@ error:
 inline ssize_t
 read_seqfile (seqfile_t *file, seq_t *seq)
 {
-    if (!zfile_ok(file->zf) || !seq_ok(seq)) {
+    if (!seqfile_ok(file) || !seq_ok(seq)) {
         return -2;
     }
     if (file->zf->eof) {
