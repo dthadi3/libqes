@@ -1,5 +1,7 @@
 #CFLAGS
-set(TEST_SRCS test.c test_zfile.c test_seq.c test_seqfile.c test_util.c test_match.c tinytest/tinytest.c)
+#file(GLOB TEST_SRCS *.c)
+set(TEST_SRCS test.c test_zfile.c test_seq.c test_seqfile.c test_util.c test_match.c)
+set(TEST_SRCS ${TEST_SRCS} tinytest/tinytest.c)
 add_executable(test_kmlib ${TEST_SRCS})
 target_link_libraries(test_kmlib km ${KMLIB_DEPENDS_LIBS})
 setup_target_for_coverage(coverage test_kmlib coverage)
