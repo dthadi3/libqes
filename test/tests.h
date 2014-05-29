@@ -68,7 +68,7 @@ void test_zfile_guess_mode (void *);
 void test_zfpeek (void *);
 void test_zfrewind (void *);
 void test_zfgetuntil (void *);
-void test_zfile_ok (void *ptr);
+void test_zfile_ok (void *);
 extern struct testcase_t zfile_tests[];
 
 /* test_seqfile tests */
@@ -81,6 +81,14 @@ extern struct testcase_t seqfile_tests[];
 
 /* test_seq tests */
 void test_create_seq (void *);
+void test_create_seq (void *);
+void test_create_seq_no_qual (void *);
+void test_create_seq_no_qual_or_comment (void *);
+void test_seq_ok (void *);
+void test_seq_ok_no_comment (void *);
+void test_seq_ok_no_qual (void *);
+void test_seq_ok_no_comment_or_qual (void *);
+void test_destroy_seq (void *);
 extern struct testcase_t seq_tests[];
 
 #endif /* TESTS_H */
