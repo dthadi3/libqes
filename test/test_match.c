@@ -26,6 +26,7 @@ test_hamming (void *p)
     (void) (p);
     tt_int_op(hamming("ACTTG", "ACTGG"), ==, 1);
     tt_int_op(hamming("ACTTG", "ACTGGA"), ==, SIZE_MAX);
+    tt_int_op(hamming("ACTTG", "ACTTG"), ==, 0);
 end:
     ;
 }
@@ -38,6 +39,7 @@ test_hamming_max (void *p)
     tt_int_op(hamming_max("ACTTG", "ACTGG", 1), ==, 1);
     tt_int_op(hamming_max("ACTTG", "ACTGG", 0), ==, 0);
     tt_int_op(hamming_max("ACTTG", "ACTGGA", 1), ==, SIZE_MAX);
+    tt_int_op(hamming_max("ACTTG", "ACTTG", 1), ==, 0);
 end:
     ;
 }
