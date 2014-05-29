@@ -23,6 +23,7 @@ void
 test_create_seq (void *ptr)
 {
     seq_t *seq = NULL;
+    (void) ptr;
     tt_ptr_op(seq, ==, NULL);
     seq = create_seq();
     tt_ptr_op(seq, !=, NULL);
@@ -50,6 +51,7 @@ void
 test_create_seq_no_qual (void *ptr)
 {
     seq_t *seq = NULL;
+    (void) ptr;
     tt_ptr_op(seq, ==, NULL);
     seq = create_seq_no_qual();
     tt_ptr_op(seq, !=, NULL);
@@ -77,6 +79,7 @@ void
 test_create_seq_no_qual_or_comment (void *ptr)
 {
     seq_t *seq = NULL;
+    (void) ptr;
     tt_ptr_op(seq, ==, NULL);
     seq = create_seq_no_qual_or_comment();
     tt_ptr_op(seq, !=, NULL);
@@ -100,11 +103,104 @@ end:
     destroy_seq(seq);
 }
 
+void
+test_seq_ok (void *ptr)
+{
+    seq_t *seq = NULL;
+    (void) ptr;
+    /* Test null seq */
+    tt_assert(!seq_ok(seq));
+    /* Make valid seq */
+    seq = create_seq();
+    tt_assert(seq_ok(seq));
+    /* invalidate name, should fail */
+    destroy_str_cp(&seq->name);
+    tt_assert(!seq_ok(seq));
+    /* Destroy seq, invalidating it */
+    destroy_seq(seq);
+    tt_assert(!seq_ok(seq));
+end:
+    destroy_seq(seq);
+}
+
+void
+test_seq_ok_no_comment (void *ptr)
+{
+    seq_t *seq = NULL;
+    (void) ptr;
+    /* Test null seq */
+    tt_assert(!seq_ok_no_comment(seq));
+    /* Make valid seq */
+    seq = create_seq();
+    tt_assert(seq_ok_no_comment(seq));
+    /* invalidate comment, should still pass */
+    destroy_str_cp(&seq->comment);
+    tt_assert(seq_ok_no_comment(seq));
+    /* invalidate name, should make seq_ok_no_comment fail */
+    destroy_str_cp(&seq->name);
+    tt_assert(!seq_ok_no_comment(seq));
+    /* Destroy seq, invalidating it */
+    destroy_seq(seq);
+    tt_assert(!seq_ok_no_comment(seq));
+end:
+    destroy_seq(seq);
+}
+
+void
+test_seq_ok_no_qual (void *ptr)
+{
+    seq_t *seq = NULL;
+    (void) ptr;
+    /* Test null seq */
+    tt_assert(!seq_ok_no_qual(seq));
+    /* Make valid seq */
+    seq = create_seq();
+    tt_assert(seq_ok_no_qual(seq));
+    /* invalidate qual, should pass */
+    destroy_str_cp(&seq->qual);
+    tt_assert(seq_ok_no_qual(seq));
+    /* invalidate name, should make seq_ok_no_qual fail */
+    destroy_str_cp(&seq->name);
+    tt_assert(!seq_ok_no_qual(seq));
+    /* Destroy seq, invalidating it */
+    destroy_seq(seq);
+    tt_assert(!seq_ok_no_qual(seq));
+end:
+    destroy_seq(seq);
+}
+
+void
+test_seq_ok_no_comment_or_qual (void *ptr)
+{
+    seq_t *seq = NULL;
+    (void) ptr;
+    /* Test null seq */
+    tt_assert(!seq_ok_no_comment_or_qual(seq));
+    /* Make valid seq */
+    seq = create_seq();
+    tt_assert(seq_ok_no_comment_or_qual(seq));
+    /* invalidate comment, should still pass */
+    destroy_str_cp(&seq->comment);
+    tt_assert(seq_ok_no_comment(seq));
+    /* invalidate qual, should pass */
+    destroy_str_cp(&seq->qual);
+    tt_assert(seq_ok_no_comment_or_qual(seq));
+    /* invalidate name, should make seq_ok_no_comment_or_qual fail */
+    destroy_str_cp(&seq->name);
+    tt_assert(!seq_ok_no_comment_or_qual(seq));
+    /* Destroy seq, invalidating it */
+    destroy_seq(seq);
+    tt_assert(!seq_ok_no_comment_or_qual(seq));
+end:
+    destroy_seq(seq);
+}
+
 
 void
 test_destroy_seq (void *ptr)
 {
     seq_t *seq = NULL;
+    (void) ptr;
     tt_ptr_op(seq, ==, NULL);
     seq = create_seq();
     tt_ptr_op(seq, !=, NULL);
@@ -121,6 +217,10 @@ struct testcase_t seq_tests[] = {
     { "create_seq", test_create_seq,},
     { "create_seq_no_qual", test_create_seq_no_qual,},
     { "create_seq_no_qual_or_comment", test_create_seq_no_qual_or_comment,},
+    { "seq_ok", test_seq_ok,},
+    { "seq_ok_no_comment", test_seq_ok_no_comment,},
+    { "seq_ok_no_qual", test_seq_ok_no_qual,},
+    { "seq_ok_no_comment_or_qual", test_seq_ok_no_comment_or_qual,},
     { "destroy_seq", test_destroy_seq,},
     END_OF_TESTCASES
 };
