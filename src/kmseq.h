@@ -38,6 +38,7 @@ typedef struct _seq {
 /* PROTOTYPES */
 seq_t *create_seq ();
 seq_t *create_seq_no_qual ();
+seq_t *create_seq_no_qual_or_comment ();
 
 extern int seq_ok(const seq_t *seq);
 extern int seq_ok_no_qual(const seq_t *seq);

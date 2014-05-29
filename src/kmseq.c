@@ -37,6 +37,9 @@ create_seq_no_qual ()
     init_str(&seq->name, __INIT_LINE_LEN);
     init_str(&seq->comment, __INIT_LINE_LEN);
     init_str(&seq->seq, __INIT_LINE_LEN);
+    seq->qual.m = 0;
+    seq->qual.l = 0;
+    seq->qual.s = NULL;
     return seq;
 }
 
@@ -46,6 +49,12 @@ create_seq_no_qual_or_comment ()
     seq_t *seq = km_malloc(sizeof(*seq));
     init_str(&seq->name, __INIT_LINE_LEN);
     init_str(&seq->seq, __INIT_LINE_LEN);
+    seq->qual.m = 0;
+    seq->qual.l = 0;
+    seq->qual.s = NULL;
+    seq->comment.m = 0;
+    seq->comment.l = 0;
+    seq->comment.s = NULL;
     return seq;
 }
 
@@ -163,9 +172,11 @@ seq_fill_header (seq_t *seqt, const char *header, size_t len)
 void
 destroy_seq_ (seq_t *seq)
 {
-    destroy_str_cp(&seq->name);
-    destroy_str_cp(&seq->comment);
-    destroy_str_cp(&seq->seq);
-    destroy_str_cp(&seq->qual);
-    km_free(seq);
+    if (seq != NULL) {
+        destroy_str_cp(&seq->name);
+        destroy_str_cp(&seq->comment);
+        destroy_str_cp(&seq->seq);
+        destroy_str_cp(&seq->qual);
+        km_free(seq);
+    }
 }
