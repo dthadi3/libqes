@@ -2,8 +2,11 @@
 set(KMLIB_SOURCES kmzfile.c kmutil.c kmmatch.c kmsequtil.c kmseq.c kmseqfile.c kmstr.c)
 
 # Targets
+if(STATIC)
+add_library(km ${KMLIB_SOURCES})
+else(STATIC)
 add_library(km SHARED ${KMLIB_SOURCES})
-add_library(km_static ${KMLIB_SOURCES})
+endif(STATIC)
+
 
 INSTALL(TARGETS km DESTINATION "lib")
-INSTALL(TARGETS km_static DESTINATION "lib")
