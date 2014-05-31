@@ -43,3 +43,49 @@ const char *first_fastq_read[] = {
     "JJJJJJJIJHIJCC#4ADFFHHHGHJJJJIJJJ",
 };
 const size_t first_fastq_len = 33;
+
+
+void
+test_data_files (void *ptr)
+{
+    char *fname = NULL;
+    char *crc_res = NULL;
+
+    (void) ptr;
+    fname = find_data_file("loremipsum.txt");
+    crc_res = crc32_file(fname);
+    tt_str_op(crc_res, ==, "9f20f7ec");
+    free(fname);
+    free(crc_res);
+    fname = find_data_file("loremipsum.txt.gz");
+    crc_res = crc32_file(fname);
+    tt_str_op(crc_res, ==, "4e42dcb2");
+    free(fname);
+    free(crc_res);
+    fname = find_data_file("test.fastq");
+    crc_res = crc32_file(fname);
+    tt_str_op(crc_res, ==, "c32cc3c0");
+    free(fname);
+    free(crc_res);
+    fname = find_data_file("test.fasta");
+    crc_res = crc32_file(fname);
+    tt_str_op(crc_res, ==, "3de06bb6");
+    free(fname);
+    free(crc_res);
+    fname = find_data_file("test.fastq.gz");
+    crc_res = crc32_file(fname);
+    tt_str_op(crc_res, ==, "ba1206ee");
+    free(fname);
+    free(crc_res);
+    fname = find_data_file("test.fastq.bz2");
+    crc_res = crc32_file(fname);
+    tt_str_op(crc_res, ==, "c8b66d33");
+end:
+    free(fname);
+    free(crc_res);
+}
+
+struct testcase_t data_tests[] = {
+    { "data_files", test_data_files,},
+    END_OF_TESTCASES
+};

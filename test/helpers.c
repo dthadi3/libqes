@@ -124,7 +124,6 @@ crc32_file(const char *filepath)
     size_t len = 0;
     unsigned char buffer[buflen];
     unsigned long crc = crc32(0L, Z_NULL, 0);
-    unsigned int crc_out = 0;
     char crcbuf[9];
 
     /* Open file */
@@ -132,12 +131,12 @@ crc32_file(const char *filepath)
     if (fp == NULL) {
         return NULL;
     }
-    while ((len = fread(buffer, buflen, sizeof(*buffer), fp)) != EOF) {
+    while (!feof(fp)) {
+        len = fread(buffer, 1, buflen, fp);
         crc = crc32(crc, buffer, len);
     }
     fclose(fp);
-    crc_out = crc & 0xffffffff; /* Cut back to 32-bit crc */
-    len = snprintf(crcbuf, 8, "%X", crc_out);
+    len = snprintf(crcbuf, 9, "%lx", crc);
     crcbuf[len] = '\0';
-    return strdup(crcbuf);;
+    return strdup(crcbuf);
 }
