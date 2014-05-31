@@ -25,6 +25,7 @@ struct testgroup_t kmlib_tests[] = {
     {"zfile/", zfile_tests},
     {"seqfile/", seqfile_tests},
     {"seq/", seq_tests},
+    {"testdata/", data_tests},
     END_OF_GROUPS
 };
 
