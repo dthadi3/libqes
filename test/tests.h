@@ -9,7 +9,7 @@
  *        Created:  04/05/14 15:48:16
  *       Revision:  none
  *        License:  GPLv3+
- *       Compiler:  gcc
+ *       Compiler:  gcc, clang
  *
  *         Author:  Kevin Murray, spam@kdmurray.id.au
  *
@@ -37,6 +37,7 @@
 #include "tinytest.h"
 #include "tinytest_macros.h"
 #include "testdata.h"
+#include "helpers.h"
 
 #define	KM_DEFAULT_ERR_FN errnil
 #define KM_EXIT_FN (void)

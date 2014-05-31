@@ -24,30 +24,46 @@ void
 test_zfopen (void *ptr)
 {
     zfile_t *file = NULL;
-    zfile_t *fafile = NULL;
-    zfile_t *zfile = NULL;
     zfile_t *badfile = NULL;
+    char *fname = NULL;
+
     (void) ptr;
-    /* Test file creation */
-    file = zfopen(fastq_file, "r");
+    /* Test file opening for reading */
+    fname = find_data_file("loremipsum.txt");
+    tt_assert(fname != NULL);
+    file = zfopen(fname, "r");
     tt_ptr_op(file, !=, NULL);
     tt_int_op(file->mode, ==, RW_READ);
-    /* with FASTA file */
-    fafile = zfopen(fasta_file, "r");
-    tt_ptr_op(fafile, !=, NULL);
-    tt_int_op(fafile->mode, ==, RW_READ);
-    /* with gziped FASTQ file */
-    zfile = zfopen(gzfastq_file, "r");
-    tt_ptr_op(zfile, !=, NULL);
-    tt_int_op(zfile->mode, ==, RW_READ);
-    /* With non-existant file */
-    badfile = zfopen("non/existant.file", "r");
+    zfclose(file);
+    free(fname);
+    /* test zipped file opening for reading */
+    fname = find_data_file("loremipsum.txt.gz");
+    tt_assert(fname != NULL);
+    file = zfopen(fname, "r");
+    tt_ptr_op(file, !=, NULL);
+    tt_int_op(file->mode, ==, RW_READ);
+    zfclose(file);
+    free(fname);
+    /* read with non-existant file */
+    fname = get_writable_file();
+    tt_assert(fname != NULL);
+    file = zfopen(fname, "r");
+    tt_ptr_op(file, ==, NULL);
+    clean_writable_file(fname);
+    /* writing with gziped file */
+    fname = get_writable_file();
+    tt_assert(fname != NULL);
+    file = zfopen(fname, "w");
+    tt_ptr_op(file, !=, NULL);
+    tt_int_op(file->mode, ==, RW_WRITE);
+    /* With non-existant file path */
+    badfile = zfopen("non/existant.file", "w");
     tt_ptr_op(badfile, ==, NULL);
+
 end:
     zfclose(file);
-    zfclose(fafile);
-    zfclose(zfile);
     zfclose(badfile);
+    free(fname);
 }
 
 void
@@ -55,9 +71,13 @@ test_zfclose (void *ptr)
 {
     zfile_t *file = NULL;
     zfile_t *nullfile = NULL;
+    char *fname = NULL;
+
     (void) ptr;
-    /* Open file and save pos */
-    file = zfopen(text_file, "r");
+    /* Open file */
+    fname = find_data_file("loremipsum.txt");
+    tt_assert(fname != NULL);
+    file = zfopen(fname, "r");
     tt_assert(file);
     zfclose(file);
     tt_ptr_op(file, ==, NULL);
@@ -66,6 +86,7 @@ test_zfclose (void *ptr)
     tt_ptr_op(nullfile, ==, NULL);
 end:
     zfclose(file);
+    free(fname);
 }
 
 
@@ -76,8 +97,13 @@ test_zfrewind (void *ptr)
     size_t bufsize = 1<<10;
     char buffer[bufsize];
     ssize_t res = 0;
+    char *fname = NULL;
+
     (void) ptr;
-    file = zfopen(text_file, "r");
+    /* Open file */
+    fname = find_data_file("loremipsum.txt");
+    tt_assert(fname != NULL);
+    file = zfopen(fname, "r");
     tt_assert(file);
     while (res != EOF) {
         res = zfreadline(file, buffer, bufsize);
@@ -93,6 +119,7 @@ test_zfrewind (void *ptr)
     tt_int_op(KM_ZTELL(file->fp), ==, 0);
 end:
     zfclose(file);
+    free(fname);
 }
 
 void
@@ -104,8 +131,13 @@ test_zfreadline (void *ptr)
     ssize_t res_len = 0;
     off_t orig_filepos = 0;
     int iii;
+    char *fname = NULL;
+
     (void) ptr;
-    file = zfopen(text_file, "r");
+    /* Open file */
+    fname = find_data_file("loremipsum.txt");
+    tt_assert(fname != NULL);
+    file = zfopen(fname, "r");
     /* Check each line is of the right length, that the length is returned,
      * that the string is as expected, and that file->filepos is updated.
      */
@@ -125,8 +157,10 @@ test_zfreadline (void *ptr)
     tt_int_op(zfreadline(NULL, buffer, bufsize), ==, -2);
     tt_int_op(zfreadline(file, NULL, bufsize), ==, -2);
     tt_int_op(zfreadline(file, buffer, 0), ==, -2);
+
 end:
     zfclose(file);
+    free(fname);
 }
 
 void
@@ -149,8 +183,13 @@ test_zfgetuntil (void *ptr)
         " Donec ornare tortor et\n",
         "rhoncus iaculis. Sed suscipit, arcu nec elementum vestibulum, tortor tortor\n",
     };
+    char *fname = NULL;
+
     (void) ptr;
-    file = zfopen(text_file, "r");
+    /* Open file */
+    fname = find_data_file("loremipsum.txt");
+    tt_assert(fname != NULL);
+    file = zfopen(fname, "r");
     /* Check each token is of the right length, that the length is returned,
      * that the string is as expected, and that file->filepos is updated.
      */
@@ -199,9 +238,13 @@ test_zfpeek (void *ptr)
     int res = 0;
     zfile_t *file = NULL;
     off_t orig_filepos = 0;
+    char *fname = NULL;
+
     (void) ptr;
     /* Open file and save pos */
-    file = zfopen(text_file, "r");
+    fname = find_data_file("loremipsum.txt");
+    tt_assert(fname != NULL);
+    file = zfopen(fname, "r");
     orig_filepos = file->filepos;
     /* Peek a char */
     res = zfpeek(file);
@@ -256,8 +299,13 @@ test_zfreadline_realloc (void *ptr)
     size_t line_num;
     char *nulcp = NULL;
     size_t tmpsz = buf_len;
+    char *fname = NULL;
+
+    (void) ptr;
+    /* Open file and save pos */
+    fname = find_data_file("loremipsum.txt");
     /* This should always work, so long as you run it from the right dir */
-    file = zfopen(text_file, "r");
+    file = zfopen(fname, "r");
     buf = calloc(buf_len, sizeof(*buf));
     smallbuf = calloc(smallbuf_len, sizeof(*smallbuf));
     tt_assert(file && buf && smallbuf);
@@ -284,7 +332,7 @@ test_zfreadline_realloc (void *ptr)
      *                  Test w/ small buffer
      */
     /* Do the same checks, but with a buffer that needs resizing */
-    file = zfopen(text_file, "r");
+    file = zfopen(fname, "r");
     tmpsz = smallbuf_len;
     fpos = 0;
     for (line_num = 0; line_num < n_loremipsum_lines; line_num++) {
@@ -312,7 +360,7 @@ test_zfreadline_realloc (void *ptr)
      *                     Test bad things
      */
     /* Null buf. Should alloc a buffer and fill it */
-    file = zfopen(text_file, "r");
+    file = zfopen(fname, "r");
     line_num = 0;
     ret = zfreadline_realloc(file, &nulcp, &tmpsz);
     tt_int_op(ret, ==, loremipsum_line_lens[line_num]);
@@ -333,15 +381,20 @@ end:
     if (smallbuf != NULL) free(smallbuf);
     if (nulcp != NULL) free(nulcp);
     if (file != NULL) zfclose(file);
+    free(fname);
 }
 
 void test_zfile_ok (void *ptr)
 {
     zfile_t *file;
-    char writeable[KM_MAX_FN_LEN];
-    snprintf(writeable, KM_MAX_FN_LEN, "%s/%s_%d.file", out_prefix, __func__,
-            0);
-    file = zfopen(text_file, "r");
+    char *writeable = NULL;
+    char *readable = NULL;
+
+    (void) ptr;
+    readable = find_data_file("loremipsum.txt");
+    writeable = get_writable_file();
+    /* Should result in an OK file */
+    file = zfopen(readable, "r");
     tt_assert(zfile_ok(file));
     tt_assert(zfile_readable(file));
     zfclose(file);
@@ -355,6 +408,8 @@ void test_zfile_ok (void *ptr)
     zfclose(file);
 end:
     if (file != NULL) zfclose(file);
+    free(writeable);
+    free(readable);
 
 }
 
