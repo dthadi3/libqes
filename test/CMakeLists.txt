@@ -15,5 +15,4 @@ add_custom_command(TARGET test_kmlib COMMAND ${CMAKE_COMMAND} -E copy_directory
 	${CMAKE_CURRENT_SOURCE_DIR}/data ${CMAKE_BINARY_DIR}/data)
 
 add_test(NAME kmlib COMMAND ${CMAKE_BINARY_DIR}/bin/test_kmlib ${CMAKE_BINARY_DIR})
-add_test(NAME kmlib_static  COMMAND ${CMAKE_BINARY_DIR}/bin/test_kmlib_static ${CMAKE_BINARY_DIR})
 add_test(NAME kmlib_benchmarks COMMAND ${CMAKE_BINARY_DIR}/bin/bench_kmlib ${CMAKE_BINARY_DIR}/data/test.fastq)
