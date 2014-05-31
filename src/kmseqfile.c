@@ -150,7 +150,12 @@ read_seqfile (seqfile_t *file, seq_t *seq)
     } else if (file->flags.format == FASTA_FMT) {
         return read_fasta_seqfile(file, seq);
     }
-    return -2; /* If we reach here, bail out with an error */
+    /* If we reach here, bail out with an error */
+    str_nullify(&seq->name);
+    str_nullify(&seq->comment);
+    str_nullify(&seq->seq);
+    str_nullify(&seq->qual);
+    return -2;
 }
 
 seqfile_t *
@@ -169,7 +174,8 @@ create_seqfile (const char *path, const char *mode)
     seqfile_guess_format(sf);
     return sf;
 }
-int
+
+seqfile_format_t
 seqfile_guess_format (seqfile_t *file)
 {
     int first_char = '\0';
@@ -189,6 +195,13 @@ seqfile_guess_format (seqfile_t *file)
             file->flags.format = UNKNOWN_FMT;
             return UNKNOWN_FMT;
     }
+}
+
+void
+seqfile_set_format (seqfile_t *file, seqfile_format_t format)
+{
+    if (!seqfile_ok(file)) return;
+    file->flags.format = format;
 }
 
 inline int

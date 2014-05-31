@@ -19,10 +19,10 @@
 #include <kmutil.h>
 #include <kmseq.h>
 #include <kmzfile.h>
+
 /*---------------------------------------------------------------------------
   |  Seqfile methods -- seamless reading & writing of FASTA & FASTQ         |
   ---------------------------------------------------------------------------*/
-
 
 #define	FASTA_DELIM '>'
 #define	FASTQ_DELIM '@'
@@ -60,7 +60,8 @@ typedef struct __seqfile_iter_flags {
 
 seqfile_t *create_seqfile (const char *path, const char *mode);
 extern int seqfile_ok(const seqfile_t *file);
-int seqfile_guess_format(seqfile_t *file);
+seqfile_format_t seqfile_guess_format(seqfile_t *file);
+void seqfile_set_format (seqfile_t *file, seqfile_format_t format);
 int seqfile_iter_parallel (seqfile_t *file, seqfile_iter_func_t func,
         void *data, seqfile_iter_flags flags);
 int seqfile_iter (seqfile_t *file, seqfile_iter_func_t func, void *data,
