@@ -10,7 +10,7 @@ compiler:
  - gcc
 
 install:
- - sudo apt-get install lcov
+ - sudo apt-get install lcov gcov python-pip
  - mkdir zlib && cd zlib
  - wget http://zlib.net/zlib-1.2.8.tar.gz
  - tar xvxf zlib-1.2.8.tar.gz
@@ -19,6 +19,7 @@ install:
  - make
  - sudo make install
  - cd ../..
+ - sudo pip install cpp-coveralls
  - git submodule update --init
  - mkdir build
  - mkdir target
@@ -31,3 +32,7 @@ script:
  - make install
  - test -f ../target/include/kmlib.h
  - if [ $static == "TRUE" ] ; then test -f ../target/lib/libkm.a; else test -f ../target/lib/libkm.so ; fi
+
+after_success:
+ - if [ $BUILD_TYPE == "Debug" ] && [ $static == "FALSE" ] ; then coveralls --exclude test; fi
+
