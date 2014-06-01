@@ -122,7 +122,7 @@ test_seqfile_guess_format (void *ptr)
     destroy_seqfile(sf);
 end:
     destroy_seqfile(sf);
-    free(fname);
+    if (fname != NULL) free(fname);
 }
 
 void
@@ -143,6 +143,7 @@ test_destroy_seqfile (void *ptr)
     tt_assert(!seqfile_ok(sf));
 end:
     destroy_seqfile(sf);
+    if (fname != NULL) free(fname);
 }
 
 
