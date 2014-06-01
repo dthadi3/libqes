@@ -4,6 +4,7 @@ kmlib
 A C library for various bioinformatics-y tasks. Proper docs will come in time.
 
 [![Build Status](https://travis-ci.org/kdmurray91/kmlib.png)](https://travis-ci.org/kdmurray91/kmlib)
+[![Coverage Status](https://img.shields.io/coveralls/kdmurray91/kmlib.svg)](https://coveralls.io/r/kdmurray91/kmlib?branch=dev)
 
 License
 =======
