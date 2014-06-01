@@ -50,12 +50,15 @@ test_zfopen (void *ptr)
     file = zfopen(fname, "r");
     tt_ptr_op(file, ==, NULL);
     clean_writable_file(fname);
+    fname = NULL;
     /* writing with gziped file */
     fname = get_writable_file();
     tt_assert(fname != NULL);
     file = zfopen(fname, "w");
     tt_ptr_op(file, !=, NULL);
     tt_int_op(file->mode, ==, RW_WRITE);
+    clean_writable_file(fname);
+    fname = NULL;
     /* With non-existant file path */
     badfile = zfopen("non/existant.file", "w");
     tt_ptr_op(badfile, ==, NULL);
@@ -63,7 +66,7 @@ test_zfopen (void *ptr)
 end:
     zfclose(file);
     zfclose(badfile);
-    free(fname);
+    if (fname != NULL) free(fname);
 }
 
 void
@@ -230,6 +233,7 @@ test_zfgetuntil (void *ptr)
     tt_int_op(zfgetuntil(file, '\n', buffer, 0), ==, -2);
 end:
     zfclose(file);
+    if (fname != NULL) free(fname);
 }
 
 void
@@ -259,6 +263,7 @@ test_zfpeek (void *ptr)
     tt_int_op(zfpeek(NULL), ==, -2);
 end:
     zfclose(file);
+    if (fname != NULL) free(fname);
 }
 
 void
@@ -408,7 +413,7 @@ void test_zfile_ok (void *ptr)
     zfclose(file);
 end:
     if (file != NULL) zfclose(file);
-    free(writeable);
+    clean_writable_file(writeable);
     free(readable);
 
 }
