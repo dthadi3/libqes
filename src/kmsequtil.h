@@ -21,7 +21,7 @@
 #include <kmutil.h>
 
 /* #####   EXPORTED FUNCTION DECLARATIONS   ################################ */
-extern char translate_codon(char *codon);
+extern char translate_codon(const char *codon);
 extern char *revcomp(const char *seq, size_t len);
 extern void revcomp_inplace(char *seq, size_t len);
 

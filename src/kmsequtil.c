@@ -27,8 +27,11 @@
  */
 
 inline char
-translate_codon (char *codon)
+translate_codon (const char *codon)
 {
+    if (codon == NULL || strnlen(codon, 4) != 3) {
+        return -1;
+    }
     if (codon[0] == 'A') {
         if (codon[1] == 'A') {
             if (codon[2] == 'A') return 'K';

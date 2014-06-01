@@ -93,4 +93,8 @@ void test_seq_ok_no_comment_or_qual (void *);
 void test_destroy_seq (void *);
 extern struct testcase_t seq_tests[];
 
+/* test_sequtil tests */
+void test_translate_codon (void *);
+extern struct testcase_t sequtil_tests[];
+
 #endif /* TESTS_H */
