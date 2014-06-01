@@ -47,5 +47,8 @@ extern const char *loremipsum_lines[];
 extern const char *first_fastq_read[];
 extern const size_t first_fastq_len;
 extern struct testcase_t data_tests[];
+extern const size_t n_codons;
+extern const char *codon_list[];
+extern const char aa_list[];
 
 #endif /* TESTDATA_H */

@@ -45,6 +45,64 @@ const char *first_fastq_read[] = {
 const size_t first_fastq_len = 33;
 
 
+const size_t n_codons = 125;
+
+const char *codon_list[] = {
+     "AAA",  "AAC",  "AAG",  "AAT",  "AAU",
+     "ACA",  "ACC",  "ACG",  "ACT",  "ACU",
+     "AGA",  "AGC",  "AGG",  "AGT",  "AGU",
+     "ATA",  "ATC",  "ATG",  "ATT",  "ATU",
+     "AUA",  "AUC",  "AUG",  "AUT",  "AUU",
+     "CAA",  "CAC",  "CAG",  "CAT",  "CAU",
+     "CCA",  "CCC",  "CCG",  "CCT",  "CCU",
+     "CGA",  "CGC",  "CGG",  "CGT",  "CGU",
+     "CTA",  "CTC",  "CTG",  "CTT",  "CTU",
+     "CUA",  "CUC",  "CUG",  "CUT",  "CUU",
+     "GAA",  "GAC",  "GAG",  "GAT",  "GAU",
+     "GCA",  "GCC",  "GCG",  "GCT",  "GCU",
+     "GGA",  "GGC",  "GGG",  "GGT",  "GGU",
+     "GTA",  "GTC",  "GTG",  "GTT",  "GTU",
+     "GUA",  "GUC",  "GUG",  "GUT",  "GUU",
+     "TAA",  "TAC",  "TAG",  "TAT",  "TAU",
+     "TCA",  "TCC",  "TCG",  "TCT",  "TCU",
+     "TGA",  "TGC",  "TGG",  "TGT",  "TGU",
+     "TTA",  "TTC",  "TTG",  "TTT",  "TTU",
+     "TUA",  "TUC",  "TUG",  "TUT",  "TUU",
+     "UAA",  "UAC",  "UAG",  "UAT",  "UAU",
+     "UCA",  "UCC",  "UCG",  "UCT",  "UCU",
+     "UGA",  "UGC",  "UGG",  "UGT",  "UGU",
+     "UTA",  "UTC",  "UTG",  "UTT",  "UTU",
+     "UUA",  "UUC",  "UUG",  "UUT",  "UUU",
+};
+
+const char aa_list[] = {
+     'K',  'N',  'K',  'N',  'N',
+     'T',  'T',  'T',  'T',  'T',
+     'R',  'S',  'R',  'S',  'S',
+     'I',  'I',  'M',  'I',  'I',
+     'I',  'I',  'M',  'I',  'I',
+     'Q',  'H',  'Q',  'H',  'H',
+     'P',  'P',  'P',  'P',  'P',
+     'R',  'R',  'R',  'R',  'R',
+     'L',  'L',  'L',  'L',  'L',
+     'L',  'L',  'L',  'L',  'L',
+     'E',  'D',  'E',  'D',  'D',
+     'A',  'A',  'A',  'A',  'A',
+     'G',  'G',  'G',  'G',  'G',
+     'V',  'V',  'V',  'V',  'V',
+     'V',  'V',  'V',  'V',  'V',
+     '*',  'Y',  '*',  'Y',  'Y',
+     'S',  'S',  'S',  'S',  'S',
+     '*',  'C',  'W',  'C',  'C',
+     'L',  'F',  'L',  'F',  'F',
+     'L',  'F',  'L',  'F',  'F',
+     '*',  'Y',  '*',  'Y',  'Y',
+     'S',  'S',  'S',  'S',  'S',
+     '*',  'C',  'W',  'C',  'C',
+     'L',  'F',  'L',  'F',  'F',
+     'L',  'F',  'L',  'F',  'F',
+};
+
 void
 test_data_files (void *ptr)
 {
