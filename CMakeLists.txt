@@ -38,7 +38,3 @@ link_directories(${CMAKE_BINARY_DIR}/lib)
 
 add_subdirectory(src)
 add_subdirectory(test)
-
-file(GLOB KMLIB_HEADERS ${CMAKE_SOURCE_DIR}/src/*.h)
-INSTALL(FILES ${KMLIB_HEADERS} DESTINATION "include")
-INSTALL(FILES ${KMLIB_HEADERS} DESTINATION "include")
