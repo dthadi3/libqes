@@ -68,6 +68,10 @@ int seqfile_iter (seqfile_t *file, seqfile_iter_func_t func, void *data,
         seqfile_iter_flags flags);
 extern ssize_t read_seqfile (seqfile_t *file, seq_t *seq);
 
+extern ssize_t write_seqfile (seqfile_t *file, seq_t *seq);
+extern size_t strfseq(const seq_t *seq, seqfile_format_t fmt, char *buffer,
+        size_t maxlen);
+
 void print_seq_seqfile (seqfile_t * file, const seq_t *seq);
 
 void destroy_seqfile_(seqfile_t *seqfile);

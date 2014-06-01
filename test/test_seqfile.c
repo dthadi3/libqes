@@ -259,11 +259,77 @@ end:
     }
 }
 
+
+/*===  FUNCTION  ============================================================*
+Name:           test_write_seqfile
+Description:    Tests the write_seqfile function from kmseqfile.c
+ *===========================================================================*/
+
+void
+test_write_seqfile (void *ptr)
+{
+    seq_t *seq = create_seq();
+    size_t expt_bytes = 0;
+    ssize_t res = 0;
+    seqfile_t *sf = NULL;
+    char *fname = NULL;
+    char *crc = NULL;
+
+    (void) ptr;
+    /* Make a seq to write */
+    seq_fill_name(seq, "HWI-TEST", 8);
+    seq_fill_comment(seq, "testseq 1 2 3", 13);
+    seq_fill_seq(seq, "ACTCAATT", 8);
+    seq_fill_qual(seq, "IIIIIIII", 8);
+    expt_bytes = 1 + 8 + 1 + 13 + 1 +   /* @ + name + ' ' + comment + '\n' */
+                 8 + 1 + 2 + 8 + 1;     /* seq + '\n' + "+\n" + qual + '\n' */
+    /* Test with a FASTQ seqfile */
+    fname = get_writable_file();
+    tt_assert(fname != NULL);
+    sf = create_seqfile(fname, "wT");
+    seqfile_set_format(sf, FASTQ_FMT);
+    res = write_seqfile(sf, seq);
+    tt_int_op(res, ==, expt_bytes);
+    destroy_seqfile(sf); /* Has to happen here to flush it */
+    crc = crc32_file(fname);
+    tt_str_op(crc, ==, "d4665941");
+    clean_writable_file(fname);
+    free(crc);
+    fname = NULL;
+    crc = NULL;
+    /* Test with a FASTA seqfile */
+    expt_bytes = 1 + 8 + 1 + 13 + 1 +   /* @ + name + ' ' + comment + '\n' */
+                 8 + 1;                 /* seq + '\n'*/
+    fname = get_writable_file();
+    tt_assert(fname != NULL);
+    sf = create_seqfile(fname, "wT");
+    seqfile_set_format(sf, FASTA_FMT);
+    /* do the write */
+    res = write_seqfile(sf, seq);
+    tt_int_op(res, ==, expt_bytes);
+    destroy_seqfile(sf); /* Flush it */
+    crc = crc32_file(fname);
+    tt_str_op(crc, ==, "0a295c77");
+    clean_writable_file(fname);
+    fname = NULL;
+    /* Check with bad params that it returns -2 */
+    res = write_seqfile(NULL, seq);
+    tt_int_op(res, ==, -2);
+    res = write_seqfile(sf, NULL);
+    tt_int_op(res, ==, -2);
+end:
+    destroy_seqfile(sf);
+    destroy_seq(seq);
+    if (fname != NULL) free(fname);
+    if (crc != NULL) free(crc);
+}
+
 struct testcase_t seqfile_tests[] = {
     { "create_seqfile", test_create_seqfile,},
     { "seqfile_guess_format", test_seqfile_guess_format,},
     { "destroy_seqfile", test_destroy_seqfile,},
     { "read_seqfile_vs_kseq", test_read_seqfile_vs_kseq,},
     { "read_seqfile", test_read_seqfile,},
+    { "write_seqfile", test_write_seqfile,},
     END_OF_TESTCASES
 };

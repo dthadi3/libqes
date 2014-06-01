@@ -218,3 +218,60 @@ destroy_seqfile_(seqfile_t *seqfile)
         km_free(seqfile);
     }
 }
+
+inline size_t
+strfseq(const seq_t *seq, seqfile_format_t fmt, char *buffer, size_t maxlen)
+{
+    size_t len = 0;
+    if (buffer == NULL || maxlen < 1) {
+        return 0;
+    }
+    switch (fmt) {
+        case FASTQ_FMT:
+            if (!seq_ok(seq)) {
+                buffer[0] = '\0';
+                return 0;
+            }
+            len = snprintf(buffer, maxlen, "%c%s %s\n%s\n%c\n%s\n",
+                    FASTQ_DELIM, seq->name.s, seq->comment.s,
+                    seq->seq.s,
+                    FASTQ_QUAL_DELIM,
+                    seq->qual.s);
+            return len;
+            break;
+        case FASTA_FMT:
+            if (!seq_ok_no_qual(seq)) {
+                buffer[0] = '\0';
+                return 0;
+            }
+            len = snprintf(buffer, maxlen, "%c%s %s\n%s\n",
+                    FASTA_DELIM, seq->name.s, seq->comment.s,
+                    seq->seq.s);
+            return len;
+            break;
+        default:
+            return 0;
+    }
+}
+
+inline ssize_t
+write_seqfile (seqfile_t *file, seq_t *seq)
+{
+    const size_t buflen = 1<<12; /* 4k max seq len, should be plenty */
+    char buffer[buflen];
+    size_t len = 0;
+    int ret = 0;
+
+    if (!seqfile_ok(file) || !seq_ok(seq)) {
+        return -2;
+    }
+    len = strfseq(seq, file->flags.format, buffer, buflen);
+    if (buflen <= len) {
+        return -2;
+    }
+    ret = KM_ZWRITE(file->zf->fp, buffer, len);
+    if (ret < len) {
+        return -2;
+    }
+    return len;
+}
