@@ -136,7 +136,7 @@ crc32_file(const char *filepath)
         crc = crc32(crc, buffer, len);
     }
     fclose(fp);
-    len = snprintf(crcbuf, 9, "%lx", crc);
+    len = snprintf(crcbuf, 9, "%08lx", crc);
     crcbuf[len] = '\0';
     return strdup(crcbuf);
 }
