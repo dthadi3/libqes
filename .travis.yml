@@ -5,6 +5,7 @@ env:
  - BUILD_TYPE=Release static=FALSE
  - BUILD_TYPE=Debug static=TRUE
  - BUILD_TYPE=Debug static=FALSE
+ - BUILD_TYPE=Coverage static=FALSE
 compiler:
  - clang
  - gcc
@@ -34,5 +35,5 @@ script:
  - if [ $static == "TRUE" ] ; then test -f ../target/lib/libkm.a; else test -f ../target/lib/libkm.so ; fi
 
 after_success:
- - if [ $BUILD_TYPE == "Debug" ] && [ $static == "FALSE" ] ; then coveralls --exclude test; fi
+ - if [ $BUILD_TYPE == "Coverage" ] && [ $static == "FALSE" ] ; then coveralls --exclude test; fi
 
