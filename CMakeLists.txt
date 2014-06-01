@@ -1,5 +1,9 @@
 cmake_minimum_required(VERSION 2.8)
-project(kmlib)
+project(kmlib C)
+set(KMLIB_MAJOR_VERSION 0)
+set(KMLIB_MINOR_VERSION 1)
+set(KMLIB_PATCH_VERSION 0)
+set(KMLIB_VERSION ${KMLIB_MAJOR_VERSION}.${KMLIB_MINOR_VERSION}.${KMLIB_PATCH_VERSION})
 
 # Cmake options
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake-modules")
@@ -9,6 +13,10 @@ set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 include(CodeCoverage)
 enable_testing()
+
+# Packaging
+INCLUDE(CPack)
+SET(CPACK_GENERATOR "TGZ;TBZ2")
 
 # find libs
 find_package(ZLIB 1.2.5 REQUIRED)
@@ -28,8 +36,7 @@ ENDIF(LINUX)
 
 # set -static, when STATIC is TRUE and set LINK_SEARCH_END_STATIC
 # to remove the additional -bdynamic from the linker line.
-set(CMAKE_C_FLAGS_RELEASE "-O3")
-set(CMAKE_C_FLAGS "-std=gnu99 -Wall ${KMLIB_DEPENDS_CFLAGS}")
+set(CMAKE_C_FLAGS "-std=gnu99 -Wall ${KMLIB_DEPENDS_CFLAGS} -DKMLIB_VERSION=${KMLIB_VERSION}")
 set(CMAKE_C_FLAGS_DEBUG "-ggdb -Werror -fprofile-arcs -ftest-coverage -O0")
 set(CMAKE_C_FLAGS_RELEASE "-O3")
 
