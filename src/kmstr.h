@@ -57,9 +57,8 @@ Returns:        void
 extern void init_str (str_t *str, size_t len);
 
 
-extern int str_fill_charptr_len (str_t *str, const char *cp,
-        const size_t len);
-extern int str_fill_charptr (str_t *str, const char *cp);
+extern int str_fill_charptr (str_t *str, const char *cp, size_t len);
+
 
 /*===  FUNCTION  ============================================================*
 Name:           str_nullify

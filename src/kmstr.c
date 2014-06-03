@@ -56,9 +56,12 @@ str_nullify (str_t *str)
 }
 
 inline int
-str_fill_charptr_len (str_t *str, const char *cp, const size_t len)
+str_fill_charptr (str_t *str, const char *cp, size_t len)
 {
     if (km_unlikely(str == NULL) || km_unlikely(cp == NULL)) return 0;
+    if (len == 0) {
+        len = strlen(cp);
+    }
     if (km_unlikely(str->m < len + 1)) {
         while (str->m < len + 1) {
             str->m = kmroundupz(str->m);
@@ -71,14 +74,6 @@ str_fill_charptr_len (str_t *str, const char *cp, const size_t len)
     return 1;
 }
 
-inline int
-str_fill_charptr (str_t *str, const char *cp)
-{
-    size_t len = 0;
-    if (km_unlikely(!str_ok(str)) || km_unlikely(cp == NULL)) return 0;
-    len = strlen(cp);
-    return str_fill_charptr_len(str, cp, len);
-}
 
 inline void
 init_str (str_t *str, size_t capacity)
