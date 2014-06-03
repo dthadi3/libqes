@@ -85,9 +85,8 @@ extern const char *kmlib_version;
 /*
  * General helper macros
  */
-/* Note the ! in these reverses the expected value!!!! */
-#define km_likely(x)      __builtin_expect(!(x), 0)
-#define km_unlikely(x)    __builtin_expect(!(x), 1)
+#define km_likely(x)      __builtin_expect(!!(x), 1)
+#define km_unlikely(x)    __builtin_expect(!!(x), 0)
 
 
 /*
