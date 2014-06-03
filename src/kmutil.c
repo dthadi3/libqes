@@ -18,6 +18,8 @@
 
 #include "kmutil.h"
 
+/* Pull KMLIB_VERSION in from CMAKE */
+const char *kmlib_version = KMLIB_VERSION;
 
 /* kmroundupz:
  *   Round up a `size_t` to the next highest power of two.
@@ -26,6 +28,7 @@ inline size_t
 kmroundupz (size_t sz)
 {
     /* Decrement v only if v is not already a power of 2 */
+    /* I.e, roundup things already a power of 2 */
     if (km_unlikely((sz & (sz - 1)) != 0)) sz--;
     /* mask all bits below MSB to 1 */
     sz |= sz>>1;
@@ -38,6 +41,36 @@ kmroundupz (size_t sz)
 #endif
     return sz + 1;
 }
+
+inline uint32_t
+kmroundup32 (uint32_t u32)
+{
+    /* Roundup things already a power of 2 */
+    if ((u32 & (u32 - 1)) != 0) u32--;
+    /* mask all bits below MSB to 1 */
+    u32 |= u32>>1;
+    u32 |= u32>>2;
+    u32 |= u32>>4;
+    u32 |= u32>>8;
+    u32 |= u32>>16;
+    return u32 + 1;
+}
+
+inline uint64_t
+kmroundup64 (uint64_t u64)
+{
+    /* Roundup things already a power of 2 */
+    if ((u64 & (u64 - 1)) != 0) u64--;
+    /* mask all bits below MSB to 1 */
+    u64 |= u64>>1;
+    u64 |= u64>>2;
+    u64 |= u64>>4;
+    u64 |= u64>>8;
+    u64 |= u64>>16;
+    u64 |= u64>>32;
+    return u64 + 1;
+}
+
 
 
 /* Valid non-function to pass to libkdm functions */
@@ -102,7 +135,7 @@ km_malloc_ (size_t size, errhandler_t onerr, const char *file, int line)
 {
     void *ret = malloc(size);
     if (ret == NULL) {
-        (*onerr)("calloc returned NULL -- Out of memory", file, line);
+        (*onerr)("malloc returned NULL -- Out of memory", file, line);
         return NULL;
     } else {
         return ret;
@@ -115,7 +148,7 @@ km_realloc_ (void *data, size_t size, errhandler_t onerr, const char *file,
 {
     void *ret = realloc(data, size);
     if (ret == NULL) {
-        (*onerr)("calloc returned NULL -- Out of memory", file, line);
+        (*onerr)("realloc returned NULL -- Out of memory", file, line);
         return NULL;
     } else {
         return ret;
