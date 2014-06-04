@@ -35,5 +35,5 @@ script:
  - if [ $static == "TRUE" ] ; then test -f ../target/lib/libkm.a; else test -f ../target/lib/libkm.so ; fi
 
 after_success:
- - if [ $BUILD_TYPE == "Coverage" ] && [ $static == "FALSE" ] ; then coveralls --exclude test; fi
-
+ - cd ..
+ - if [ "$BUILD_TYPE" == "Coverage" ] ; then coveralls -e target -e test  -e util -e zlib -E '.*\.h' -e build/CMakeFiles; fi
