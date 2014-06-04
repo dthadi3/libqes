@@ -63,9 +63,10 @@ IF(LINUX)
 ENDIF(LINUX)
 
 # Set CFLAGS
+SET(EXTRA_WARNING_FLAGS "-fstack-protector-all -Wstack-protector -Wfloat-equal -Wundef -Wpointer-arith -Wstrict-prototypes -Wmissing-prototypes -Wwrite-strings -Wredundant-decls -Wchar-subscripts -Wcomment -Wformat=2 -Wwrite-strings -Wmissing-declarations -Wredundant-decls -Wnested-externs -Wbad-function-cast -Wswitch-enum -Winit-self -Wmissing-field-initializers -Wdeclaration-after-statement -Wold-style-definition -Waddress -Wmissing-noreturn -Wstrict-overflow=1 -Wnormalized=id -Woverride-init -Wextra -Warray-bounds -Wlogical-op")
 SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=gnu99 -Wall ${KMLIB_DEPENDS_CFLAGS}")
 SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DKMLIB_VERSION=\\\"${KMLIB_VERSION}\\\"")
-SET(CMAKE_C_FLAGS_DEBUG "-ggdb -Werror")
+SET(CMAKE_C_FLAGS_DEBUG "-ggdb ${EXTRA_WARNING_FLAGS}")
 SET(CMAKE_C_FLAGS_RELEASE "-O3")
 # Coverage target set in CodeCoverage.cmake
 
