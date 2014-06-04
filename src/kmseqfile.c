@@ -258,37 +258,6 @@ strfseq(const seq_t *seq, seqfile_format_t fmt, char *buffer, size_t maxlen)
 inline ssize_t
 write_seqfile (seqfile_t *file, seq_t *seq)
 {
-#if 0
-    size_t len = 0;
-
-    if (!seqfile_ok(file) || !seq_ok(seq)) {
-        return -2;
-    }
-    switch (file->flags.format) {
-        case FASTQ_FMT:
-            if (!seq_ok(seq)) {
-                return 0;
-            }
-            len = KM_ZFPRINTF(file->zf->fp, "%c%s %s\n%s\n%c\n%s\n",
-                    FASTQ_DELIM, seq->name.s, seq->comment.s,
-                    seq->seq.s,
-                    FASTQ_QUAL_DELIM,
-                    seq->qual.s);
-            return len;
-            break;
-        case FASTA_FMT:
-            if (!seq_ok_no_qual(seq)) {
-                return 0;
-            }
-            len = KM_ZFPRINTF(file->zf->fp,  "%c%s %s\n%s\n",
-                    FASTA_DELIM, seq->name.s, seq->comment.s,
-                    seq->seq.s);
-            return len;
-            break;
-        default:
-            return 0;
-    }
-#else
     ssize_t len = 0;
     const size_t buflen = 1<<12; /* 4k max seq len, should be plenty */
     char buffer[1<<12];
@@ -306,5 +275,4 @@ write_seqfile (seqfile_t *file, seq_t *seq)
         return -2;
     }
     return len;
-#endif
 }
