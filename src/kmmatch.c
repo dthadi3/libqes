@@ -20,12 +20,16 @@
 
 #include "kmmatch.h"
 
-inline uint_fast32_t
+inline int_fast32_t
 hamming (const char *seq1, const char *seq2, size_t len)
 {
-    uint_fast32_t mismatches = 0;
+    int_fast32_t mismatches = 0;
     size_t iii = 0;
 
+    /* Error out on bad arguments */
+    if (seq1 == NULL || seq2 == NULL) {
+        return -1;
+    }
     /* If we've been given a length of 0, we make it up ourselves */
     if (len == 0) {
         size_t len2 = strlen(seq2);
@@ -47,22 +51,16 @@ hamming (const char *seq1, const char *seq2, size_t len)
 }
 
 
-/*===  FUNCTION  ============================================================*
-Name:           hamming_max
-Paramters:      const char *seq1, *seq2: Two strings to compare.
-                size_t max: Stop counting at ``max``, return ``max + 1``.
-Description:    Find the hamming distance between two strings. The strings are
-                matched until the length of the smallest string, or until the
-                maximum hamming distance (``max``) is reached.
-Returns:        The hamming distance between ``seq1`` and ``seq2``, or
-                ``max + 1`` if the hamming distance exceeds ``max``.
- *===========================================================================*/
-inline uint_fast32_t
-hamming_max(const char *seq1, const char *seq2, size_t len, uint_fast32_t max)
+inline int_fast32_t
+hamming_max(const char *seq1, const char *seq2, size_t len, int_fast32_t max)
 {
-    uint_fast32_t mismatches = 0;
+    int_fast32_t mismatches = 0;
     size_t iii = 0;
 
+    /* Error out on bad arguments */
+    if (seq1 == NULL || seq2 == NULL || max < 0) {
+        return -1;
+    }
     /* If we've been given a lenght of 0, we make it up ourselves */
     if (len == 0) {
         size_t len2 = strlen(seq2);
