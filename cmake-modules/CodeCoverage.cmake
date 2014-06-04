@@ -87,7 +87,7 @@ ENDIF() # NOT CMAKE_COMPILER_IS_GNUCXX
 #                       HTML report is generated in _outputname/index.html
 # Optional fourth parameter is passed as arguments to _testrunner
 #   Pass them in list form, e.g.: "-j;2" for -j 2
-FUNCTION(SETUP_TARGET_FOR_COVERAGE _targetname _testrunner _outputname)
+FUNCTION(SETUP_TARGET_FOR_COVERAGE _targetname _testrunner _outputname _coverdir)
 
 	IF(NOT LCOV_PATH)
 		MESSAGE(FATAL_ERROR "lcov not found! Aborting...")
@@ -101,16 +101,15 @@ FUNCTION(SETUP_TARGET_FOR_COVERAGE _targetname _testrunner _outputname)
 	ADD_CUSTOM_TARGET(${_targetname}
 
 		# Cleanup lcov
-		${LCOV_PATH} --rc lcov_branch_coverage=1 --directory . --zerocounters
+		${LCOV_PATH} --rc lcov_branch_coverage=1 --directory  ${_coverdir} --zerocounters
 
 		# Run tests
-		COMMAND ${_testrunner} ${ARGV3}
+		COMMAND ${_testrunner} ${ARGV4}
 
 		# Capturing lcov counters and generating report
-		COMMAND ${LCOV_PATH} --rc lcov_branch_coverage=1 --directory . --capture --output-file ${_outputname}.info
-		COMMAND ${LCOV_PATH} --rc lcov_branch_coverage=1 --remove ${_outputname}.info 'test/*' '/usr/*' --output-file ${_outputname}.info.cleaned
-		COMMAND ${GENHTML_PATH} --branch-coverage --function-coverage -o ${_outputname} ${_outputname}.info.cleaned
-		COMMAND ${CMAKE_COMMAND} -E remove ${_outputname}.info ${_outputname}.info.cleaned
+		COMMAND ${LCOV_PATH} --rc lcov_branch_coverage=1 --directory ${_coverdir} --capture --output-file ${_outputname}.info
+		COMMAND ${GENHTML_PATH} --branch-coverage -o ${_outputname} ${_outputname}.info
+		COMMAND ${CMAKE_COMMAND} -E remove ${_outputname}.info
 
 		WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
 		COMMENT "Resetting code coverage counters to zero.\nProcessing code coverage counters and generating report."
