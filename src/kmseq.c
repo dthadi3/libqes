@@ -117,56 +117,58 @@ print_seq (const seq_t *seq, FILE *stream)
 inline int
 seq_fill_name (seq_t *seqobj, const char *name, size_t len)
 {
-    if (name != NULL) {
-        str_fill_charptr(&seqobj->name, name, len);
-        return 1;
+    if (seqobj == NULL || name == NULL || len < 1) {
+        return 0;
     }
-    return 0;
+    str_fill_charptr(&seqobj->name, name, len);
+    return 1;
 }
 
 inline int
 seq_fill_comment (seq_t *seqobj, const char *comment, size_t len)
 {
-    if (comment != NULL) {
-        str_fill_charptr(&seqobj->comment, comment, len);
-        return 1;
+    if (seqobj == NULL || comment == NULL || len < 1) {
+        return 0;
     }
-    return 0;
+    str_fill_charptr(&seqobj->comment, comment, len);
+    return 1;
 }
 
 inline int
 seq_fill_seq (seq_t *seqobj, const char *seq, size_t len)
 {
-    if (seq != NULL) {
-        str_fill_charptr(&seqobj->seq, seq, len);
-        return 1;
+    if (seqobj == NULL || seq == NULL || len < 1) {
+        return 0;
     }
-    return 0;
+    str_fill_charptr(&seqobj->seq, seq, len);
+    return 1;
 }
 
 inline int
 seq_fill_qual (seq_t *seqobj, const char *qual, size_t len)
 {
-    if (qual != NULL) {
-        str_fill_charptr(&seqobj->qual, qual, len);
-        return 1;
+    if (seqobj == NULL || qual == NULL || len < 1) {
+        return 0;
     }
-    return 0;
+    str_fill_charptr(&seqobj->qual, qual, len);
+    return 1;
 }
 
 inline int
 seq_fill_header (seq_t *seqobj, const char *header, size_t len)
 {
-    if (header != NULL) {
-        char *tmp = strchr(header, ' ');
-        if (tmp != NULL) {
-            tmp[0] = '\0';
-            str_fill_charptr(&seqobj->name, header, tmp - header);
-            str_fill_charptr(&seqobj->comment, tmp + 1, 0);
-        } else {
-            str_fill_charptr(&seqobj->name, header, len);
-            str_nullify(&seqobj->name);
-        }
+    if (seqobj == NULL || header == NULL || len < 1) {
+        return 0;
+    }
+    char *tmp = memchr(header, ' ', len);
+    size_t startfrom = header[0] == '@' || header[0] == '>' ? 1 : 0;
+    if (tmp != NULL) {
+        str_fill_charptr(&seqobj->name, header + startfrom,
+                tmp - header - startfrom);
+        str_fill_charptr(&seqobj->comment, tmp + 1, 0);
+    } else {
+        str_fill_charptr(&seqobj->name, header + startfrom, len - startfrom);
+        str_nullify(&seqobj->comment);
     }
     return 1;
 }

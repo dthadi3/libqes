@@ -91,6 +91,7 @@ void test_seq_ok_no_comment (void *);
 void test_seq_ok_no_qual (void *);
 void test_seq_ok_no_comment_or_qual (void *);
 void test_destroy_seq (void *);
+void test_seq_fill_funcs(void *);
 extern struct testcase_t seq_tests[];
 
 /* test_sequtil tests */
