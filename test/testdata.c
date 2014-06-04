@@ -144,6 +144,6 @@ end:
 }
 
 struct testcase_t data_tests[] = {
-    { "data_files", test_data_files,},
+    { "data_files", test_data_files, 0, NULL, NULL},
     END_OF_TESTCASES
 };

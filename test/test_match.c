@@ -45,7 +45,7 @@ end:
 }
 
 struct testcase_t match_tests[] = {
-    { "hamming", test_hamming,},
-    { "hamming_max", test_hamming_max,},
+    { "hamming", test_hamming, 0, NULL, NULL},
+    { "hamming_max", test_hamming_max, 0, NULL, NULL},
     END_OF_TESTCASES
 };

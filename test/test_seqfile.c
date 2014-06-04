@@ -325,11 +325,11 @@ end:
 }
 
 struct testcase_t seqfile_tests[] = {
-    { "create_seqfile", test_create_seqfile,},
-    { "seqfile_guess_format", test_seqfile_guess_format,},
-    { "destroy_seqfile", test_destroy_seqfile,},
-    { "read_seqfile_vs_kseq", test_read_seqfile_vs_kseq,},
-    { "read_seqfile", test_read_seqfile,},
-    { "write_seqfile", test_write_seqfile,},
+    { "create_seqfile", test_create_seqfile, 0, NULL, NULL},
+    { "seqfile_guess_format", test_seqfile_guess_format, 0, NULL, NULL},
+    { "destroy_seqfile", test_destroy_seqfile, 0, NULL, NULL},
+    { "read_seqfile_vs_kseq", test_read_seqfile_vs_kseq, 0, NULL, NULL},
+    { "read_seqfile", test_read_seqfile, 0, NULL, NULL},
+    { "write_seqfile", test_write_seqfile, 0, NULL, NULL},
     END_OF_TESTCASES
 };

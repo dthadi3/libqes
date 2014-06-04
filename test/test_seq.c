@@ -214,13 +214,13 @@ end:
 
 
 struct testcase_t seq_tests[] = {
-    { "create_seq", test_create_seq,},
-    { "create_seq_no_qual", test_create_seq_no_qual,},
-    { "create_seq_no_qual_or_comment", test_create_seq_no_qual_or_comment,},
-    { "seq_ok", test_seq_ok,},
-    { "seq_ok_no_comment", test_seq_ok_no_comment,},
-    { "seq_ok_no_qual", test_seq_ok_no_qual,},
-    { "seq_ok_no_comment_or_qual", test_seq_ok_no_comment_or_qual,},
-    { "destroy_seq", test_destroy_seq,},
+    { "create_seq", test_create_seq, 0, NULL, NULL},
+    { "create_seq_no_qual", test_create_seq_no_qual, 0, NULL, NULL},
+    { "create_seq_no_qual_or_comment", test_create_seq_no_qual_or_comment, 0, NULL, NULL},
+    { "seq_ok", test_seq_ok, 0, NULL, NULL},
+    { "seq_ok_no_comment", test_seq_ok_no_comment, 0, NULL, NULL},
+    { "seq_ok_no_qual", test_seq_ok_no_qual, 0, NULL, NULL},
+    { "seq_ok_no_comment_or_qual", test_seq_ok_no_comment_or_qual, 0, NULL, NULL},
+    { "destroy_seq", test_destroy_seq, 0, NULL, NULL},
     END_OF_TESTCASES
 };
