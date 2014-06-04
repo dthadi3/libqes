@@ -36,9 +36,9 @@ typedef struct _seq {
 } seq_t;
 
 /* PROTOTYPES */
-seq_t *create_seq ();
-seq_t *create_seq_no_qual ();
-seq_t *create_seq_no_qual_or_comment ();
+seq_t *create_seq (void);
+seq_t *create_seq_no_qual (void);
+seq_t *create_seq_no_qual_or_comment (void);
 
 extern int seq_ok(const seq_t *seq);
 extern int seq_ok_no_qual(const seq_t *seq);
@@ -49,6 +49,8 @@ extern int seq_fill_seq(seq_t *seqobj, const char *seq, size_t len);
 extern int seq_fill_qual(seq_t *seqobj, const char *qual, size_t len);
 extern int seq_fill_name(seq_t *seqobj, const char *name, size_t len);
 extern int seq_fill_comment(seq_t *seqobj, const char *comment, size_t len);
+void print_seq (const seq_t *seq, FILE *stream);
+
 void destroy_seq_(seq_t *seq);
 #define destroy_seq(seq) do {       \
             destroy_seq_(seq);      \

@@ -20,7 +20,7 @@
 #include "kmseq.h"
 
 seq_t *
-create_seq ()
+create_seq (void)
 {
     seq_t *seq = km_malloc(sizeof(*seq));
 
@@ -32,7 +32,7 @@ create_seq ()
 }
 
 seq_t *
-create_seq_no_qual ()
+create_seq_no_qual (void)
 {
     seq_t *seq = km_malloc(sizeof(*seq));
 
@@ -46,7 +46,7 @@ create_seq_no_qual ()
 }
 
 seq_t *
-create_seq_no_qual_or_comment ()
+create_seq_no_qual_or_comment (void)
 {
     seq_t *seq = km_malloc(sizeof(*seq));
     init_str(&seq->name, __INIT_LINE_LEN);

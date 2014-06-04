@@ -39,7 +39,7 @@
 extern char *data_prefix;
 
 char *find_data_file(const char * filepath);
-char *get_writable_file();
+char *get_writable_file(void);
 void clean_writable_file(char *filepath);
 char *crc32_file(const char *filepath);
 

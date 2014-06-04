@@ -133,7 +133,7 @@ test_zfreadline (void *ptr)
     char buffer[bufsize];
     ssize_t res_len = 0;
     off_t orig_filepos = 0;
-    int iii;
+    size_t iii;
     char *fname = NULL;
 
     (void) ptr;
@@ -176,7 +176,7 @@ test_zfgetuntil (void *ptr)
     size_t expt_len = 0;
     off_t orig_filepos = 0;
     off_t our_filepos = 0;
-    int iii;
+    size_t iii;
     const size_t n_delims = 5;
     const int delims[] = {' ', ',', '.', '\n', '\n'};
     const char *delim_words[] = {

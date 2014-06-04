@@ -224,9 +224,9 @@ translate_codon (const char *codon)
 inline char *
 revcomp (const char *seq, size_t len)
 {
-	int seqlen = strlen(seq);
-    seqlen = seqlen < len ? seqlen : len - 1;
+    size_t seqlen = strlen(seq);
     char *outseq = strdup(seq);
+    seqlen = seqlen < len ? seqlen : len - 1;
 
 	if (outseq[seqlen - 1] == '\n') {
 		outseq[seqlen - 1] = '\0';

@@ -147,6 +147,21 @@ end:
     ;
 }
 
+void
+test_expects (void *ptr)
+{
+    int t = 1;
+    int f = 0;
+
+    (void) ptr;
+    tt_assert(km_likely(t));
+    tt_assert(!km_likely(f));
+    tt_assert(km_unlikely(t));
+    tt_assert(!km_unlikely(f));
+end:
+    ;
+}
+
 struct testcase_t util_tests[] = {
     { "km_calloc", test_km_calloc, 0, NULL, NULL},
     { "km_malloc", test_km_malloc, 0, NULL, NULL},
@@ -154,5 +169,6 @@ struct testcase_t util_tests[] = {
     { "km_free", test_km_free, 0, NULL, NULL},
     { "kmroundup32", test_kmroundup32, 0, NULL, NULL},
     { "kmroundup64", test_kmroundup64, 0, NULL, NULL},
+    { "expects", test_expects, 0, NULL, NULL},
     END_OF_TESTCASES
 };

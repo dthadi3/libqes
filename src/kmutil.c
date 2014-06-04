@@ -87,10 +87,10 @@ void
 errprint (ERRFN_ARGS)
 {
     char msg_fmt[1<<8] = "";
+    va_list args;
     if (msg == NULL) {
         msg = "GENERIC ERROR WITH NO MESSAGE";
     }
-    va_list args;
     va_start (args, line);
     vsnprintf(msg_fmt, 1<<8, msg, args);
     va_end (args);
@@ -103,10 +103,10 @@ void
 errprintexit (ERRFN_ARGS)
 {
     char msg_fmt[1<<8] = "";
+    va_list args;
     if (msg == NULL) {
         msg = "GENERIC ERROR WITH NO MESSAGE";
     }
-    va_list args;
     va_start (args, line);
     vsnprintf(msg_fmt, 1<<8, msg, args);
     va_end (args);

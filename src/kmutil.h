@@ -20,6 +20,7 @@
 #define KMUTIL_H
 
 /* #####   HEADER FILE INCLUDES   ########################################## */
+#include <ctype.h>
 #include <errno.h>
 #include <stdarg.h>
 #include <stddef.h>
@@ -110,7 +111,7 @@ extern const char *kmlib_version;
 #define ERRFN_ARGS const char *msg,  const char *file, int line, ...
 void errnil(ERRFN_ARGS);
 void errprint (ERRFN_ARGS);
-void errprintexit (ERRFN_ARGS);
+void errprintexit (ERRFN_ARGS)  __attribute__ ((noreturn));
 typedef void (*errhandler_t) (const char*, const char *, int, ...);
 
 /*

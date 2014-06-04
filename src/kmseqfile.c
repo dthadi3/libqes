@@ -60,7 +60,7 @@ read_fastq_seqfile(seqfile_t *file, seq_t *seq)
     /* Fill the qual score string directly */
     len = zfreadline_str(file->zf, &seq->qual);
     CHECK_AND_TRIM(seq->qual)
-    if (len != seq->seq.l) {
+    if ((size_t)len != seq->seq.l) {
         /* Error out on different len qual/seq entries */
         goto error;
     }
@@ -249,6 +249,7 @@ strfseq(const seq_t *seq, seqfile_format_t fmt, char *buffer, size_t maxlen)
                     seq->seq.s);
             return len;
             break;
+        case UNKNOWN_FMT:
         default:
             return 0;
     }
