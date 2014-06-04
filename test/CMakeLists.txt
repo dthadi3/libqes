@@ -5,7 +5,7 @@ SET(TEST_SRCS ${TEST_SRCS} tinytest/tinytest.c)
 ADD_EXECUTABLE(test_kmlib ${TEST_SRCS})
 TARGET_LINK_LIBRARIES(test_kmlib km ${KMLIB_DEPENDS_LIBS})
 IF (CMAKE_BUILD_TYPE STREQUAL "Coverage")
-	SETUP_TARGET_FOR_COVERAGE(coverage test_kmlib coverage)
+	SETUP_TARGET_FOR_COVERAGE(coverage test_kmlib coverage src)
 ENDIF()
 ADD_TEST(NAME kmlib COMMAND ${CMAKE_BINARY_DIR}/bin/test_kmlib ${CMAKE_BINARY_DIR})
 
