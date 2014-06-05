@@ -26,9 +26,9 @@
   |  Seqfile methods -- seamless reading & writing of FASTA & FASTQ         |
   ---------------------------------------------------------------------------*/
 
-#define	FASTA_DELIM '>'
-#define	FASTQ_DELIM '@'
-#define	FASTQ_QUAL_DELIM '+'
+#define    FASTA_DELIM '>'
+#define    FASTQ_DELIM '@'
+#define    FASTQ_QUAL_DELIM '+'
 
 typedef enum _seqfile_format {
     UNKNOWN_FMT = 0,

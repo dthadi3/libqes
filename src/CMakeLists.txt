@@ -3,7 +3,7 @@ SET(KMLIB_SOURCES kmzfile.c kmutil.c kmmatch.c kmsequtil.c kmseq.c kmseqfile.c k
 
 # Targets
 IF(STATIC)
-	ADD_LIBRARY(km ${KMLIB_SOURCES})
+    ADD_LIBRARY(km ${KMLIB_SOURCES})
 ELSE()
     ADD_LIBRARY(km SHARED ${KMLIB_SOURCES})
 ENDIF()

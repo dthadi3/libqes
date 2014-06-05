@@ -53,10 +53,10 @@ extern const char *kmlib_version;
 
 #define KM_MAX_FN_LEN (1<<16)
 /* Size of buffers for file IO */
-#define	KM_FILEBUFFER_LEN (1<<20) 
+#define    KM_FILEBUFFER_LEN (1<<20) 
 /* Starting point for allocing a char pointer. Set to slightly larger than the
    standard size of whatever you're reading in. */
-#define	__INIT_LINE_LEN (128)
+#define    __INIT_LINE_LEN (128)
 
 /*
  * Macro helpers from tor
@@ -170,46 +170,46 @@ extern uint64_t kmroundup64 (uint64_t u64);
 /* Definitions to make changing fp type easy */
 #ifdef HAVE_ZLIB
 #   include <zlib.h>
-#   define	KM_ZTYPE gzFile
-#   define	KM_ZOPEN gzopen
-#   define	KM_ZDOPEN gzdopen
-#   define	KM_ZCLOSE gzclose
-#   define	KM_ZREAD gzread
-#   define	KM_ZWRITE gzwrite
-#   define	KM_ZFLUSH gzflush
-#   define	KM_ZFPRINTF gzprintf
-#   define	KM_ZFPUTS gzputs
-#   define	KM_ZFPUTC gzputc
-#   define	KM_ZFGETS gzgets
-#   define	KM_ZFGETC gzgetc
-#   define	KM_ZFUNGETC gzungetc
-#   define	KM_ZERR gzerror
-#   define	KM_ZEOF gzeof
-#   define	KM_ZBUFFER gzbuffer
-#   define	KM_ZSEEK gzseek
-#   define	KM_ZTELL gztell
-#   define	KM_ZREWIND gzrewind
+#   define    KM_ZTYPE gzFile
+#   define    KM_ZOPEN gzopen
+#   define    KM_ZDOPEN gzdopen
+#   define    KM_ZCLOSE gzclose
+#   define    KM_ZREAD gzread
+#   define    KM_ZWRITE gzwrite
+#   define    KM_ZFLUSH gzflush
+#   define    KM_ZFPRINTF gzprintf
+#   define    KM_ZFPUTS gzputs
+#   define    KM_ZFPUTC gzputc
+#   define    KM_ZFGETS gzgets
+#   define    KM_ZFGETC gzgetc
+#   define    KM_ZFUNGETC gzungetc
+#   define    KM_ZERR gzerror
+#   define    KM_ZEOF gzeof
+#   define    KM_ZBUFFER gzbuffer
+#   define    KM_ZSEEK gzseek
+#   define    KM_ZTELL gztell
+#   define    KM_ZREWIND gzrewind
 #else
-#   define	KM_ZTYPE FILE*
-#   define	KM_ZOPEN fopen
-#   define	KM_ZCLOSE fclose
-#   define	KM_ZDOPEN fdopen
-#   define	KM_ZCLOSE fclose
-#   define	KM_ZREAD fread
-#   define	KM_ZWRITE fwrite
-#   define	KM_ZFLUSH fflush
-#   define	KM_ZFPRINTF fprintf
-#   define	KM_ZFPUTS fputs
-#   define	KM_ZFPUTC fputc
-#   define	KM_ZFGETS fgets
-#   define	KM_ZFGETC fgetc
-#   define	KM_ZFUNGETC fungetc
-#   define	KM_ZERR ferror
-#   define	KM_ZEOF feof
-#   define	KM_ZBUFFER fbuffer
-#   define	KM_ZSEEK fseek
-#   define	KM_ZTELL ftell
-#   define	KM_ZREWIND frewind
+#   define    KM_ZTYPE FILE*
+#   define    KM_ZOPEN fopen
+#   define    KM_ZCLOSE fclose
+#   define    KM_ZDOPEN fdopen
+#   define    KM_ZCLOSE fclose
+#   define    KM_ZREAD fread
+#   define    KM_ZWRITE fwrite
+#   define    KM_ZFLUSH fflush
+#   define    KM_ZFPRINTF fprintf
+#   define    KM_ZFPUTS fputs
+#   define    KM_ZFPUTC fputc
+#   define    KM_ZFGETS fgets
+#   define    KM_ZFGETC fgetc
+#   define    KM_ZFUNGETC fungetc
+#   define    KM_ZERR ferror
+#   define    KM_ZEOF feof
+#   define    KM_ZBUFFER fbuffer
+#   define    KM_ZSEEK fseek
+#   define    KM_ZTELL ftell
+#   define    KM_ZREWIND frewind
 #endif
 
 typedef enum __rwmode {

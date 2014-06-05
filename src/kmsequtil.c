@@ -228,10 +228,10 @@ revcomp (const char *seq, size_t len)
     char *outseq = strdup(seq);
     seqlen = seqlen < len ? seqlen : len - 1;
 
-	if (outseq[seqlen - 1] == '\n') {
-		outseq[seqlen - 1] = '\0';
-		seqlen--;
-	}
+    if (outseq[seqlen - 1] == '\n') {
+        outseq[seqlen - 1] = '\0';
+        seqlen--;
+    }
 
     revcomp_inplace(outseq, len);
     return outseq;
