@@ -60,7 +60,7 @@ read_fastq_seqfile(seqfile_t *file, seq_t *seq)
     /* Fill the qual score string directly */
     len = zfreadline_str(file->zf, &seq->qual);
     CHECK_AND_TRIM(seq->qual)
-    if (len != seq->seq.l) {
+    if ((size_t)len != seq->seq.l) {
         /* Error out on different len qual/seq entries */
         goto error;
     }
@@ -249,6 +249,7 @@ strfseq(const seq_t *seq, seqfile_format_t fmt, char *buffer, size_t maxlen)
                     seq->seq.s);
             return len;
             break;
+        case UNKNOWN_FMT:
         default:
             return 0;
     }
@@ -257,16 +258,16 @@ strfseq(const seq_t *seq, seqfile_format_t fmt, char *buffer, size_t maxlen)
 inline ssize_t
 write_seqfile (seqfile_t *file, seq_t *seq)
 {
+    ssize_t len = 0;
     const size_t buflen = 1<<12; /* 4k max seq len, should be plenty */
-    char buffer[buflen];
-    size_t len = 0;
+    char buffer[1<<12];
     int ret = 0;
 
     if (!seqfile_ok(file) || !seq_ok(seq)) {
         return -2;
     }
     len = strfseq(seq, file->flags.format, buffer, buflen);
-    if (buflen <= len) {
+    if ((ssize_t) buflen <= len) {
         return -2;
     }
     ret = KM_ZWRITE(file->zf->fp, buffer, len);

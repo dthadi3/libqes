@@ -51,6 +51,6 @@ end:
 }
 
 struct testcase_t sequtil_tests[] = {
-    { "translate_codon", test_translate_codon,},
+    { "translate_codon", test_translate_codon, 0, NULL, NULL},
     END_OF_TESTCASES
 };

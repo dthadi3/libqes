@@ -53,6 +53,7 @@ void test_km_realloc(void *);
 void test_km_free(void *);
 void test_kmroundup32(void *);
 void test_kmroundup64(void *);
+void test_expects (void *);
 extern struct testcase_t util_tests[];
 
 /* test_match tests */
@@ -83,7 +84,6 @@ extern struct testcase_t seqfile_tests[];
 
 /* test_seq tests */
 void test_create_seq (void *);
-void test_create_seq (void *);
 void test_create_seq_no_qual (void *);
 void test_create_seq_no_qual_or_comment (void *);
 void test_seq_ok (void *);
@@ -91,6 +91,7 @@ void test_seq_ok_no_comment (void *);
 void test_seq_ok_no_qual (void *);
 void test_seq_ok_no_comment_or_qual (void *);
 void test_destroy_seq (void *);
+void test_seq_fill_funcs(void *);
 extern struct testcase_t seq_tests[];
 
 /* test_sequtil tests */

@@ -20,6 +20,7 @@
 #define KMUTIL_H
 
 /* #####   HEADER FILE INCLUDES   ########################################## */
+#include <ctype.h>
 #include <errno.h>
 #include <stdarg.h>
 #include <stddef.h>
@@ -36,19 +37,27 @@
 
 #if defined(WIN32) || defined(_WIN32)
 #include <windows.h>
-#define km_pathsep "\\"
+#define KM_PATHSEP "\\"
 #else
-#define km_pathsep "/"
+#define KM_PATHSEP "/"
 #include <unistd.h>
 #endif
+
+
 
 /*
  * Misc constants
  */
-#define KM_MAX_FN_LEN (1<<16)
 
-#define	KM_FILEBUFFER_LEN (1<<20) /* Size of buffers for file IO */
-#define	__INIT_LINE_LEN 128 /* Starting point for allocing a str_t */
+extern const char *kmlib_version;
+
+#define KM_MAX_FN_LEN (1<<16)
+/* Size of buffers for file IO */
+#define    KM_FILEBUFFER_LEN (1<<20) 
+/* Starting point for allocing a char pointer. Set to slightly larger than the
+   standard size of whatever you're reading in. */
+#define    __INIT_LINE_LEN (128)
+
 /*
  * Macro helpers from tor
  */
@@ -60,17 +69,17 @@
  * argument. */
 #define STMT_VOID(a) while (0) { (void)(a); }
 
-#ifdef __GNUC__
 /* STMT_BEGIN and STMT_END are used to wrap blocks inside macros so that
  * the macro can be used as if it were a single C statement. */
-#define STMT_BEGIN (void) ({
-#define STMT_END })
+#ifdef __GNUC__
+    #define STMT_BEGIN (void) ({
+    #define STMT_END })
 #elif defined(sun) || defined(__sun__)
-#define STMT_BEGIN if (1) {
-#define STMT_END } else STMT_NIL
+    #define STMT_BEGIN if (1) {
+    #define STMT_END } else STMT_NIL
 #else
-#define STMT_BEGIN do {
-#define STMT_END } while (0)
+    #define STMT_BEGIN do {
+    #define STMT_END } while (0)
 #endif
 
 
@@ -81,7 +90,6 @@
 #define km_unlikely(x)    __builtin_expect(!!(x), 0)
 
 
-
 /*
  * Error handling functions
  */
@@ -89,27 +97,27 @@
 /* use the stdlib exit function by default, during testing we can #define this
    to some kind of error handler if we need to. */
 #ifndef  KM_EXIT_FN
-#define  KM_EXIT_FN exit
+    #define  KM_EXIT_FN exit
 #endif
 
 
 /* By default, we use this error handler. At compile or include time, we can
    chose another more appropriate one if we need to. */
 #ifndef  KM_DEFAULT_ERR_FN
-#define  KM_DEFAULT_ERR_FN errprintexit
+    #define  KM_DEFAULT_ERR_FN errprintexit
 #endif
 
-
-/* Valid non-function to pass to libkdm functions */
 
 #define ERRFN_ARGS const char *msg,  const char *file, int line, ...
 void errnil(ERRFN_ARGS);
 void errprint (ERRFN_ARGS);
-void errprintexit (ERRFN_ARGS);
+void errprintexit (ERRFN_ARGS)  __attribute__ ((noreturn));
 typedef void (*errhandler_t) (const char*, const char *, int, ...);
+
 /*
  * Memory allocation/deallocation
  */
+
 extern void *km_calloc_ (size_t n, size_t size, errhandler_t onerr,
         const char *file, int line);
 #define km_calloc(n, sz) \
@@ -120,6 +128,7 @@ extern void *km_calloc_ (size_t n, size_t size, errhandler_t onerr,
     km_calloc_(n, sz, errprint, __FILE__, __LINE__)
 #define km_calloc_errprintexit(n, sz) \
     km_calloc_(n, sz, errprintexit, __FILE__, __LINE__)
+
 extern void *km_malloc_ (size_t size, errhandler_t onerr, const char *file,
         int line);
 #define km_malloc(sz) \
@@ -130,6 +139,7 @@ extern void *km_malloc_ (size_t size, errhandler_t onerr, const char *file,
     km_malloc_(sz, errprint, __FILE__, __LINE__)
 #define km_malloc_errprintexit(sz) \
     km_malloc_(sz, errprintexit, __FILE__, __LINE__)
+
 extern void *km_realloc_ (void *data, size_t size, errhandler_t onerr,
         const char *file, int line);
 #define km_realloc(ptr, sz) \
@@ -148,99 +158,58 @@ extern void *km_realloc_ (void *data, size_t size, errhandler_t onerr,
     }                               \
     STMT_END
 
-/*
- * Bit fiddling and maths hacks
- */
-
-
 /* Flogged from http://stackoverflow.com/a/1322548 and
    http://graphics.stanford.edu/~seander/bithacks.html, and kseq.h */
 /* Round a 32-bit int up to nearest base-2 number */
-#define	kmroundup32(v) (((v) & ((v) - 1)) == 0) ? /* Power of 2 */ \
-        (                               \
-            (v)|=(v)>>1,                \
-            (v)|=(v)>>2,                \
-            (v)|=(v)>>4,                \
-            (v)|=(v)>>8,                \
-            (v)|=(v)>>16,               \
-            ++(v)                       \
-        ) : (                           \
-            --(v),                      \
-            (v)|=(v)>>1,                \
-            (v)|=(v)>>2,                \
-            (v)|=(v)>>4,                \
-            (v)|=(v)>>8,                \
-            (v)|=(v)>>16,               \
-            ++(v)                       \
-        )
-
-/* Round a 64-bit int up to nearest base-2 number */
-#define	kmroundup64(v) (((v) & ((v) - 1)) == 0) ? /* Power of 2 */ \
-        (                               \
-            (v)|=(v)>>1,                \
-            (v)|=(v)>>2,                \
-            (v)|=(v)>>4,                \
-            (v)|=(v)>>8,                \
-            (v)|=(v)>>16,               \
-            (v)|=(v)>>32,               \
-            ++(v)                       \
-        ) : (                           \
-            --(v),                      \
-            (v)|=(v)>>1,                \
-            (v)|=(v)>>2,                \
-            (v)|=(v)>>4,                \
-            (v)|=(v)>>8,                \
-            (v)|=(v)>>16,               \
-            (v)|=(v)>>32,               \
-            ++(v)                       \
-        )
 extern size_t kmroundupz(size_t sz);
+extern uint32_t kmroundup32 (uint32_t u32);
+extern uint64_t kmroundup64 (uint64_t u64);
 
 /* IO helpers */
 
 /* Definitions to make changing fp type easy */
 #ifdef HAVE_ZLIB
 #   include <zlib.h>
-#   define	KM_ZTYPE gzFile
-#   define	KM_ZOPEN gzopen
-#   define	KM_ZDOPEN gzdopen
-#   define	KM_ZCLOSE gzclose
-#   define	KM_ZREAD gzread
-#   define	KM_ZWRITE gzwrite
-#   define	KM_ZFLUSH gzflush
-#   define	KM_ZFPRINTF gzprintf
-#   define	KM_ZFPUTS gzputs
-#   define	KM_ZFPUTC gzputc
-#   define	KM_ZFGETS gzgets
-#   define	KM_ZFGETC gzgetc
-#   define	KM_ZFUNGETC gzungetc
-#   define	KM_ZERR gzerror
-#   define	KM_ZEOF gzeof
-#   define	KM_ZBUFFER gzbuffer
-#   define	KM_ZSEEK gzseek
-#   define	KM_ZTELL gztell
-#   define	KM_ZREWIND gzrewind
+#   define    KM_ZTYPE gzFile
+#   define    KM_ZOPEN gzopen
+#   define    KM_ZDOPEN gzdopen
+#   define    KM_ZCLOSE gzclose
+#   define    KM_ZREAD gzread
+#   define    KM_ZWRITE gzwrite
+#   define    KM_ZFLUSH gzflush
+#   define    KM_ZFPRINTF gzprintf
+#   define    KM_ZFPUTS gzputs
+#   define    KM_ZFPUTC gzputc
+#   define    KM_ZFGETS gzgets
+#   define    KM_ZFGETC gzgetc
+#   define    KM_ZFUNGETC gzungetc
+#   define    KM_ZERR gzerror
+#   define    KM_ZEOF gzeof
+#   define    KM_ZBUFFER gzbuffer
+#   define    KM_ZSEEK gzseek
+#   define    KM_ZTELL gztell
+#   define    KM_ZREWIND gzrewind
 #else
-#   define	KM_ZTYPE FILE*
-#   define	KM_ZOPEN fopen
-#   define	KM_ZCLOSE fclose
-#   define	KM_ZDOPEN fdopen
-#   define	KM_ZCLOSE fclose
-#   define	KM_ZREAD fread
-#   define	KM_ZWRITE fwrite
-#   define	KM_ZFLUSH fflush
-#   define	KM_ZFPRINTF fprintf
-#   define	KM_ZFPUTS fputs
-#   define	KM_ZFPUTC fputc
-#   define	KM_ZFGETS fgets
-#   define	KM_ZFGETC fgetc
-#   define	KM_ZFUNGETC fungetc
-#   define	KM_ZERR ferror
-#   define	KM_ZEOF feof
-#   define	KM_ZBUFFER fbuffer
-#   define	KM_ZSEEK fseek
-#   define	KM_ZTELL ftell
-#   define	KM_ZREWIND frewind
+#   define    KM_ZTYPE FILE*
+#   define    KM_ZOPEN fopen
+#   define    KM_ZCLOSE fclose
+#   define    KM_ZDOPEN fdopen
+#   define    KM_ZCLOSE fclose
+#   define    KM_ZREAD fread
+#   define    KM_ZWRITE fwrite
+#   define    KM_ZFLUSH fflush
+#   define    KM_ZFPRINTF fprintf
+#   define    KM_ZFPUTS fputs
+#   define    KM_ZFPUTC fputc
+#   define    KM_ZFGETS fgets
+#   define    KM_ZFGETC fgetc
+#   define    KM_ZFUNGETC fungetc
+#   define    KM_ZERR ferror
+#   define    KM_ZEOF feof
+#   define    KM_ZBUFFER fbuffer
+#   define    KM_ZSEEK fseek
+#   define    KM_ZTELL ftell
+#   define    KM_ZREWIND frewind
 #endif
 
 typedef enum __rwmode {

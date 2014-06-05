@@ -20,82 +20,69 @@
 
 #include "kmmatch.h"
 
-/*
- * ===  FUNCTION  =============================================================
- *         Name:    hamming_max
- *  Description:    Calculates the hamming distance up until max. Useful for
- *                      non-exact substring finding
- * Return Value:    size_t: max if max >= hamming dist, else hamming dist
- * ============================================================================
- */
-
-inline size_t
-hamming_max (const char *seq1, const char *seq2, size_t max)
+inline int_fast32_t
+hamming (const char *seq1, const char *seq2, size_t len)
 {
-    size_t len = strlen(seq1);
-    /* check seq lengths */
-    if (len != strlen(seq2)) {
-#ifdef  KMLIB_DEBUG
-        KM_ERROR("length of seq1 and seq2 not the same")
-        fprintf(stderr, "\tseq1:\t'%s'\n", seq1);
-        fprintf(stderr, "\tseq2:\t'%s'\n", seq2);
-        fprintf(stderr, "\tmax:\t'%zu'\n", max);
-#endif     /* -----  not FDB_DEBUG  ----- */
-        return(SIZE_MAX);
-    }
+    int_fast32_t mismatches = 0;
+    size_t iii = 0;
 
-    if (strncmp(seq2, seq1, len) == 0){
-        /* exact match */
-        return 0;
-    } else {
-        size_t mismatches = 0;
-        size_t iii = 0;
-        while(iii < len && mismatches < max) {
-            if (seq2[iii] != seq1[iii]) {
-                mismatches++;
-            }
-            iii++;
-        }
-        return mismatches;
+    /* Error out on bad arguments */
+    if (seq1 == NULL || seq2 == NULL) {
+        return -1;
     }
+    /* If we've been given a length of 0, we make it up ourselves */
+    if (len == 0) {
+        size_t len2 = strlen(seq2);
+        len = strlen(seq1);
+        /* Max of len & len2 */
+        if (len > len2) {
+            len = len2;
+        }
+    }
+    /* Count mismatches. See comment on analagous loop in hamming_max for an
+       explanation. */
+    while(iii < len) {
+        if (seq2[iii] != seq1[iii]) {
+            mismatches++;
+        }
+        iii++;
+    }
+    return mismatches;
 }
 
 
-/*
- * ===  FUNCTION  =============================================================
- *         Name:    hamming
- *  Description:    Calculate Hamming distance between two same-lengthed
- *                      strings
- * Return Value:    size_t: Hamming distance, i.e. number of differences
- *                      between strings. 0 < hamming < strlen(seq1)
- * ============================================================================
- */
-
-inline size_t
-hamming (const char *seq1, const char *seq2)
+inline int_fast32_t
+hamming_max(const char *seq1, const char *seq2, size_t len, int_fast32_t max)
 {
-    size_t len = strlen(seq1);
+    int_fast32_t mismatches = 0;
+    size_t iii = 0;
 
-    /* check seq lengths */
-    if (len != strlen(seq2)) {
-#ifdef  KMLIB_DEBUG
-        KM_ERROR("length of seq1 and seq2 not the same")
-        fprintf(stderr, "\tseq1:\t'%s'\n", seq1);
-        fprintf(stderr, "\tseq2:\t'%s'\n", seq2);
-#endif     /* -----  not FDB_DEBUG  ----- */
-        return(SIZE_MAX);
+    /* Error out on bad arguments */
+    if (seq1 == NULL || seq2 == NULL || max < 0) {
+        return -1;
     }
-
-    if (strncmp(seq2, seq1, len) == 0){
-        /* exact match */
-        return 0;
-    } else {
-        size_t mismatches = 0;
-        for (size_t iii = 0; iii < len; iii++) {
-            if (seq2[iii] != seq1[iii]) {
-                mismatches++;
-            }
+    /* If we've been given a lenght of 0, we make it up ourselves */
+    if (len == 0) {
+        size_t len2 = strlen(seq2);
+        len = strlen(seq1);
+        /* Max of len & len2 */
+        if (len > len2) {
+            len = len2;
         }
-        return mismatches;
     }
+    /* We obediently go until ``len``, assuming whoever gave us ``len`` knew
+       WTF they were doing. This makes things a bit faster, since these
+       functions are expected to be very much inner-loop. */
+    while(iii < len) {
+        /* Find mismatch count */
+        if (seq2[iii] != seq1[iii]) {
+            mismatches++;
+        }
+        iii++;
+        if (mismatches > max) {
+            /* Bail out if we're over max, always cap at max + 1 */
+            return max + 1;
+        }
+    }
+    return mismatches;
 }

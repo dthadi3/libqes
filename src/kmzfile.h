@@ -42,13 +42,13 @@ typedef struct __zfile_t {
  */
 zfile_t *zfopen_ (const char *path, const char *mode, errhandler_t onerr,
         const char *file, int line);
-#define	zfopen(pth, mod) \
+#define    zfopen(pth, mod) \
     zfopen_(pth, mod, KM_DEFAULT_ERR_FN, __FILE__, __LINE__)
-#define	zfopen_errnil(pth, mod) \
+#define    zfopen_errnil(pth, mod) \
     zfopen_(pth, mod, errnil, __FILE__, __LINE__)
-#define	zfopen_errprint(pth, mod) \
+#define    zfopen_errprint(pth, mod) \
     zfopen_(pth, mod, errprint, __FILE__, __LINE__)
-#define	zfopen_errprintexit(pth, mod) \
+#define    zfopen_errprintexit(pth, mod) \
     zfopen_(pth, mod, errprintexit, __FILE__, __LINE__)
 
 

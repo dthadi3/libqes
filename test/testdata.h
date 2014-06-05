@@ -51,4 +51,6 @@ extern const size_t n_codons;
 extern const char *codon_list[];
 extern const char aa_list[];
 
+void test_data_files (void *ptr);
+
 #endif /* TESTDATA_H */

@@ -133,7 +133,7 @@ test_zfreadline (void *ptr)
     char buffer[bufsize];
     ssize_t res_len = 0;
     off_t orig_filepos = 0;
-    int iii;
+    size_t iii;
     char *fname = NULL;
 
     (void) ptr;
@@ -176,7 +176,7 @@ test_zfgetuntil (void *ptr)
     size_t expt_len = 0;
     off_t orig_filepos = 0;
     off_t our_filepos = 0;
-    int iii;
+    size_t iii;
     const size_t n_delims = 5;
     const int delims[] = {' ', ',', '.', '\n', '\n'};
     const char *delim_words[] = {
@@ -419,14 +419,14 @@ end:
 }
 
 struct testcase_t zfile_tests[] = {
-    { "zfopen", test_zfopen,},
-    { "zfpeek", test_zfpeek,},
-    { "zfreadline", test_zfreadline,},
-    { "zfreadline_realloc", test_zfreadline_realloc,},
-    { "zfile_guess_mode", test_zfile_guess_mode, },
-    { "zfclose", test_zfclose,},
-    { "zfrewind", test_zfrewind,},
-    { "zfgetuntil", test_zfgetuntil,},
-    { "zfile_ok", test_zfile_ok,},
+    { "zfopen", test_zfopen, 0, NULL, NULL},
+    { "zfpeek", test_zfpeek, 0, NULL, NULL},
+    { "zfreadline", test_zfreadline, 0, NULL, NULL},
+    { "zfreadline_realloc", test_zfreadline_realloc, 0, NULL, NULL},
+    { "zfile_guess_mode", test_zfile_guess_mode, 0, NULL, NULL},
+    { "zfclose", test_zfclose, 0, NULL, NULL},
+    { "zfrewind", test_zfrewind, 0, NULL, NULL},
+    { "zfgetuntil", test_zfgetuntil, 0, NULL, NULL},
+    { "zfile_ok", test_zfile_ok, 0, NULL, NULL},
     END_OF_TESTCASES
 };

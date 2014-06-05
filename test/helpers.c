@@ -62,7 +62,7 @@ find_data_file(const char * filepath)
 
 /*===  FUNCTION  ============================================================*
 Name:           get_writable_file
-Paramters:      None
+Paramters:      void
 Description:    Gets a temporary file which can be written to, under the data
                 directory.
 Returns:        A ``char *`` on the heap that contains a valid path to a file
@@ -70,7 +70,7 @@ Returns:        A ``char *`` on the heap that contains a valid path to a file
  *===========================================================================*/
 
 char *
-get_writable_file()
+get_writable_file(void)
 {
     size_t buflen = 1<<12;
     size_t len = 0;

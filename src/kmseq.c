@@ -20,9 +20,10 @@
 #include "kmseq.h"
 
 seq_t *
-create_seq ()
+create_seq (void)
 {
     seq_t *seq = km_malloc(sizeof(*seq));
+
     init_str(&seq->name, __INIT_LINE_LEN);
     init_str(&seq->comment, __INIT_LINE_LEN);
     init_str(&seq->seq, __INIT_LINE_LEN);
@@ -31,9 +32,10 @@ create_seq ()
 }
 
 seq_t *
-create_seq_no_qual ()
+create_seq_no_qual (void)
 {
     seq_t *seq = km_malloc(sizeof(*seq));
+
     init_str(&seq->name, __INIT_LINE_LEN);
     init_str(&seq->comment, __INIT_LINE_LEN);
     init_str(&seq->seq, __INIT_LINE_LEN);
@@ -44,7 +46,7 @@ create_seq_no_qual ()
 }
 
 seq_t *
-create_seq_no_qual_or_comment ()
+create_seq_no_qual_or_comment (void)
 {
     seq_t *seq = km_malloc(sizeof(*seq));
     init_str(&seq->name, __INIT_LINE_LEN);
@@ -115,60 +117,68 @@ print_seq (const seq_t *seq, FILE *stream)
 inline int
 seq_fill_name (seq_t *seqobj, const char *name, size_t len)
 {
-    if (name != NULL) {
-        str_fill_charptr_len(&seqobj->name, name, len);
-        return 1;
+    if (seqobj == NULL || name == NULL || len < 1) {
+        return 0;
     }
-    return 0;
+    str_fill_charptr(&seqobj->name, name, len);
+    return 1;
 }
 
 inline int
 seq_fill_comment (seq_t *seqobj, const char *comment, size_t len)
 {
-    if (comment != NULL) {
-        str_fill_charptr_len(&seqobj->comment, comment, len);
-        return 1;
+    if (seqobj == NULL || comment == NULL || len < 1) {
+        return 0;
     }
-    return 0;
+    str_fill_charptr(&seqobj->comment, comment, len);
+    return 1;
 }
 
 inline int
 seq_fill_seq (seq_t *seqobj, const char *seq, size_t len)
 {
-    if (seq != NULL) {
-        str_fill_charptr_len(&seqobj->seq, seq, len);
-        return 1;
+    if (seqobj == NULL || seq == NULL || len < 1) {
+        return 0;
     }
-    return 0;
+    str_fill_charptr(&seqobj->seq, seq, len);
+    return 1;
 }
 
 inline int
 seq_fill_qual (seq_t *seqobj, const char *qual, size_t len)
 {
-    if (qual != NULL) {
-        str_fill_charptr_len(&seqobj->qual, qual, len);
-        return 1;
+    if (seqobj == NULL || qual == NULL || len < 1) {
+        return 0;
     }
-    return 0;
+    str_fill_charptr(&seqobj->qual, qual, len);
+    return 1;
 }
 
 inline int
 seq_fill_header (seq_t *seqobj, const char *header, size_t len)
 {
-    if (header != NULL) {
-        char *tmp = strchr(header, ' ');
-        if (tmp != NULL) {
-            tmp[0] = '\0';
-            str_fill_charptr_len(&seqobj->name, header, tmp - header);
-            str_fill_charptr(&seqobj->comment, tmp + 1);
-        } else {
-            str_fill_charptr(&seqobj->name, header);
-            str_nullify(&seqobj->name);
-        }
+    if (seqobj == NULL || header == NULL || len < 1) {
+        return 0;
+    }
+    char *tmp = memchr(header, ' ', len);
+    size_t startfrom = header[0] == '@' || header[0] == '>' ? 1 : 0;
+    if (tmp != NULL) {
+        str_fill_charptr(&seqobj->name, header + startfrom,
+                tmp - header - startfrom);
+        str_fill_charptr(&seqobj->comment, tmp + 1, 0);
+    } else {
+        str_fill_charptr(&seqobj->name, header + startfrom, len - startfrom);
+        str_nullify(&seqobj->comment);
     }
     return 1;
 }
 
+/*===  FUNCTION  ============================================================*
+Name:           destroy_seq
+Paramters:      seq_t *: seq to destroy.
+Description:    Deallocate and set to NULL a seq_t on the heap.
+Returns:        void.
+ *===========================================================================*/
 void
 destroy_seq_ (seq_t *seq)
 {
