@@ -1,5 +1,5 @@
 #file(GLOB KMLIB_SOURCES *.c)
-SET(KMLIB_SOURCES kmzfile.c kmutil.c kmmatch.c kmsequtil.c kmseq.c kmseqfile.c kmstr.c)
+SET(KMLIB_SOURCES kmzfile.c kmutil.c kmmatch.c kmsequtil.c kmseq.c kmseqfile.c kmstr.c kmdnatrie.c)
 
 # Targets
 IF(STATIC)
