@@ -9,10 +9,9 @@
  *        Created:  11/08/13 21:34:38
  *       Revision:  none
  *        License:  GPLv3+
- *       Compiler:  gcc
+ *       Compiler:  gcc, clang
  *
  *         Author:  Kevin Murray, spam@kdmurray.id.au
- *                                [include word penguin in subject]
  *
  * ===========================================================================
  */
@@ -22,7 +21,7 @@
 
 
 /* #####   HEADER FILE INCLUDES   ########################################## */
-#include "kmbase.h"
+#include "kmutil.h"
 #include "kmmatch.h"
 #include "kmseq.h"
 #include "kmfile.h"

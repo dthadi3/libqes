@@ -1,13 +1,16 @@
 kmlib
 =====
 
-A bunch of C libraries for various bioinformatics-y tasks.
+A C library for various bioinformatics-y tasks. Proper docs will come in time.
 
 [![Build Status](https://travis-ci.org/kdmurray91/kmlib.png)](https://travis-ci.org/kdmurray91/kmlib)
-[![Bitdeli Badge](https://d2weczhvl823v0.cloudfront.net/kdmurray91/kmlib/trend.png)](https://bitdeli.com/free "Bitdeli Badge")
+[![Coverage Status](https://img.shields.io/coveralls/kdmurray91/kmlib.svg)](https://coveralls.io/r/kdmurray91/kmlib?branch=dev)
 
 License
 =======
 
-All files licened under the Affero GNU Public License version 3, or later at your preference.
-For license text, see [the GNU website here](http://www.gnu.org/licenses/agpl-3.0.txt)
+![GPL logo](http://www.gnu.org/graphics/gplv3-127x51.png)
+
+All source code is licened under the GNU Public License version 3, or a later
+version at your preference.  For license text, see `./gpl-3.0.txt` or
+[the GNU website here](http://www.gnu.org/licenses/gpl-3.0.html).

@@ -1,12 +1,39 @@
-language: C
+language: c
 
+env:
+ - BUILD_TYPE=Release static=TRUE
+ - BUILD_TYPE=Release static=FALSE
+ - BUILD_TYPE=Debug static=TRUE
+ - BUILD_TYPE=Debug static=FALSE
+ - BUILD_TYPE=Coverage static=FALSE
 compiler:
- - gcc
  - clang
+ - gcc
 
 install:
- - sudo apt-get install zlib1g-dev cmake
+ - sudo apt-get install lcov python-pip
+ - mkdir zlib && cd zlib
+ - wget http://zlib.net/zlib-1.2.8.tar.gz
+ - tar xvxf zlib-1.2.8.tar.gz
+ - cd zlib-1.2.8
+ - ./configure
+ - make
+ - sudo make install
+ - cd ../..
+ - sudo pip install cpp-coveralls
+ - git submodule update --init
+ - mkdir build
+ - mkdir target
+ - cd build
 
 script:
- - cmake .
- - make && make test
+ - cmake .. -DCMAKE_INSTALL_PREFIX=../target -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DSTATIC=$static
+ - make
+ - ctest --verbose
+ - make install
+ - test -f ../target/include/kmlib.h
+ - if [ $static == "TRUE" ] ; then test -f ../target/lib/libkm.a; else test -f ../target/lib/libkm.so ; fi
+
+after_success:
+ - cd ..
+ - if [ "$BUILD_TYPE" == "Coverage" ] ; then coveralls -e target -e test  -e util -e zlib -E '.*\.h' -e build/CMakeFiles; fi
