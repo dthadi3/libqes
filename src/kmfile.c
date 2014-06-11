@@ -9,7 +9,7 @@
  *        Created:  02/12/13 17:19:07
  *       Revision:  none
  *        License:  GPLv3+
- *       Compiler:  gcc
+ *       Compiler:  gcc, clang
  *
  *         Author:  Kevin Murray, spam@kdmurray.id.au
  *                                [include word penguin in subject]
@@ -21,7 +21,7 @@
 
 
 inline void
-__kmfile_fill_buffer (kmfile *file)
+__kmfile_fill_buffer (file_t *file)
 {
     /* work out how many bytes we need
     * This needs a picture
@@ -65,12 +65,10 @@ __kmfile_fill_buffer (kmfile *file)
     int bytes_read = 0;
 
     if (file == NULL) {
-        /* fuck off SIGSEGV */
         return;
     }
 
-    /* we need to read into buffer, from bufferiter to bufferend.
-        */
+    /* we need to read into buffer, from bufferiter to bufferend. */
     bytes_to_read = KMFILE_BUFFER_LEN - \
                     (size_t)(file->bufferend - file->bufferiter) - 1;
 
@@ -78,7 +76,7 @@ __kmfile_fill_buffer (kmfile *file)
             file->buffer, file->bufferiter, file->bufferend, bytes_to_read); */
     if (bytes_to_read < 1) {
         /*  Already full! */
-        /* KM_ERROR("kmfile already full") */
+        /* KM_ERROR("file_t already full") */
         return;
     }
 
@@ -103,13 +101,13 @@ __kmfile_fill_buffer (kmfile *file)
     /* printf("after move: %p, bi %p, be, %p\n",
             file->buffer, file->bufferiter, file->bufferend); */
     /* Refill the buffer */
-    bytes_read = __FP_READ(file->file, file->bufferend - 1, bytes_to_read);
+    bytes_read = KM_ZREAD(file->file, file->bufferend - 1, bytes_to_read);
     if (bytes_read < bytes_to_read) { /* check for errors */
         if (gzeof(file->file)) {
             file->eof = 1;
         }
         else {
-            const char * err_str = __FP_ERR(file->file, &file->err);
+            const char * err_str = KM_ZERR(file->file, &file->err);
             if (file->err) {
                 fprintf(stderr, "Error reading %s:\n%s\n",
                         file->path, err_str);
@@ -128,21 +126,21 @@ __kmfile_fill_buffer (kmfile *file)
 }
 
 
-kmfile *
-create_kmfile (const char *filename)
+file_t *
+create_file_t (const char *filename)
 {
     size_t      fnlen;
-    kmfile     *file;
+    file_t     *file;
     /* Make struct */
     file = calloc(1, sizeof(*file));
     CHECK_ALLOC(file);
 
     /* init file */
-    file->file = __FP_OPEN(filename, "r");
+    file->file = KM_ZOPEN(filename, "r");
     if (file->file == NULL) {
         fprintf(stderr, "Opening file %s failed:\n%s\n",
                 filename, strerror(errno));
-        FREE(file);
+        km_free(file);
         return(NULL);
     }
 
@@ -164,7 +162,7 @@ create_kmfile (const char *filename)
     file->bufferend = file->buffer + (size_t)(KMFILE_BUFFER_LEN - 1);
     file->bufferiter = file->bufferend;
 
-    __kmfile_fill_buffer(file);
+    __file_t_fill_buffer(file);
 
     file->mode = file->bufferiter[0];
     /* printf("file mode is %c\n", file->mode); */
@@ -172,18 +170,18 @@ create_kmfile (const char *filename)
 }
 
 void
-destroy_kmfile (kmfile *file)
+destroy_file_t (file_t *file)
 {
     if(file != NULL){
-        if (file->file != NULL) { __FP_CLOSE(file->file); }
-        FREE(file->buffer);
-        FREE(file->path);
-        FREE(file);
+        if (file->file != NULL) { KM_ZCLOSE(file->file); }
+        km_free(file->buffer);
+        km_free(file->path);
+        km_free(file);
     }
 }
 
 inline size_t
-__readline_kmfile_keep (kmfile *file, char **dest, size_t maxlen)
+__readline_file_t_keep (file_t *file, char **dest, size_t maxlen)
 {
     char *newline = NULL;
     size_t len = 0;
@@ -195,7 +193,7 @@ __readline_kmfile_keep (kmfile *file, char **dest, size_t maxlen)
             file->bufferiter, *(file->bufferiter), *(file->bufferiter+1)); */
     if (newline == NULL) {
         /* printf("no newline found, filling buffer\n"); */
-        __kmfile_fill_buffer(file);
+        __file_t_fill_buffer(file);
         newline = strchr(file->bufferiter, '\n');
     }
 
@@ -212,18 +210,18 @@ __readline_kmfile_keep (kmfile *file, char **dest, size_t maxlen)
 }
 
 size_t
-readline_kmfile (kmfile *file, char **dest, size_t maxlen)
+readline_file_t (file_t *file, char **dest, size_t maxlen)
 {
     size_t bytes_taken;
 
-    bytes_taken = __readline_kmfile_keep(file, dest, maxlen);
+    bytes_taken = __readline_file_t_keep(file, dest, maxlen);
     /* don't keep the bytes in the buffer's todo section  */
     file->bufferiter += bytes_taken;
     return bytes_taken;
 }
 
-size_t
-hint_line_length_kmfile (kmfile *file)
+inline size_t
+hint_line_length_file_t (file_t *file)
 {
     size_t len = 0;
     char *tmp;
@@ -231,8 +229,36 @@ hint_line_length_kmfile (kmfile *file)
     return tmp - file->bufferiter + 2;
 }
 
-char
-peek_ahead_kmfile (kmfile *file)
+inline char
+peek_ahead_file (file_t *file)
 {
     return file->bufferiter[0];
+}
+
+/* Zero-copy `getline()`, with the added benefit of `realloc`-ing `buf` to
+    the next highest base-2 power, if we run out of space. If it is realloced,
+    (*size) is updated to the right size.
+    DON'T USE ON STACK BUFFERS.
+*/
+static inline ssize_t
+km_readline_realloc_ (char **buf, FILE *fp, size_t *size, errhandler_t onerr,
+        char *file, int line)
+{
+    if (buf == NULL || (*buf) == NULL || fp == NULL || size == NULL) {
+        return -2; /* EOF is normally == -1, so use -2 to differentiate them */
+    }
+    size_t len = 0;
+    while(((*buf)[len] = fgetc(fp)) != EOF && (*buf)[len++] != '\n') {
+        while (len + 1 >= (*size) - 1) {
+            size_t newsize = (*size) + 1;
+            *size = kmroundupz(newsize);
+            char *newbuf = km_realloc(*buf, sizeof(**buf) * (*size), onerr);
+            if (newbuf == NULL) {
+                return -2;
+            } else (*buf) = newbuf;
+        }
+    }
+    (*buf)[len] = '\0';
+    if (feof(fp)) return EOF;
+    else return len;
 }
