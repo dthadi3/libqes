@@ -155,7 +155,7 @@ Description:    Tests the read_seqfile function from kmseqfile.c
 void
 test_read_seqfile (void *ptr)
 {
-    seq_t *seq = create_seq();
+    seq_t *seq = seq_create();
     ssize_t res = 0;
     seqfile_t *sf = NULL;
     char *fname = NULL;
@@ -191,7 +191,7 @@ test_read_seqfile (void *ptr)
     tt_int_op(res, ==, -2);
 end:
     destroy_seqfile(sf);
-    destroy_seq(seq);
+    seq_destroy(seq);
     if (fname != NULL) {
         free(fname);
     }
@@ -200,7 +200,7 @@ end:
 void
 test_read_seqfile_vs_kseq (void *ptr)
 {
-    seq_t *seq = create_seq();
+    seq_t *seq = seq_create();
     char *fname = find_data_file("test.fastq.gz");
     seqfile_t *sf = create_seqfile(fname, "r");
     gzFile fp = gzopen(fname, "r");
@@ -224,12 +224,12 @@ test_read_seqfile_vs_kseq (void *ptr)
         tt_str_op(seq->qual.s, ==, kseq->qual.s);
     }
     destroy_seqfile(sf);
-    destroy_seq(seq);
+    seq_destroy(seq);
     kseq_destroy(kseq);
     gzclose(fp);
     free(fname);
     /* Try again, with fasta */
-    seq = create_seq();
+    seq = seq_create();
     fname = find_data_file("test.fasta");
     tt_assert(fname != NULL);
     sf = create_seqfile(fname, "r");
@@ -251,7 +251,7 @@ test_read_seqfile_vs_kseq (void *ptr)
     }
 end:
     destroy_seqfile(sf);
-    destroy_seq(seq);
+    seq_destroy(seq);
     kseq_destroy(kseq);
     gzclose(fp);
     if (fname != NULL) {
@@ -268,7 +268,7 @@ Description:    Tests the write_seqfile function from kmseqfile.c
 void
 test_write_seqfile (void *ptr)
 {
-    seq_t *seq = create_seq();
+    seq_t *seq = seq_create();
     size_t expt_bytes = 0;
     ssize_t res = 0;
     seqfile_t *sf = NULL;
@@ -319,7 +319,7 @@ test_write_seqfile (void *ptr)
     tt_int_op(res, ==, -2);
 end:
     destroy_seqfile(sf);
-    destroy_seq(seq);
+    seq_destroy(seq);
     if (fname != NULL) free(fname);
     if (crc != NULL) free(crc);
 }

@@ -103,7 +103,7 @@ gnu_getline_file(int silent)
 void
 seqfile_parse_fq(int silent)
 {
-    seq_t *seq = create_seq();
+    seq_t *seq = seq_create();
     seqfile_t *sf = create_seqfile(infile, "r");
     ssize_t res = 0;
     size_t n_recs = 0;
@@ -120,7 +120,7 @@ seqfile_parse_fq(int silent)
         printf("[seqfile_fq] Total seq len %zu\n", seq_len);
     }
     destroy_seqfile(sf);
-    destroy_seq(seq);
+    seq_destroy(seq);
 }
 
 void
@@ -145,7 +145,7 @@ kseq_parse_fq(int silent)
 void
 seqfile_write(int silent)
 {
-    seq_t *seq = create_seq();
+    seq_t *seq = seq_create();
     ssize_t res = 0;
     seqfile_t *sf = NULL;
     char *fname = tmpnam(NULL);
@@ -166,7 +166,7 @@ seqfile_write(int silent)
         printf("[seqfile_write] Total file len %zu to %s\n", res, fname);
     }
     destroy_seqfile(sf);
-    destroy_seq(seq);
+    seq_destroy(seq);
     remove(fname);
 
 }
