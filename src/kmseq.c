@@ -20,7 +20,7 @@
 #include "kmseq.h"
 
 seq_t *
-create_seq (void)
+seq_create (void)
 {
     seq_t *seq = km_malloc(sizeof(*seq));
 
@@ -32,7 +32,7 @@ create_seq (void)
 }
 
 seq_t *
-create_seq_no_qual (void)
+seq_create_no_qual (void)
 {
     seq_t *seq = km_malloc(sizeof(*seq));
 
@@ -46,7 +46,7 @@ create_seq_no_qual (void)
 }
 
 seq_t *
-create_seq_no_qual_or_comment (void)
+seq_create_no_qual_or_comment (void)
 {
     seq_t *seq = km_malloc(sizeof(*seq));
     init_str(&seq->name, __INIT_LINE_LEN);
@@ -174,13 +174,13 @@ seq_fill_header (seq_t *seqobj, const char *header, size_t len)
 }
 
 /*===  FUNCTION  ============================================================*
-Name:           destroy_seq
+Name:           seq_destroy
 Paramters:      seq_t *: seq to destroy.
 Description:    Deallocate and set to NULL a seq_t on the heap.
 Returns:        void.
  *===========================================================================*/
 void
-destroy_seq_ (seq_t *seq)
+seq_destroy_ (seq_t *seq)
 {
     if (seq != NULL) {
         destroy_str_cp(&seq->name);
