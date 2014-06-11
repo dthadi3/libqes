@@ -12,7 +12,7 @@ ADD_TEST(NAME kmlib COMMAND ${CMAKE_BINARY_DIR}/bin/test_kmlib ${CMAKE_BINARY_DI
 # Benchmarking:
 ADD_EXECUTABLE(bench_kmlib benchmarks.c helpers.c)
 TARGET_LINK_LIBRARIES(bench_kmlib km ${KMLIB_DEPENDS_LIBS})
-ADD_TEST(NAME kmlib_benchmarks COMMAND ${CMAKE_BINARY_DIR}/bin/bench_kmlib ${CMAKE_BINARY_DIR}/data/test.fastq)
+ADD_TEST(NAME kmlib_benchmarks COMMAND ${CMAKE_BINARY_DIR}/bin/bench_kmlib ${CMAKE_BINARY_DIR}/data/test.fastq 50 seqfile_write kseq_parse_fq seqfile_par_iter_fq gnu_getline seqfile_parse_fq zfreadline_realloc)
 
 # Copy test files over to bin dir
 ADD_CUSTOM_COMMAND(TARGET test_kmlib COMMAND ${CMAKE_COMMAND} -E copy_directory
