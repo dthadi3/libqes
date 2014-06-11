@@ -240,26 +240,23 @@ revcomp (const char *seq, size_t len)
 inline void
 revcomp_inplace (char *seq, size_t len)
 {
-	int seqlen = strlen(seq);
-	int iii;
-    seqlen = seqlen < len ? seqlen : len - 1;
-
-	if (seq[seqlen - 1] == '\n') {
-		seq[seqlen - 1] = '\0';
-		seqlen--;
-	}
-
-	for (iii = 0; iii < seqlen; iii++) {
-		int endpos = seqlen - iii - 1;
+    size_t iii;
+    /* Trim trailing whitespace */
+    while (len > 0 && isspace(seq[len - 1])) {
+        seq[--len] = '\0';
+    }
+    for (iii = 0; iii < len && seq[iii] != '\0'; iii++) {
+        size_t endpos = len - iii - 1;
         char endchar = seq[endpos];
-		if (seq[iii] == 'a' || seq[iii] == 'A') seq[endpos] = 'T';
-		if (seq[iii] == 'c' || seq[iii] == 'C') seq[endpos] = 'G';
-		if (seq[iii] == 'g' || seq[iii] == 'G') seq[endpos] = 'C';
-		if (seq[iii] == 't' || seq[iii] == 'T') seq[endpos] = 'A';
-
-		if (endchar == 'a' || endchar == 'A') seq[iii] = 'T';
-		if (endchar == 'c' || endchar == 'C') seq[iii] = 'G';
-		if (endchar == 'g' || endchar == 'G') seq[iii] = 'C';
-		if (endchar == 't' || endchar == 'T') seq[iii] = 'A';
-	}
+        if (seq[iii] == 'a' || seq[iii] == 'A') seq[endpos] = 'T';
+        else if (seq[iii] == 'c' || seq[iii] == 'C') seq[endpos] = 'G';
+        else if (seq[iii] == 'g' || seq[iii] == 'G') seq[endpos] = 'C';
+        else if (seq[iii] == 't' || seq[iii] == 'T') seq[endpos] = 'A';
+        else seq[endpos] = 'N';
+        if (endchar == 'a' || endchar == 'A') seq[iii] = 'T';
+        else if (endchar == 'c' || endchar == 'C') seq[iii] = 'G';
+        else if (endchar == 'g' || endchar == 'G') seq[iii] = 'C';
+        else if (endchar == 't' || endchar == 'T') seq[iii] = 'A';
+        else seq[iii] = 'N';
+    }
 }
