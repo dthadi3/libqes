@@ -165,12 +165,12 @@ seqfile_create (const char *path, const char *mode)
     if (path == NULL || mode == NULL) return NULL;
     sf = km_calloc(1, sizeof(*sf));
     sf->zf = zfopen(path, mode);
-    sf->n_records = 0;
     if (sf->zf == NULL) {
         km_free(sf->zf);
         km_free(sf);
         return NULL;
     }
+    sf->n_records = 0;
     seqfile_guess_format(sf);
     return sf;
 }
