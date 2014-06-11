@@ -49,14 +49,14 @@ typedef struct _kmseqfile {
 
 
 /*===  FUNCTION  ============================================================*
-Name:           create_seqfile
+Name:           seqfile_create
 Paramters:      const char *path: Path to open.
                 const char *mode: Mode to pass to the fopen equivalent used.
 Description:    Allocates structures, initialises values and opens the internal
                 file handle.
 Returns:        A fully usable ``seqfile_t *`` or NULL.
  *===========================================================================*/
-seqfile_t *create_seqfile (const char *path, const char *mode);
+seqfile_t *seqfile_create (const char *path, const char *mode);
 
 
 /*===  FUNCTION  ============================================================*
@@ -86,20 +86,21 @@ seqfile_format_t seqfile_guess_format(seqfile_t *file);
 
 void seqfile_set_format (seqfile_t *file, seqfile_format_t format);
 
-extern ssize_t read_seqfile (seqfile_t *file, seq_t *seq);
+extern ssize_t seqfile_read (seqfile_t *file, seq_t *seq);
 
-extern ssize_t write_seqfile (seqfile_t *file, seq_t *seq);
+extern ssize_t seqfile_write (seqfile_t *file, seq_t *seq);
 
 extern size_t strfseq(const seq_t *seq, seqfile_format_t fmt, char *buffer,
         size_t maxlen);
+
 void print_seq_seqfile (seqfile_t * file, const seq_t *seq);
 
-void destroy_seqfile_(seqfile_t *seqfile);
-#define destroy_seqfile(seqfile) do {       \
-            destroy_seqfile_(seqfile);      \
-            seqfile = NULL;             \
-        } while(0)
 
+void seqfile_destroy_(seqfile_t *seqfile);
+#define seqfile_destroy(seqfile) do {                                       \
+            seqfile_destroy_(seqfile);                                      \
+            seqfile = NULL;                                                 \
+        } while(0)
 #if 0
 /*
  * Collection of options to a seqfile_iter function.

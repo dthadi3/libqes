@@ -137,7 +137,7 @@ error:
 #undef CHECK_AND_TRIM
 }
 inline ssize_t
-read_seqfile (seqfile_t *file, seq_t *seq)
+seqfile_read (seqfile_t *file, seq_t *seq)
 {
     if (!seqfile_ok(file) || !seq_ok(seq)) {
         return -2;
@@ -159,7 +159,7 @@ read_seqfile (seqfile_t *file, seq_t *seq)
 }
 
 seqfile_t *
-create_seqfile (const char *path, const char *mode)
+seqfile_create (const char *path, const char *mode)
 {
     seqfile_t *sf = NULL;
     if (path == NULL || mode == NULL) return NULL;
@@ -211,7 +211,7 @@ seqfile_ok(const seqfile_t *file)
 }
 
 void
-destroy_seqfile_(seqfile_t *seqfile)
+seqfile_destroy_(seqfile_t *seqfile)
 {
     if (seqfile != NULL) {
         zfclose(seqfile->zf);
@@ -256,7 +256,7 @@ strfseq(const seq_t *seq, seqfile_format_t fmt, char *buffer, size_t maxlen)
 }
 
 inline ssize_t
-write_seqfile (seqfile_t *file, seq_t *seq)
+seqfile_write (seqfile_t *file, seq_t *seq)
 {
     ssize_t len = 0;
     const size_t buflen = 1<<12; /* 4k max seq len, should be plenty */

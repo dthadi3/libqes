@@ -100,16 +100,51 @@ gnu_getline_file(int silent)
     free(buf);
 }
 
+int _sum_seq(const seq_t *seq, void *data)
+{
+    unsigned long long int tmp = 0;
+    int iii = 0;
+    if (!seq_ok(seq) || data == NULL) {
+        return 0;
+    }
+    *((size_t *) data) += seq->seq.l;
+    for (iii = 0; iii < 1<<10; iii ++) {
+        tmp += iii;
+    }
+    return (tmp >0);
+}
+
 void
-seqfile_parse_fq(int silent)
+bench_seqfile_par_iter_fq(int silent)
 {
     seq_t *seq = seq_create();
-    seqfile_t *sf = create_seqfile(infile, "r");
+    seqfile_t *sf = seqfile_create(infile, "r");
+    size_t seq_len = 0;
+    seqfile_iter_flags flags;
+    flags.die_quickly = 0;
+    flags.num_threads = 4;
+    int res = 0;
+
+    res = seqfile_iter_parallel_single(sf, &_sum_seq, &seq_len, flags);
+    if (!silent) {
+        printf("[seqfile_iter_fq] Total seq len %zu, iter res %d\n", seq_len,
+                res);
+    }
+    seqfile_destroy(sf);
+    seq_destroy(seq);
+}
+
+void
+bench_seqfile_parse_fq(int silent)
+{
+    seq_t *seq = seq_create();
+    seqfile_t *sf = seqfile_create(infile, "r");
     ssize_t res = 0;
     size_t n_recs = 0;
     size_t seq_len = 0;
+
     while (res != EOF) {
-        res = read_seqfile(sf, seq);
+        res = seqfile_read(sf, seq);
         if (res < 1) {
             break;
         }
@@ -157,10 +192,10 @@ seqfile_write(int silent)
     seq_fill_seq(seq, "ACTCAATT", 8);
     seq_fill_qual(seq, "IIIIIIII", 8);
     /* Setup file for writing */
-    sf = create_seqfile(fname, "wT");
+    sf = seqfile_create(fname, "wT");
     seqfile_set_format(sf, FASTQ_FMT);
     for (iii = 0; iii < 1<<11; iii++) {
-        res += write_seqfile(sf, seq);
+        res += seqfile_write(sf, seq);
     }
     if (!silent) {
         printf("[seqfile_write] Total file len %zu to %s\n", res, fname);

@@ -24,7 +24,7 @@
 KSEQ_INIT(gzFile, gzread)
 
 void
-test_create_seqfile(void *ptr)
+test_seqfile_create(void *ptr)
 {
     seqfile_t *sf = NULL;
     char *fname = NULL;
@@ -34,52 +34,52 @@ test_create_seqfile(void *ptr)
     /* test opening a valid, unziped FASTQ */
     fname = find_data_file("test.fastq");
     tt_assert(fname != NULL);
-    sf = create_seqfile(fname, "r");
+    sf = seqfile_create(fname, "r");
     tt_ptr_op(sf, !=, NULL);
     tt_ptr_op(sf->zf, !=, NULL);
     tt_int_op(sf->zf->mode, ==, RW_READ);
     tt_int_op(sf->n_records, ==, 0);
     tt_int_op(sf->flags.format, ==, FASTQ_FMT);
-    destroy_seqfile(sf);
+    seqfile_destroy(sf);
     free(fname);
     /* test opening a valid, unziped FASTA */
     fname = find_data_file("test.fasta");
     tt_assert(fname != NULL);
-    sf = create_seqfile(fname, "r");
+    sf = seqfile_create(fname, "r");
     tt_ptr_op(sf, !=, NULL);
     tt_ptr_op(sf->zf, !=, NULL);
     tt_int_op(sf->zf->mode, ==, RW_READ);
     tt_int_op(sf->n_records, ==, 0);
     tt_int_op(sf->flags.format, ==, FASTA_FMT);
-    destroy_seqfile(sf);
+    seqfile_destroy(sf);
     free(fname);
     /* Test opening a file in transparent write mode */
     fname = get_writable_file();
     tt_assert(fname != NULL);
-    sf = create_seqfile(fname, "wT");
+    sf = seqfile_create(fname, "wT");
     KM_ZWRITE(sf->zf->fp, "ABCD", 4);
     tt_ptr_op(sf, !=, NULL);
     tt_ptr_op(sf->zf, !=, NULL);
     tt_int_op(sf->zf->mode, ==, RW_WRITE);
     tt_int_op(sf->n_records, ==, 0);
     tt_int_op(access(fname, F_OK), ==, 0);
-    destroy_seqfile(sf);
+    seqfile_destroy(sf);
     clean_writable_file(fname);
     fname = NULL;
     /* Test opening a file in write mode , acually zipping output */
     fname = get_writable_file();
     tt_assert(fname != NULL);
-    sf = create_seqfile(fname, "w9");
+    sf = seqfile_create(fname, "w9");
     tt_ptr_op(sf, !=, NULL);
     tt_ptr_op(sf->zf, !=, NULL);
     tt_int_op(sf->zf->mode, ==, RW_WRITE);
     tt_int_op(sf->n_records, ==, 0);
     tt_int_op(access(fname, F_OK), ==, 0);
-    destroy_seqfile(sf);
+    seqfile_destroy(sf);
     clean_writable_file(fname);
     fname = NULL;
 end:
-    destroy_seqfile(sf);
+    seqfile_destroy(sf);
     if (fname != NULL) {
         free(fname);
     }
@@ -96,37 +96,37 @@ test_seqfile_guess_format (void *ptr)
     /* Test file opening for reading */
     fname = find_data_file("test.fastq");
     tt_assert(fname != NULL);
-    sf = create_seqfile(fname, "r");
+    sf = seqfile_create(fname, "r");
     /* test with a FASTQ file */
     res = seqfile_guess_format(sf);
     tt_int_op(res, ==, FASTQ_FMT);
     tt_int_op(sf->flags.format, ==, FASTQ_FMT);
-    destroy_seqfile(sf);
+    seqfile_destroy(sf);
     free(fname);
     /* test with a FASTA file */
     fname = find_data_file("test.fasta");
     tt_assert(fname != NULL);
-    sf = create_seqfile(fname, "r");
+    sf = seqfile_create(fname, "r");
     res = seqfile_guess_format(sf);
     tt_int_op(res, ==, FASTA_FMT);
     tt_int_op(sf->flags.format, ==, FASTA_FMT);
-    destroy_seqfile(sf);
+    seqfile_destroy(sf);
     free(fname);
     /* test with a gziped FASTQ file */
     fname = find_data_file("test.fastq.gz");
     tt_assert(fname != NULL);
-    sf = create_seqfile(fname, "r");
+    sf = seqfile_create(fname, "r");
     res = seqfile_guess_format(sf);
     tt_int_op(res, ==, FASTQ_FMT);
     tt_int_op(sf->flags.format, ==, FASTQ_FMT);
-    destroy_seqfile(sf);
+    seqfile_destroy(sf);
 end:
-    destroy_seqfile(sf);
+    seqfile_destroy(sf);
     if (fname != NULL) free(fname);
 }
 
 void
-test_destroy_seqfile (void *ptr)
+test_seqfile_destroy (void *ptr)
 {
     seqfile_t *sf = NULL;
     char *fname = NULL;
@@ -135,25 +135,25 @@ test_destroy_seqfile (void *ptr)
     /* Test file opening for reading */
     fname = find_data_file("test.fastq");
     tt_assert(fname != NULL);
-    sf = create_seqfile(fname, "r");
+    sf = seqfile_create(fname, "r");
     tt_ptr_op(sf, !=, NULL);
     tt_assert(seqfile_ok(sf));
-    destroy_seqfile(sf);
+    seqfile_destroy(sf);
     tt_ptr_op(sf, ==, NULL);
     tt_assert(!seqfile_ok(sf));
 end:
-    destroy_seqfile(sf);
+    seqfile_destroy(sf);
     if (fname != NULL) free(fname);
 }
 
 
 
 /*===  FUNCTION  ============================================================*
-Name:           test_read_seqfile
-Description:    Tests the read_seqfile function from kmseqfile.c
+Name:           test_seqfile_read
+Description:    Tests the seqfile_read function from kmseqfile.c
  *===========================================================================*/
 void
-test_read_seqfile (void *ptr)
+test_seqfile_read (void *ptr)
 {
     seq_t *seq = seq_create();
     ssize_t res = 0;
@@ -164,33 +164,33 @@ test_read_seqfile (void *ptr)
     /* Test file opening for reading */
     fname = find_data_file("test.fastq");
     tt_assert(fname != NULL);
-    sf = create_seqfile(fname, "r");
+    sf = seqfile_create(fname, "r");
     /* Test with a good seqfile */
-    res = read_seqfile(sf, seq);
+    res = seqfile_read(sf, seq);
     tt_int_op(res, ==, first_fastq_len);
     tt_str_op(seq->name.s, ==, first_fastq_read[0]);
     tt_str_op(seq->comment.s, ==, first_fastq_read[1]);
     tt_str_op(seq->seq.s, ==, first_fastq_read[2]);
     tt_str_op(seq->qual.s, ==, first_fastq_read[3]);
-    destroy_seqfile(sf);
+    seqfile_destroy(sf);
     free(fname);
     /* Test with bad seqfiles */
     fname = find_data_file("loremipsum.txt");
     tt_assert(fname != NULL);
-    sf = create_seqfile(fname, "r");
-    res = read_seqfile(sf, seq);
+    sf = seqfile_create(fname, "r");
+    res = seqfile_read(sf, seq);
     tt_int_op(res, ==, -2);
     tt_str_op(seq->name.s, ==, "");
     tt_str_op(seq->comment.s, ==, "");
     tt_str_op(seq->seq.s, ==, "");
     tt_str_op(seq->qual.s, ==, "");
     /* Check with bad params that it returns -2 */
-    res = read_seqfile(NULL, seq);
+    res = seqfile_read(NULL, seq);
     tt_int_op(res, ==, -2);
-    res = read_seqfile(sf, NULL);
+    res = seqfile_read(sf, NULL);
     tt_int_op(res, ==, -2);
 end:
-    destroy_seqfile(sf);
+    seqfile_destroy(sf);
     seq_destroy(seq);
     if (fname != NULL) {
         free(fname);
@@ -198,11 +198,11 @@ end:
 }
 
 void
-test_read_seqfile_vs_kseq (void *ptr)
+test_seqfile_read_vs_kseq (void *ptr)
 {
     seq_t *seq = seq_create();
     char *fname = find_data_file("test.fastq.gz");
-    seqfile_t *sf = create_seqfile(fname, "r");
+    seqfile_t *sf = seqfile_create(fname, "r");
     gzFile fp = gzopen(fname, "r");
     kseq_t *kseq = kseq_init(fp);
     ssize_t kseq_res = 0;
@@ -211,7 +211,7 @@ test_read_seqfile_vs_kseq (void *ptr)
     (void) ptr;
     tt_assert(fname != NULL);
     while (1) {
-        my_res = read_seqfile(sf, seq);
+        my_res = seqfile_read(sf, seq);
         kseq_res = kseq_read(kseq);
         tt_int_op(my_res, ==, kseq_res);
         if (my_res < 1 || kseq_res < 1) {
@@ -223,7 +223,7 @@ test_read_seqfile_vs_kseq (void *ptr)
         tt_str_op(seq->seq.s, ==, kseq->seq.s);
         tt_str_op(seq->qual.s, ==, kseq->qual.s);
     }
-    destroy_seqfile(sf);
+    seqfile_destroy(sf);
     seq_destroy(seq);
     kseq_destroy(kseq);
     gzclose(fp);
@@ -232,13 +232,13 @@ test_read_seqfile_vs_kseq (void *ptr)
     seq = seq_create();
     fname = find_data_file("test.fasta");
     tt_assert(fname != NULL);
-    sf = create_seqfile(fname, "r");
+    sf = seqfile_create(fname, "r");
     fp = gzopen(fname, "r");
     kseq = kseq_init(fp);
     kseq_res = 0;
     my_res = 0;
     while (1) {
-        my_res = read_seqfile(sf, seq);
+        my_res = seqfile_read(sf, seq);
         kseq_res = kseq_read(kseq);
         tt_int_op(my_res, ==, kseq_res);
         if (my_res < 1 || kseq_res < 1) {
@@ -250,7 +250,7 @@ test_read_seqfile_vs_kseq (void *ptr)
         tt_str_op(seq->seq.s, ==, kseq->seq.s);
     }
 end:
-    destroy_seqfile(sf);
+    seqfile_destroy(sf);
     seq_destroy(seq);
     kseq_destroy(kseq);
     gzclose(fp);
@@ -261,12 +261,12 @@ end:
 
 
 /*===  FUNCTION  ============================================================*
-Name:           test_write_seqfile
-Description:    Tests the write_seqfile function from kmseqfile.c
+Name:           test_seqfile_write
+Description:    Tests the seqfile_write function from kmseqfile.c
  *===========================================================================*/
 
 void
-test_write_seqfile (void *ptr)
+test_seqfile_write (void *ptr)
 {
     seq_t *seq = seq_create();
     size_t expt_bytes = 0;
@@ -286,11 +286,11 @@ test_write_seqfile (void *ptr)
     /* Test with a FASTQ seqfile */
     fname = get_writable_file();
     tt_assert(fname != NULL);
-    sf = create_seqfile(fname, "wT");
+    sf = seqfile_create(fname, "wT");
     seqfile_set_format(sf, FASTQ_FMT);
-    res = write_seqfile(sf, seq);
+    res = seqfile_write(sf, seq);
     tt_int_op(res, ==, expt_bytes);
-    destroy_seqfile(sf); /* Has to happen here to flush it */
+    seqfile_destroy(sf); /* Has to happen here to flush it */
     crc = crc32_file(fname);
     tt_str_op(crc, ==, "d4665941");
     clean_writable_file(fname);
@@ -302,34 +302,34 @@ test_write_seqfile (void *ptr)
                  8 + 1;                 /* seq + '\n'*/
     fname = get_writable_file();
     tt_assert(fname != NULL);
-    sf = create_seqfile(fname, "wT");
+    sf = seqfile_create(fname, "wT");
     seqfile_set_format(sf, FASTA_FMT);
     /* do the write */
-    res = write_seqfile(sf, seq);
+    res = seqfile_write(sf, seq);
     tt_int_op(res, ==, expt_bytes);
-    destroy_seqfile(sf); /* Flush it */
+    seqfile_destroy(sf); /* Flush it */
     crc = crc32_file(fname);
     tt_str_op(crc, ==, "0a295c77");
     clean_writable_file(fname);
     fname = NULL;
     /* Check with bad params that it returns -2 */
-    res = write_seqfile(NULL, seq);
+    res = seqfile_write(NULL, seq);
     tt_int_op(res, ==, -2);
-    res = write_seqfile(sf, NULL);
+    res = seqfile_write(sf, NULL);
     tt_int_op(res, ==, -2);
 end:
-    destroy_seqfile(sf);
+    seqfile_destroy(sf);
     seq_destroy(seq);
     if (fname != NULL) free(fname);
     if (crc != NULL) free(crc);
 }
 
 struct testcase_t seqfile_tests[] = {
-    { "create_seqfile", test_create_seqfile, 0, NULL, NULL},
+    { "seqfile_create", test_seqfile_create, 0, NULL, NULL},
     { "seqfile_guess_format", test_seqfile_guess_format, 0, NULL, NULL},
-    { "destroy_seqfile", test_destroy_seqfile, 0, NULL, NULL},
-    { "read_seqfile_vs_kseq", test_read_seqfile_vs_kseq, 0, NULL, NULL},
-    { "read_seqfile", test_read_seqfile, 0, NULL, NULL},
-    { "write_seqfile", test_write_seqfile, 0, NULL, NULL},
+    { "seqfile_destroy", test_seqfile_destroy, 0, NULL, NULL},
+    { "seqfile_read_vs_kseq", test_seqfile_read_vs_kseq, 0, NULL, NULL},
+    { "seqfile_read", test_seqfile_read, 0, NULL, NULL},
+    { "seqfile_write", test_seqfile_write, 0, NULL, NULL},
     END_OF_TESTCASES
 };
