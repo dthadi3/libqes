@@ -220,7 +220,8 @@ seqfile_destroy_(seqfile_t *seqfile)
 }
 
 inline size_t
-strfseq(const seq_t *seq, seqfile_format_t fmt, char *buffer, size_t maxlen)
+seqfile_format_seq(const seq_t *seq, seqfile_format_t fmt, char *buffer,
+        size_t maxlen)
 {
     size_t len = 0;
     if (buffer == NULL || maxlen < 1) {
@@ -266,7 +267,7 @@ seqfile_write (seqfile_t *file, seq_t *seq)
     if (!seqfile_ok(file) || !seq_ok(seq)) {
         return -2;
     }
-    len = strfseq(seq, file->flags.format, buffer, buflen);
+    len = seqfile_format_seq(seq, file->flags.format, buffer, buflen);
     if ((ssize_t) buflen <= len) {
         return -2;
     }

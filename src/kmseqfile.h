@@ -90,11 +90,8 @@ extern ssize_t seqfile_read (seqfile_t *file, seq_t *seq);
 
 extern ssize_t seqfile_write (seqfile_t *file, seq_t *seq);
 
-extern size_t strfseq(const seq_t *seq, seqfile_format_t fmt, char *buffer,
-        size_t maxlen);
-
-void print_seq_seqfile (seqfile_t * file, const seq_t *seq);
-
+extern size_t seqfile_format_seq(const seq_t *seq, seqfile_format_t fmt,
+        char *buffer, size_t maxlen);
 
 void seqfile_destroy_(seqfile_t *seqfile);
 #define seqfile_destroy(seqfile) do {                                       \
