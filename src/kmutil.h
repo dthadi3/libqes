@@ -53,7 +53,7 @@ extern const char *kmlib_version;
 
 #define KM_MAX_FN_LEN (1<<16)
 /* Size of buffers for file IO */
-#define    KM_FILEBUFFER_LEN (1<<20) 
+#define    KM_FILEBUFFER_LEN (1<<20)
 /* Starting point for allocing a char pointer. Set to slightly larger than the
    standard size of whatever you're reading in. */
 #define    __INIT_LINE_LEN (128)
@@ -82,6 +82,10 @@ extern const char *kmlib_version;
     #define STMT_END } while (0)
 #endif
 
+/* This can be helpful in some macros, particularly with #pragma */
+#ifndef STRINGIFY
+    #define STRINGIFY(a) #a
+#endif
 
 /*
  * General helper macros
