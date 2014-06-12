@@ -117,7 +117,6 @@ int _sum_seq(const seq_t *seq, void *data)
 void
 bench_seqfile_par_iter_fq(int silent)
 {
-    seq_t *seq = seq_create();
     seqfile_t *sf = seqfile_create(infile, "r");
     size_t seq_len = 0;
     seqfile_iter_flags flags;
@@ -131,9 +130,26 @@ bench_seqfile_par_iter_fq(int silent)
                 res);
     }
     seqfile_destroy(sf);
-    seq_destroy(seq);
 }
 
+void
+bench_seqfile_par_iter_fq_macro(int silent)
+{
+    seqfile_t *sf = seqfile_create(infile, "r");
+    size_t total_len = 0;
+
+    SEQFILE_ITER_PARALLEL_SINGLE_BEGIN(sf, seq, seq_len, shared(total_len))
+        #pragma omp critical
+        {
+        total_len += seq->seq.l;
+        }
+    SEQFILE_ITER_PARALLEL_SINGLE_END(seq)
+
+    if (!silent) {
+        printf("[seqfile_iter_fq_macro] Total seq len %zu\n", total_len);
+    }
+    seqfile_destroy(sf);
+}
 void
 bench_seqfile_parse_fq(int silent)
 {
@@ -213,6 +229,7 @@ static const bench_t benchmarks[] = {
     { "gnu_getline", &bench_gnu_getline_file},
     { "seqfile_parse_fq", &bench_seqfile_parse_fq},
     { "seqfile_par_iter_fq", &bench_seqfile_par_iter_fq},
+    { "seqfile_par_iter_fq_macro", &bench_seqfile_par_iter_fq_macro},
     { "kseq_parse_fq", &bench_kseq_parse_fq},
     { "seqfile_write", &bench_seqfile_write},
     { NULL, NULL}
