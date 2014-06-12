@@ -36,8 +36,8 @@ ENDIF()
 ENABLE_TESTING()
 
 # Packaging
-INCLUDE(CPack)
 SET(CPACK_GENERATOR "TGZ;TBZ2")
+INCLUDE(CPack)
 
 ###############################
 ## Find Packages and Headers ##
