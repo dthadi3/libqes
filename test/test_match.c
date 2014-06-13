@@ -20,6 +20,8 @@
 
 #include <kmmatch.h>
 
+#include <limits.h>
+
 void
 test_hamming (void *p)
 {
