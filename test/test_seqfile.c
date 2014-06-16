@@ -159,31 +159,55 @@ test_seqfile_read (void *ptr)
     ssize_t res = 0;
     seqfile_t *sf = NULL;
     char *fname = NULL;
+    /* Check a seq is empty */
+#define CHECK_SEQ_EMPTY                                                     \
+    tt_str_op(seq->name.s, ==, "");                                         \
+    tt_str_op(seq->comment.s, ==, "");                                      \
+    tt_str_op(seq->seq.s, ==, "");                                          \
+    tt_str_op(seq->qual.s, ==, "")
+    /* Check seq against the first known read */
+#define CHECK_SEQ_FIRST                                                     \
+    tt_str_op(seq->name.s, ==, first_fastq_read[0]);                        \
+    tt_str_op(seq->comment.s, ==, first_fastq_read[1]);                     \
+    tt_str_op(seq->seq.s, ==, first_fastq_read[2]);                         \
+    tt_str_op(seq->qual.s, ==, first_fastq_read[3])
+    /* Open, read, check & close a seqfile */
+#define CHECK_SEQFILE_READ(fn, expt_res, check_seq)                         \
+    fname = find_data_file(fn);                                             \
+    tt_assert(fname != NULL);                                               \
+    sf = seqfile_create(fname, "r");                                        \
+    res = seqfile_read(sf, seq);                                            \
+    tt_int_op(res, ==, expt_res);                                           \
+    check_seq;                                                              \
+    seqfile_destroy(sf);                                                    \
+    free(fname);                                                            \
+    fname = NULL
+    /* Open, read, check & close a seqfile, forcing its filetype to FASTQ */
+#define CHECK_SEQFILE_READ_FORCE(fn, expt_res, check_seq)                   \
+    fname = find_data_file(fn);                                             \
+    tt_assert(fname != NULL);                                               \
+    sf = seqfile_create(fname, "r");                                        \
+    seqfile_set_format(sf, FASTQ_FMT);                                      \
+    res = seqfile_read(sf, seq);                                            \
+    tt_int_op(res, ==, expt_res);                                           \
+    check_seq;                                                              \
+    seqfile_destroy(sf);                                                    \
+    free(fname);                                                            \
+    fname = NULL
 
     (void) ptr;
     /* Test file opening for reading */
-    fname = find_data_file("test.fastq");
-    tt_assert(fname != NULL);
-    sf = seqfile_create(fname, "r");
-    /* Test with a good seqfile */
-    res = seqfile_read(sf, seq);
-    tt_int_op(res, ==, first_fastq_len);
-    tt_str_op(seq->name.s, ==, first_fastq_read[0]);
-    tt_str_op(seq->comment.s, ==, first_fastq_read[1]);
-    tt_str_op(seq->seq.s, ==, first_fastq_read[2]);
-    tt_str_op(seq->qual.s, ==, first_fastq_read[3]);
-    seqfile_destroy(sf);
-    free(fname);
-    /* Test with bad seqfiles */
-    fname = find_data_file("loremipsum.txt");
-    tt_assert(fname != NULL);
-    sf = seqfile_create(fname, "r");
-    res = seqfile_read(sf, seq);
-    tt_int_op(res, ==, -2);
-    tt_str_op(seq->name.s, ==, "");
-    tt_str_op(seq->comment.s, ==, "");
-    tt_str_op(seq->seq.s, ==, "");
-    tt_str_op(seq->qual.s, ==, "");
+    CHECK_SEQFILE_READ("test.fastq", first_fastq_len, CHECK_SEQ_FIRST);
+    /* Test with bad fastqs, ensure all code paths are taken */
+    CHECK_SEQFILE_READ("loremipsum.txt", -2, CHECK_SEQ_EMPTY);
+    CHECK_SEQFILE_READ("bad_nohdr.fastq", -2, CHECK_SEQ_EMPTY);
+    CHECK_SEQFILE_READ("loremipsum.txt", -2, CHECK_SEQ_EMPTY);
+    CHECK_SEQFILE_READ_FORCE("loremipsum.txt", -2, CHECK_SEQ_EMPTY);
+    CHECK_SEQFILE_READ("empty.fastq", -2, CHECK_SEQ_EMPTY);
+    CHECK_SEQFILE_READ("bad_noqual.fastq", -2, CHECK_SEQ_EMPTY);
+    CHECK_SEQFILE_READ("bad_noqualhdrchr.fastq", -2, CHECK_SEQ_EMPTY);
+    CHECK_SEQFILE_READ("bad_noqualhdreol.fastq", -2, CHECK_SEQ_EMPTY);
+    CHECK_SEQFILE_READ("bad_diff_lens.fastq", -2, CHECK_SEQ_EMPTY);
     /* Check with bad params that it returns -2 */
     res = seqfile_read(NULL, seq);
     tt_int_op(res, ==, -2);
@@ -195,6 +219,8 @@ end:
     if (fname != NULL) {
         free(fname);
     }
+#undef CHECK_SEQ_EMPTY
+#undef CHECK_SEQFILE_READ
 }
 
 void
