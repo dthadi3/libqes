@@ -217,27 +217,4 @@ void seqfile_destroy_(seqfile_t *seqfile);
         seq_destroy(sq2);                                                   \
     }
 
-/*
- * Collection of options to a seqfile_iter function.
- */
-typedef struct __seqfile_iter_flags {
-    int die_quickly         :1;
-    int                     :7; /* Fill to byte */
-    int num_threads         :8; /* Don't know of anything w/ > 255 threads */
-    int interleaved         :1; /* Is the file interleaved */
-} seqfile_iter_flags;
-
-/* Function pointer that takes a seq_t and a pointer to arbitrary data and
-   returns a success/failure value */
-typedef int (*seqfile_iter_func_single_t)(const seq_t*, void *);
-typedef int (*seqfile_iter_func_paired_t)(const seq_t*, const seq_t*, void *);
-
-void seqfile_iter_set_theads(seqfile_iter_flags *, int threads);
-void seqfile_iter_set_die_quickly(seqfile_iter_flags *, int die_quickly);
-
-int seqfile_iter_parallel_single (seqfile_t *file,
-        seqfile_iter_func_single_t func, void *data, seqfile_iter_flags flags);
-int seqfile_iter_parallel_paired (seqfile_t *file1, seqfile_t *file2,
-        seqfile_iter_func_paired_t func, void *data, seqfile_iter_flags flags);
-
 #endif /* KMSEQFILE_H */
