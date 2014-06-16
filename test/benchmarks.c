@@ -33,12 +33,12 @@ void bench_gnu_getline_file(int silent);
 void bench_seqfile_parse_fq(int silent);
 void bench_kseq_parse_fq(int silent);
 void bench_seqfile_write(int silent);
+void bench_seqfile_par_iter_fq_macro(int silent);
 
 
 KSEQ_INIT(gzFile, gzread)
 
 static char *infile;
-
 
 typedef struct __bench {
     const char *name;
@@ -100,19 +100,6 @@ bench_gnu_getline_file(int silent)
     free(buf);
 }
 
-int _sum_seq(const seq_t *seq, void *data)
-{
-    unsigned long long int tmp = 0;
-    int iii = 0;
-    if (!seq_ok(seq) || data == NULL) {
-        return 0;
-    }
-    *((size_t *) data) += seq->seq.l;
-    for (iii = 0; iii < 1<<10; iii ++) {
-        tmp += iii;
-    }
-    return (tmp >0);
-}
 
 void
 bench_seqfile_par_iter_fq_macro(int silent)
@@ -248,7 +235,7 @@ main (int argc, char *argv[])
         printf("Begining benchmarks.\n");
         printf("---------------------------------------------------------------------\n");
     }
-    for (iii = 3; iii < argc; iii++) {
+    for (iii = 3; iii < (unsigned int) argc; iii++) {
         nbench = 0;
         while (1) {
             thisbench = benchmarks[nbench++];
