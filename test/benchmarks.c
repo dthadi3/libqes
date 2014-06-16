@@ -115,24 +115,6 @@ int _sum_seq(const seq_t *seq, void *data)
 }
 
 void
-bench_seqfile_par_iter_fq(int silent)
-{
-    seqfile_t *sf = seqfile_create(infile, "r");
-    size_t seq_len = 0;
-    seqfile_iter_flags flags;
-    flags.die_quickly = 0;
-    flags.num_threads = 4;
-    int res = 0;
-
-    res = seqfile_iter_parallel_single(sf, &_sum_seq, &seq_len, flags);
-    if (!silent) {
-        printf("[seqfile_iter_fq] Total seq len %zu, iter res %d\n", seq_len,
-                res);
-    }
-    seqfile_destroy(sf);
-}
-
-void
 bench_seqfile_par_iter_fq_macro(int silent)
 {
     seqfile_t *sf = seqfile_create(infile, "r");
@@ -150,6 +132,7 @@ bench_seqfile_par_iter_fq_macro(int silent)
     }
     seqfile_destroy(sf);
 }
+
 void
 bench_seqfile_parse_fq(int silent)
 {
@@ -228,7 +211,6 @@ static const bench_t benchmarks[] = {
     { "zfreadline_realloc", &bench_zfreadline_realloc_file},
     { "gnu_getline", &bench_gnu_getline_file},
     { "seqfile_parse_fq", &bench_seqfile_parse_fq},
-    { "seqfile_par_iter_fq", &bench_seqfile_par_iter_fq},
     { "seqfile_par_iter_fq_macro", &bench_seqfile_par_iter_fq_macro},
     { "kseq_parse_fq", &bench_kseq_parse_fq},
     { "seqfile_write", &bench_seqfile_write},
