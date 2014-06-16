@@ -400,7 +400,8 @@ zfgetc (zfile_t *file)
 {
     if (!zfile_ok(file) || zfile_readable(file) == 0) {
         return -2;
-    } else if (file->eof) {
+    }
+    if (file->eof) {
         return EOF;
     }
     return (file->bufiter++)[0];
