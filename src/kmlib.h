@@ -21,9 +21,12 @@
 
 
 /* #####   HEADER FILE INCLUDES   ########################################## */
-#include "kmutil.h"
-#include "kmmatch.h"
-#include "kmseq.h"
-#include "kmfile.h"
+#include <kmmatch.h>
+#include <kmseqfile.h>
+#include <kmseq.h>
+#include <kmsequtil.h>
+#include <kmstr.h>
+#include <kmutil.h>
+#include <kmzfile.h>
 
 #endif /* KMLIB_H */
