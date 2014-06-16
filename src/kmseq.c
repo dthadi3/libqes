@@ -100,20 +100,6 @@ seq_ok_no_comment_or_qual (const seq_t *seq)
         str_ok(&seq->seq);
 }
 
-void
-print_seq (const seq_t *seq, FILE *stream)
-{
-    fprintf(stream, "@");
-    print_str(&seq->name, stream);
-    fprintf(stream, " ");
-    print_str(&seq->comment, stream);
-    fprintf(stream, "\n");
-    print_str(&seq->seq, stream);
-    fprintf(stream, "\n+\n");
-    print_str(&seq->qual, stream);
-    fprintf(stream, "\n");
-}
-
 inline int
 seq_fill_name (seq_t *seqobj, const char *name, size_t len)
 {
@@ -157,11 +143,14 @@ seq_fill_qual (seq_t *seqobj, const char *qual, size_t len)
 inline int
 seq_fill_header (seq_t *seqobj, const char *header, size_t len)
 {
+    char *tmp = NULL;
+    size_t startfrom = 0;
+
     if (seqobj == NULL || header == NULL || len < 1) {
         return 0;
     }
-    char *tmp = memchr(header, ' ', len);
-    size_t startfrom = header[0] == '@' || header[0] == '>' ? 1 : 0;
+    tmp = memchr(header, ' ', len);
+    startfrom = header[0] == '@' || header[0] == '>' ? 1 : 0;
     if (tmp != NULL) {
         str_fill_charptr(&seqobj->name, header + startfrom,
                 tmp - header - startfrom);
