@@ -74,23 +74,23 @@ void test_zfile_ok (void *);
 extern struct testcase_t zfile_tests[];
 
 /* test_seqfile tests */
-void test_create_seqfile (void *);
 void test_seqfile_guess_format (void *);
-void test_destroy_seqfile (void *);
-void test_read_seqfile_vs_kseq (void *);
-void test_read_seqfile (void *);
-void test_write_seqfile (void *);
+void test_seqfile_create(void *);
+void test_seqfile_destroy (void *);
+void test_seqfile_read (void *);
+void test_seqfile_read_vs_kseq (void *);
+void test_seqfile_write (void *);
 extern struct testcase_t seqfile_tests[];
 
 /* test_seq tests */
-void test_create_seq (void *);
-void test_create_seq_no_qual (void *);
-void test_create_seq_no_qual_or_comment (void *);
+void test_seq_create (void *);
+void test_seq_create_no_qual (void *);
+void test_seq_create_no_qual_or_comment (void *);
 void test_seq_ok (void *);
 void test_seq_ok_no_comment (void *);
 void test_seq_ok_no_qual (void *);
 void test_seq_ok_no_comment_or_qual (void *);
-void test_destroy_seq (void *);
+void test_seq_destroy (void *);
 void test_seq_fill_funcs(void *);
 extern struct testcase_t seq_tests[];
 
