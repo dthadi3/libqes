@@ -72,9 +72,9 @@ SET(CMAKE_C_FLAGS_RELEASE "-O3")
 
 # Set include dirs
 INCLUDE_DIRECTORIES(
-    ${CMAKE_SOURCE_DIR}/src
-    ${CMAKE_SOURCE_DIR}/test
-    ${CMAKE_SOURCE_DIR}/test/tinytest
+    ${CMAKE_CURRENT_SOURCE_DIR}/src
+    ${CMAKE_CURRENT_SOURCE_DIR}/test
+    ${CMAKE_CURRENT_SOURCE_DIR}/test/tinytest
     ${KMLIB_DEPENDS_INCLUDE_DIRS}
     )
 
