@@ -29,8 +29,7 @@ read_fastq_seqfile(seqfile_t *file, seq_t *seq)
             subrec.l = len; \
         }
     ssize_t len = 0;
-    ssize_t spidx = 0;
-    ssize_t nlidx = 0;
+    char headerbuf[8192] = "";
     int next = '\0';
     /* Fast-forward past the delimiter '@', ensuring it exists */
     next = zfgetc(file->zf);
@@ -40,21 +39,9 @@ read_fastq_seqfile(seqfile_t *file, seq_t *seq)
         /* This ain't a fastq! WTF! */
         goto error;
     }
-    spidx = zfchrindex(file->zf, ' ', 1024);
-    nlidx = zfchrindex(file->zf, '\n', 1024);
-    if (spidx < nlidx) {/* spidx < nlidx) { */
-        /* Get until the first space, which is the seq name */
-        len = zfgetuntil_realloc(file->zf, ' ', &seq->name.s, &seq->name.m);
-        CHECK_AND_TRIM(seq->name)
-        /* Fill the comment, from first space to EOL */
-        len = zfreadline_realloc(file->zf, &seq->comment.s, &seq->comment.m);
-        CHECK_AND_TRIM(seq->comment)
-    } else {
-        /* Get the whole first line, which is the seq name */
-        len = zfgetuntil_realloc(file->zf, '\n', &seq->name.s, &seq->name.m);
-        CHECK_AND_TRIM(seq->name)
-        str_nullify(&seq->comment);
-    }
+    len = zfreadline(file->zf, headerbuf, 8192);
+    CHECK_AND_TRIM(seq->name)
+    seq_fill_header(seq, headerbuf, 8192);
     /* Fill the actual sequence directly */
     len = zfreadline_str(file->zf, &seq->seq);
     CHECK_AND_TRIM(seq->seq)
