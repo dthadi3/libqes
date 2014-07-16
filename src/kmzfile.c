@@ -18,36 +18,6 @@
 
 #include "kmzfile.h"
 
-inline int
-__zfile_fill_buffer (zfile_t *file)
-{
-    ssize_t res = 0;
-    if (!zfile_ok(file)) {
-        return 0;
-    }
-    if (file->feof || file->eof) {
-        file->eof = 1;
-        return EOF;
-    }
-    res = KM_ZREAD(file->fp, file->buffer, (KM_FILEBUFFER_LEN) - 1);
-    if (res < 0) {
-        /* Errored */
-        return 0;
-    } else if (res == 0) {
-        /* At both buffer & file EOF */
-        file->eof = 1;
-        file->feof = 1;
-        return EOF;
-    } else if (res < (KM_FILEBUFFER_LEN) - 1) {
-        /* At file EOF */
-        file->feof = 1;
-    }
-    file->bufiter = file->buffer;
-    file->bufend = file->buffer + res;
-    file->bufend[0] = '\0';
-    return 1;
-}
-
 zfile_t *
 zfopen_ (const char *path, const char *mode, errhandler_t onerr,
         const char *file, int line)
@@ -348,55 +318,7 @@ zfprint_str (zfile_t *stream, const str_t *str)
 }
 
 inline int
-zfile_ok(const zfile_t *zf)
-{
-    /* zfile_ok just check we won't dereference NULLs, so we check pointer
-     * NULLness for all pointers we care about in current modes. Which, unless
-     * we're Write-only, is all of them */
-    return  zf != NULL && \
-            zf->fp != NULL && \
-            (zf->mode == RW_WRITE || \
-                (zf->bufiter != NULL && \
-                 zf->buffer != NULL)
-            );
-}
-
-inline int
-zfile_readable(zfile_t *file)
-{
-    /* Here we check that reads won't fail. We refil if we need to. */
-    /* Can we possibly read from this file? */
-    if (!zfile_ok(file) || file->mode == RW_UNKNOWN || \
-            file->mode == RW_WRITE || file->eof) {
-        return 0;
-    }
-    /* We can read from buffer */
-    if (file->bufiter < file->bufend && file->bufiter[0] != '\0') {
-        return 1;
-    }
-    /* Buffer needs a refil */
-    if (__zfile_fill_buffer(file) != 0) {
-        /* we either successfully refilled, or are at EOF */
-        return file->eof ? EOF : 1;
-    } else {
-        /* No, we can't rea */
-        return 0;
-    }
-}
-
-inline int
-zfpeek (zfile_t *file)
-{
-    if (!zfile_ok(file) || zfile_readable(file) == 0) {
-        return -2;
-    } else if (file->eof) {
-        return EOF;
-    }
-    return file->bufiter[0];
-}
-
-inline int
-zfgetc (zfile_t *file)
+zfgetc(zfile_t *file)
 {
     if (!zfile_ok(file) || zfile_readable(file) == 0) {
         return -2;
@@ -405,4 +327,21 @@ zfgetc (zfile_t *file)
         return EOF;
     }
     return (file->bufiter++)[0];
+}
+
+const char *
+zferror (zfile_t *file)
+{
+    int error = 0;
+    const char *errstr = "";
+
+    if (!zfile_ok(file)) {
+        /* Never return NULL, or we'll SIGSEGV printf */
+        return "BAD FILE";
+    }
+    errstr = gzerror(file->fp, &error);
+    if (error == Z_ERRNO) {
+        return strerror(errno);
+    }
+    return errstr;
 }

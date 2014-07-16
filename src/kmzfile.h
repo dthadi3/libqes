@@ -53,7 +53,6 @@ zfile_t *zfopen_ (const char *path, const char *mode, errhandler_t onerr,
 
 
 extern int zfile_guess_mode (const char *mode);
-extern int zfpeek (zfile_t *file);
 extern int zfgetc (zfile_t *file);
 extern void zfrewind (zfile_t *file);
 
@@ -94,7 +93,7 @@ Description:    Reads ``file`` into ``dest`` until ``delim`` is found or
 Returns:        ssize_t: EOF, -2 (error) or size of data read.
  *===========================================================================*/
 extern ssize_t zfgetuntil (zfile_t *file, const int delim, char *dest,
-        size_t maxlen);
+                           size_t maxlen);
 
 /*===  FUNCTION  ============================================================*
 Name:           zfgetuntil_realloc
@@ -159,7 +158,144 @@ extern ssize_t zfreadline_realloc_ (zfile_t *file, char **buf, size_t *size,
     zfreadline_realloc_(fp, buf, sz, errprintexit, __FILE__, __LINE__)
 
 extern void zfprint_str (zfile_t *stream, const str_t *str);
-extern int zfile_ok(const zfile_t *zf);
-extern int zfile_readable(zfile_t *zf);
-extern int __zfile_fill_buffer (zfile_t *file);
+const char * zferror (zfile_t *file);
+
+/* INLINE FUNCTIONS */
+static inline int
+zfile_ok(const zfile_t *zf)
+{
+    /* zfile_ok just check we won't dereference NULLs, so we check pointer
+     * NULLness for all pointers we care about in current modes. Which, unless
+     * we're Write-only, is all of them */
+    return  zf != NULL && \
+            zf->fp != NULL && \
+            (zf->mode == RW_WRITE || \
+                (zf->bufiter != NULL && \
+                 zf->buffer != NULL)
+            );
+}
+
+static inline int
+__zfile_awkward_shuffle (zfile_t *file)
+{
+    size_t to_read = 0;
+    size_t to_move = 0;
+    ssize_t res = 0;
+    if (!zfile_ok(file)) {
+        return 0;
+    }
+    if (file->feof || file->eof) {
+        file->eof = 1;
+        return EOF;
+    }
+
+    to_move = file->bufend - file->bufiter; /* No + 1, don't copy the \0 */
+    to_read = (KM_FILEBUFFER_LEN - to_move) - 1;
+    memcpy(file->buffer, file->bufiter, to_move);
+    file->bufiter = file->buffer + to_move;
+    res = KM_ZREAD(file->fp, file->bufiter, to_read);
+    if (res < 0) {
+        /* Errored */
+        return 0;
+    } else if (res == 0) {
+        /* At both buffer & file EOF */
+        file->eof = 1;
+        file->feof = 1;
+        return EOF;
+    } else if ((size_t)res < to_read) {
+        /* At file EOF */
+        file->feof = 1;
+    }
+    file->bufiter = file->buffer;
+    file->bufend[0] = '\0';
+    return 1;
+}
+
+static inline int
+__zfile_fill_buffer (zfile_t *file)
+{
+    ssize_t res = 0;
+    if (!zfile_ok(file)) {
+        return 0;
+    }
+    if (file->feof || file->eof) {
+        file->eof = 1;
+        return EOF;
+    }
+    res = KM_ZREAD(file->fp, file->buffer, (KM_FILEBUFFER_LEN) - 1);
+    if (res < 0) {
+        /* Errored */
+        return 0;
+    } else if (res == 0) {
+        /* At both buffer & file EOF */
+        file->eof = 1;
+        file->feof = 1;
+        return EOF;
+    } else if (res < (KM_FILEBUFFER_LEN) - 1) {
+        /* At file EOF */
+        file->feof = 1;
+    }
+    file->bufiter = file->buffer;
+    file->bufend = file->buffer + res;
+    file->bufend[0] = '\0';
+    return 1;
+}
+
+static inline int
+zfile_readable(zfile_t *file)
+{
+    /* Here we check that reads won't fail. We refil if we need to. */
+    /* Can we possibly read from this file? */
+    if (!zfile_ok(file) || file->mode == RW_UNKNOWN || \
+            file->mode == RW_WRITE || file->eof) {
+        return 0;
+    }
+    /* We can read from buffer */
+    if (file->bufiter < file->bufend && file->bufiter[0] != '\0') {
+        return 1;
+    }
+    /* Buffer needs a refil */
+    if (__zfile_fill_buffer(file) != 0) {
+        /* we either successfully refilled, or are at EOF */
+        return file->eof ? EOF : 1;
+    } else {
+        /* No, we can't rea */
+        return 0;
+    }
+}
+
+static inline int
+zfpeek(zfile_t *file)
+{
+    if (!zfile_ok(file) || zfile_readable(file) == 0) {
+        return -2;
+    } else if (file->eof) {
+        return EOF;
+    }
+    return file->bufiter[0];
+}
+
+static inline ssize_t
+zfchrindex(zfile_t *file, char chr, size_t max)
+{
+    char *tmp = NULL;
+
+    if (!zfile_ok(file) || zfile_readable(file) == 0) {
+        return -2;
+    }
+    tmp = memchr(file->bufiter, chr, max);
+    if (tmp != NULL) {
+        return tmp - file->bufiter;
+    }
+    if ((size_t)(file->bufend - file->bufiter - 1) < max) {
+        __zfile_awkward_shuffle(file);
+    }
+    tmp = memchr(file->bufiter, chr, max);
+    if (tmp != NULL) {
+        return tmp - file->bufiter;
+    } else {
+        return -1;
+    }
+}
+
 #endif /* KMZFILE_H */
