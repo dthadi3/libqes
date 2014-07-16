@@ -40,8 +40,10 @@ read_fastq_seqfile(seqfile_t *file, seq_t *seq)
         goto error;
     }
     len = zfreadline(file->zf, headerbuf, 8192);
-    CHECK_AND_TRIM(seq->name)
-    seq_fill_header(seq, headerbuf, 8192);
+    if (len < 1) {
+        goto error;
+    }
+    seq_fill_header(seq, headerbuf, len);
     /* Fill the actual sequence directly */
     len = zfreadline_str(file->zf, &seq->seq);
     CHECK_AND_TRIM(seq->seq)
