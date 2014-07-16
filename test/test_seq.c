@@ -314,6 +314,7 @@ test_seq_fill_funcs(void *ptr)
 
     seq_t *seq = NULL;
     int res = 0;
+    char *tmp = NULL;
 
     (void) ptr;
     /* These should all work pretty well */
@@ -337,10 +338,11 @@ test_seq_fill_funcs(void *ptr)
 
     /* Fill header */
 #define CHECK_FILL_HEADER(str, len, nm, nmlen, com, comlen)     \
+    tmp = strdup(str);                                          \
     seq = seq_create();                                         \
     tt_str_op(seq->name.s, ==, "");                             \
     tt_str_op(seq->comment.s, ==, "");                          \
-    res = seq_fill_header(seq, str, len);                       \
+    res = seq_fill_header(seq, tmp, len);                       \
     tt_int_op(res, ==, 1);                                      \
     tt_str_op(seq->name.s, ==, nm);                             \
     tt_int_op(seq->name.l, ==, nmlen);                          \
@@ -348,7 +350,11 @@ test_seq_fill_funcs(void *ptr)
     tt_str_op(seq->comment.s, ==, com);                         \
     tt_int_op(seq->comment.l, ==, comlen);                      \
     tt_int_op(seq->comment.m, >=, comlen);                      \
-    seq_destroy(seq);
+    seq_destroy(seq);                                           \
+    free(tmp);                                                  \
+    tmp = NULL;
+    CHECK_FILL_HEADER("@HWI_TEST COMM\n", 15, "HWI_TEST", 8, "COMM", 4)
+    CHECK_FILL_HEADER("@HWI_TEST COMM \r\n", 17, "HWI_TEST", 8, "COMM", 4)
     CHECK_FILL_HEADER("@HWI_TEST COMM", 14, "HWI_TEST", 8, "COMM", 4)
     CHECK_FILL_HEADER(">HWI_TEST COMM", 14, "HWI_TEST", 8, "COMM", 4)
     CHECK_FILL_HEADER("HWI_TEST COMM", 13, "HWI_TEST", 8, "COMM", 4)
@@ -357,11 +363,15 @@ test_seq_fill_funcs(void *ptr)
     CHECK_FILL_HEADER("HWI_TEST", 8, "HWI_TEST", 8, "", 0)
     /* Check bad values */
     seq = seq_create();
-    tt_int_op(seq_fill_header(NULL, "BAD", 3), ==, 0);
+    tmp = strdup("BAD");
+    tt_int_op(seq_fill_header(NULL, tmp, 3), ==, 0);
     tt_int_op(seq_fill_header(seq, NULL, 3), ==, 0);
-    tt_int_op(seq_fill_header(seq, "BAD", 0), ==, 0);
+    tt_int_op(seq_fill_header(seq, tmp, 0), ==, 0);
     seq_destroy(seq);
 end:
+    if (tmp != NULL) {
+        free(tmp);
+    }
     seq_destroy(seq);
 #undef CHECK_FILLING
 #undef CHECK_FILLING_FAIL
