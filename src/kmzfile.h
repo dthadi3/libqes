@@ -176,42 +176,6 @@ zfile_ok(const zfile_t *zf)
 }
 
 static inline int
-__zfile_awkward_shuffle (zfile_t *file)
-{
-    size_t to_read = 0;
-    size_t to_move = 0;
-    ssize_t res = 0;
-    if (!zfile_ok(file)) {
-        return 0;
-    }
-    if (file->feof || file->eof) {
-        file->eof = 1;
-        return EOF;
-    }
-
-    to_move = file->bufend - file->bufiter; /* No + 1, don't copy the \0 */
-    to_read = (KM_FILEBUFFER_LEN - to_move) - 1;
-    memcpy(file->buffer, file->bufiter, to_move);
-    file->bufiter = file->buffer + to_move;
-    res = KM_ZREAD(file->fp, file->bufiter, to_read);
-    if (res < 0) {
-        /* Errored */
-        return 0;
-    } else if (res == 0) {
-        /* At both buffer & file EOF */
-        file->eof = 1;
-        file->feof = 1;
-        return EOF;
-    } else if ((size_t)res < to_read) {
-        /* At file EOF */
-        file->feof = 1;
-    }
-    file->bufiter = file->buffer;
-    file->bufend[0] = '\0';
-    return 1;
-}
-
-static inline int
 __zfile_fill_buffer (zfile_t *file)
 {
     ssize_t res = 0;
@@ -275,27 +239,5 @@ zfpeek(zfile_t *file)
     return file->bufiter[0];
 }
 
-static inline ssize_t
-zfchrindex(zfile_t *file, char chr, size_t max)
-{
-    char *tmp = NULL;
-
-    if (!zfile_ok(file) || zfile_readable(file) == 0) {
-        return -2;
-    }
-    tmp = memchr(file->bufiter, chr, max);
-    if (tmp != NULL) {
-        return tmp - file->bufiter;
-    }
-    if ((size_t)(file->bufend - file->bufiter - 1) < max) {
-        __zfile_awkward_shuffle(file);
-    }
-    tmp = memchr(file->bufiter, chr, max);
-    if (tmp != NULL) {
-        return tmp - file->bufiter;
-    } else {
-        return -1;
-    }
-}
 
 #endif /* KMZFILE_H */
