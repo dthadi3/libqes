@@ -249,6 +249,10 @@ test_seqfile_read_vs_kseq (void *ptr)
         tt_str_op(seq->seq.s, ==, kseq->seq.s);
         tt_str_op(seq->qual.s, ==, kseq->qual.s);
     }
+    my_res = seqfile_read(sf, seq);
+    kseq_res = kseq_read(kseq);
+    tt_int_op(my_res, ==, kseq_res);
+    tt_int_op(my_res, ==, EOF);
     seqfile_destroy(sf);
     seq_destroy(seq);
     kseq_destroy(kseq);
