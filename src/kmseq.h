@@ -21,6 +21,7 @@
 
 #include <kmutil.h>
 #include <kmstr.h>
+#include <ctype.h>
 
 
 /*---------------------------------------------------------------------------
@@ -69,7 +70,7 @@ Description:    Fills the name and comment members of a ``seq_t`` from the
                 header line of a fasta/fastq file.
 Returns:        int: 1 on success, otherwise 0 for failure.
  *===========================================================================*/
-extern int seq_fill_header(seq_t *seqobj, const char *header, size_t len);
+extern int seq_fill_header(seq_t *seqobj, char *header, size_t len);
 
 
 /*===  FUNCTION  ============================================================*

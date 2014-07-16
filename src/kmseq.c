@@ -141,13 +141,16 @@ seq_fill_qual (seq_t *seqobj, const char *qual, size_t len)
 }
 
 inline int
-seq_fill_header (seq_t *seqobj, const char *header, size_t len)
+seq_fill_header (seq_t *seqobj, char *header, size_t len)
 {
     char *tmp = NULL;
     size_t startfrom = 0;
 
     if (seqobj == NULL || header == NULL || len < 1) {
         return 0;
+    }
+    while (isspace(header[len-1])) {
+        header[--len] = '\0';
     }
     tmp = memchr(header, ' ', len);
     startfrom = header[0] == '@' || header[0] == '>' ? 1 : 0;
