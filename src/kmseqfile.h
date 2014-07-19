@@ -99,6 +99,7 @@ void seqfile_destroy_(seqfile_t *seqfile);
             seqfile = NULL;                                                 \
         } while(0)
 
+#ifndef KMLIB_NO_OPENMP
 #define SEQFILE_ITER_PARALLEL_SINGLE_BEGIN(fle, sq, ln, opts)               \
     _Pragma(STRINGIFY(omp parallel shared(fle) opts default(none)))         \
     {                                                                       \
@@ -163,6 +164,8 @@ void seqfile_destroy_(seqfile_t *seqfile);
         seq_destroy(sq1);                                                   \
         seq_destroy(sq2);                                                   \
     }
+
+#endif /* KMLIB_NO_OPENMP */
 
 #define SEQFILE_ITER_SINGLE_BEGIN(fle, sq, ln)                              \
     {                                                                       \

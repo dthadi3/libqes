@@ -18,7 +18,6 @@ ADD_TEST(NAME kmlib_benchmarks
 	  50
 	  seqfile_write
 	  kseq_parse_fq
-	  seqfile_par_iter_fq
 	  gnu_getline
 	  seqfile_parse_fq
 	  zfreadline_realloc)

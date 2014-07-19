@@ -33,7 +33,9 @@ void bench_gnu_getline_file(int silent);
 void bench_seqfile_parse_fq(int silent);
 void bench_kseq_parse_fq(int silent);
 void bench_seqfile_write(int silent);
+#ifndef KMLIB_NO_OPENMP
 void bench_seqfile_par_iter_fq_macro(int silent);
+#endif
 
 
 KSEQ_INIT(gzFile, gzread)
@@ -101,6 +103,7 @@ bench_gnu_getline_file(int silent)
 }
 
 
+#ifndef KMLIB_NO_OPENMP
 void
 bench_seqfile_par_iter_fq_macro(int silent)
 {
@@ -119,6 +122,7 @@ bench_seqfile_par_iter_fq_macro(int silent)
     }
     seqfile_destroy(sf);
 }
+#endif
 
 void
 bench_seqfile_parse_fq(int silent)
@@ -198,7 +202,9 @@ static const bench_t benchmarks[] = {
     { "zfreadline_realloc", &bench_zfreadline_realloc_file},
     { "gnu_getline", &bench_gnu_getline_file},
     { "seqfile_parse_fq", &bench_seqfile_parse_fq},
+#ifndef KMLIB_NO_OPENMP
     { "seqfile_par_iter_fq_macro", &bench_seqfile_par_iter_fq_macro},
+#endif
     { "kseq_parse_fq", &bench_kseq_parse_fq},
     { "seqfile_write", &bench_seqfile_write},
     { NULL, NULL}
