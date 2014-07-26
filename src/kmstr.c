@@ -18,13 +18,6 @@
 
 #include "kmstr.h"
 
-inline int
-str_ok (const str_t *str)
-{
-    return str != NULL && str->s != NULL && str->m > 0;
-}
-
-
 inline void
 print_str (const str_t *str, FILE *stream)
 {

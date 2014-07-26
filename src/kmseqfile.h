@@ -69,7 +69,12 @@ Description:    Check a file referenece ``file``, ensuring that it may be
                 read from the file.
 Returns:        An int evaluating to true if ``file`` is OK, otherwise false.
  *===========================================================================*/
-extern int seqfile_ok(const seqfile_t *file);
+static inline int
+seqfile_ok(const seqfile_t *file)
+{
+    return (file != NULL && zfile_ok(file->zf));
+}
+
 
 
 /*===  FUNCTION  ============================================================*
@@ -170,6 +175,7 @@ void seqfile_destroy_(seqfile_t *seqfile);
 #define SEQFILE_ITER_SINGLE_BEGIN(fle, sq, ln)                              \
     {                                                                       \
         seq_t *sq = seq_create();                                           \
+        /* TODO MUSTFIX check for null sq */                                \
         ssize_t ln = 0;                                                     \
         while(1) {                                                          \
             ln = seqfile_read(fle, sq);                                     \

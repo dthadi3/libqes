@@ -162,12 +162,61 @@ extern void *km_realloc_ (void *data, size_t size, errhandler_t onerr,
     }                               \
     STMT_END
 
+/* kmroundupz:
+ *   Round up a `size_t` to the next highest power of two.
+ */
 /* Flogged from http://stackoverflow.com/a/1322548 and
    http://graphics.stanford.edu/~seander/bithacks.html, and kseq.h */
 /* Round a 32-bit int up to nearest base-2 number */
-extern size_t kmroundupz(size_t sz);
-extern uint32_t kmroundup32 (uint32_t u32);
-extern uint64_t kmroundup64 (uint64_t u64);
+static inline size_t
+kmroundupz (size_t sz)
+{
+    /* Decrement v only if v is not already a power of 2 */
+    /* I.e, roundup things already a power of 2 */
+    if (km_unlikely((sz & (sz - 1)) != 0)) sz--;
+    /* mask all bits below MSB to 1 */
+    sz |= sz>>1;
+    sz |= sz>>2;
+    sz |= sz>>4;
+    sz |= sz>>8;
+    sz |= sz>>16;
+#if UINTPTR_MAX == 0xffffffffffffffff /* 64-bit system */
+    sz |= sz>>32;
+#endif
+    return sz + 1;
+}
+
+static inline uint32_t
+kmroundup32 (uint32_t u32)
+{
+    /* Roundup things already a power of 2 */
+    if ((u32 & (u32 - 1)) != 0) u32--;
+    /* mask all bits below MSB to 1 */
+    u32 |= u32>>1;
+    u32 |= u32>>2;
+    u32 |= u32>>4;
+    u32 |= u32>>8;
+    u32 |= u32>>16;
+    return u32 + 1;
+}
+
+static inline uint64_t
+kmroundup64 (uint64_t u64)
+{
+    /* Roundup things already a power of 2 */
+    if ((u64 & (u64 - 1)) != 0) u64--;
+    /* mask all bits below MSB to 1 */
+    u64 |= u64>>1;
+    u64 |= u64>>2;
+    u64 |= u64>>4;
+    u64 |= u64>>8;
+    u64 |= u64>>16;
+    u64 |= u64>>32;
+    return u64 + 1;
+}
+
+
+
 
 /* IO helpers */
 

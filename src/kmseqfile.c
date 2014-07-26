@@ -206,12 +206,6 @@ seqfile_set_format (seqfile_t *file, seqfile_format_t format)
     file->flags.format = format;
 }
 
-inline int
-seqfile_ok(const seqfile_t *file)
-{
-    return (file != NULL && zfile_ok(file->zf));
-}
-
 void
 seqfile_destroy_(seqfile_t *seqfile)
 {

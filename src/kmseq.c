@@ -60,45 +60,6 @@ seq_create_no_qual_or_comment (void)
     return seq;
 }
 
-inline int
-seq_ok (const seq_t *seq)
-{
-    return \
-       seq != NULL && \
-       str_ok(&seq->name) && \
-       str_ok(&seq->comment) && \
-       str_ok(&seq->seq) && \
-       str_ok(&seq->qual);
-}
-
-inline int
-seq_ok_no_comment (const seq_t *seq)
-{
-    return \
-       seq != NULL && \
-       str_ok(&seq->name) && \
-       str_ok(&seq->seq) && \
-       str_ok(&seq->qual);
-}
-
-inline int
-seq_ok_no_qual (const seq_t *seq)
-{
-    return \
-        seq != NULL && \
-        str_ok(&seq->name) && \
-        str_ok(&seq->comment) && \
-        str_ok(&seq->seq);
-}
-
-inline int
-seq_ok_no_comment_or_qual (const seq_t *seq)
-{
-    return \
-        seq != NULL && \
-        str_ok(&seq->name) && \
-        str_ok(&seq->seq);
-}
 
 inline int
 seq_fill_name (seq_t *seqobj, const char *name, size_t len)

@@ -58,10 +58,45 @@ Description:    Check if ``seq`` is a usable seq_t struct. seq_ok_no-X
                 functions permit the member(s) in their names to be unusable.
 Returns:        1 if usable, 0 otherwise.
  *===========================================================================*/
-extern int seq_ok(const seq_t *seq);
-extern int seq_ok_no_qual(const seq_t *seq);
-extern int seq_ok_no_comment(const seq_t *seq);
-extern int seq_ok_no_comment_or_qual(const seq_t *seq);
+static inline int
+seq_ok (const seq_t *seq)
+{
+    return \
+       seq != NULL && \
+       str_ok(&seq->name) && \
+       str_ok(&seq->comment) && \
+       str_ok(&seq->seq) && \
+       str_ok(&seq->qual);
+}
+
+static inline int
+seq_ok_no_comment (const seq_t *seq)
+{
+    return \
+       seq != NULL && \
+       str_ok(&seq->name) && \
+       str_ok(&seq->seq) && \
+       str_ok(&seq->qual);
+}
+
+static inline int
+seq_ok_no_qual (const seq_t *seq)
+{
+    return \
+        seq != NULL && \
+        str_ok(&seq->name) && \
+        str_ok(&seq->comment) && \
+        str_ok(&seq->seq);
+}
+
+static inline int
+seq_ok_no_comment_or_qual (const seq_t *seq)
+{
+    return \
+        seq != NULL && \
+        str_ok(&seq->name) && \
+        str_ok(&seq->seq);
+}
 
 /*===  FUNCTION  ============================================================*
 Name:           seq_fill_header

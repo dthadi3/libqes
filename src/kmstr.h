@@ -35,8 +35,11 @@ Description:    Checks if a string is OK to use, i.e. checks that `str->s` is
                 a valid `char` array.
 Returns:        An `int` that evaluates to true or false.
  *===========================================================================*/
-extern int str_ok (const str_t *str);
-
+static inline int
+str_ok (const str_t *str)
+{
+    return str != NULL && str->s != NULL && str->m > 0;
+}
 
 /*===  FUNCTION  ============================================================*
 Name:           create_str
