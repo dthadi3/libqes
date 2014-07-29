@@ -149,9 +149,13 @@ zfgetuntil_realloc_ (zfile_t *file, int delim, char **bufref, size_t *sizeref,
     if (buf == NULL) {
         buf = km_malloc_(__INIT_LINE_LEN * sizeof(*buf), onerr, src, line);
         size = __INIT_LINE_LEN;
+        buf[0] = '\0';
     }
     /* Set nextbuf AFTER we may/may not have alloced buf above */
     nextbuf = buf;
+    /* In case we error out below, we always set bufref = buf here, as
+       then we don't lose the memory alloced above */
+    *bufref = buf;
     /* Read until delim is in file->buffer, filling buffer */
     while ((end = strchr(file->bufiter, delim)) == NULL) {
         /* copy the remainder of the buffer */
