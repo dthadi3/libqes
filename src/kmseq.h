@@ -98,6 +98,31 @@ seq_ok_no_comment_or_qual (const seq_t *seq)
         str_ok(&seq->seq);
 }
 
+static inline int
+seq_has_comment (const seq_t *seq)
+{
+    return seq_ok(seq) && seq->comment.l > 0;
+}
+
+static inline int
+seq_has_qual (const seq_t *seq)
+{
+    return seq_ok(seq) && seq->qual.l > 0;
+}
+
+static inline int
+seq_n_bytes (const seq_t *seq)
+{
+    if (!seq_ok(seq)) {
+        return -1;
+    }
+    /* Arragned per line in a fastq */
+    return 1 + seq->seq.l + seq_has_comment(seq) * 1 + seq->comment.l + 1 + \
+           seq->seq.l + 1 +\
+           2 * seq_has_qual(seq) + \
+           seq->qual.l + seq_has_qual(seq) * 1;
+}
+
 /*===  FUNCTION  ============================================================*
 Name:           seq_fill_header
 Paramters:      seq_t *seqobj: Seq object that will receive the header.

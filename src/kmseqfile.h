@@ -44,8 +44,10 @@ typedef struct _kmseqfile {
     zfile_t *zf;
     seqfile_flags_t flags;
     size_t n_records;
+    /* A buffer to store misc shit in while reading.
+       One per file to keep it re-entrant */
+    str_t scratch;
 } seqfile_t;
-
 
 
 /*===  FUNCTION  ============================================================*

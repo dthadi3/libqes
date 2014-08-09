@@ -309,10 +309,19 @@ zfreadline (zfile_t *file, char *dest, size_t maxlen)
 inline ssize_t
 zfreadline_str (zfile_t *file, str_t *str)
 {
+    ssize_t ln = 0;
+
     if (file == NULL || !str_ok(str)) {
         return -2; /* ERROR, not EOF */
     }
-    return zfreadline_realloc(file, &(str->s), &(str->m));
+    ln = zfreadline_realloc(file, &(str->s), &(str->m));
+    if (ln < 0) {
+        str_nullify(str);
+        return ln;
+    } else {
+        str->l = ln;
+        return ln;
+    }
 }
 
 inline void

@@ -29,8 +29,8 @@ read_fastq_seqfile(seqfile_t *file, seq_t *seq)
             subrec.l = len; \
         }
     ssize_t len = 0;
-    char headerbuf[8192] = "";
     int next = '\0';
+
     /* Fast-forward past the delimiter '@', ensuring it exists */
     next = zfgetc(file->zf);
     if (next == EOF) {
@@ -39,11 +39,11 @@ read_fastq_seqfile(seqfile_t *file, seq_t *seq)
         /* This ain't a fastq! WTF! */
         goto error;
     }
-    len = zfreadline(file->zf, headerbuf, 8192);
+    len = zfreadline_str(file->zf, &file->scratch);
     if (len < 1) {
         goto error;
     }
-    seq_fill_header(seq, headerbuf, len);
+    seq_fill_header(seq, file->scratch.s, file->scratch.l);
     /* Fill the actual sequence directly */
     len = zfreadline_str(file->zf, &seq->seq);
     CHECK_AND_TRIM(seq->seq)
@@ -172,6 +172,7 @@ seqfile_create (const char *path, const char *mode)
         km_free(sf);
         return NULL;
     }
+    init_str(&sf->scratch, __INIT_LINE_LEN);
     sf->n_records = 0;
     seqfile_guess_format(sf);
     return sf;
@@ -211,6 +212,7 @@ seqfile_destroy_(seqfile_t *seqfile)
 {
     if (seqfile != NULL) {
         zfclose(seqfile->zf);
+        destroy_str_cp(&seqfile->scratch);
         km_free(seqfile);
     }
 }
@@ -252,24 +254,60 @@ seqfile_format_seq(const seq_t *seq, seqfile_format_t fmt, char *buffer,
     }
 }
 
+
 inline ssize_t
 seqfile_write (seqfile_t *file, seq_t *seq)
 {
-    ssize_t len = 0;
-    const size_t buflen = 1<<12; /* 4k max seq len, should be plenty */
-    char buffer[1<<12];
+#define sf_putc_check(c) ret = gzputc(file->zf->fp, c);     \
+    if (ret != c) {return -2;}                               \
+    else res_len += 1;                                    \
+    ret = 0
+#define sf_puts_check(s) ret = gzputs(file->zf->fp, s);   \
+    if (ret < 0) {return -2;}                               \
+    else res_len += ret;                                    \
+    ret = 0
+
     int ret = 0;
+    ssize_t res_len = 0;
 
     if (!seqfile_ok(file) || !seq_ok(seq)) {
         return -2;
     }
-    len = seqfile_format_seq(seq, file->flags.format, buffer, buflen);
-    if ((ssize_t) buflen <= len) {
-        return -2;
+    switch (file->flags.format) {
+        case FASTA_FMT:
+            sf_putc_check(FASTA_DELIM);
+            sf_puts_check(seq->name.s);
+            if (seq_has_comment(seq)) {
+                sf_putc_check(' ');
+                sf_puts_check(seq->comment.s);
+            }
+            sf_putc_check('\n');
+            sf_puts_check(seq->seq.s);
+            sf_putc_check('\n');
+            break;
+        case FASTQ_FMT:
+            sf_putc_check(FASTQ_DELIM);
+            sf_puts_check(seq->name.s);
+            if (seq_has_comment(seq)) {
+                sf_putc_check(' ');
+                sf_puts_check(seq->comment.s);
+            }
+            sf_putc_check('\n');
+            sf_puts_check(seq->seq.s);
+            sf_putc_check('\n');
+            if (seq_has_qual(seq)) {
+                sf_putc_check('+');
+                sf_putc_check('\n');
+                sf_puts_check(seq->qual.s);
+                sf_putc_check('\n');
+
+            }
+            break;
+        default:
+            return -2;
+            break;
     }
-    ret = KM_ZWRITE(file->zf->fp, buffer, len);
-    if (ret < len) {
-        return -2;
-    }
-    return len;
+    return res_len;
+#undef sf_putc_check
+#undef sf_puts_check
 }
