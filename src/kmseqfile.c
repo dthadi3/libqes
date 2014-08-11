@@ -258,13 +258,13 @@ seqfile_format_seq(const seq_t *seq, seqfile_format_t fmt, char *buffer,
 inline ssize_t
 seqfile_write (seqfile_t *file, seq_t *seq)
 {
-#define sf_putc_check(c) ret = gzputc(file->zf->fp, c);     \
-    if (ret != c) {return -2;}                               \
-    else res_len += 1;                                    \
+#define sf_putc_check(c) ret = KM_ZFPUTC(file->zf->fp, c);                  \
+    if (ret != c) {return -2;}                                              \
+    else res_len += 1;                                                      \
     ret = 0
-#define sf_puts_check(s) ret = gzputs(file->zf->fp, s);   \
-    if (ret < 0) {return -2;}                               \
-    else res_len += ret;                                    \
+#define sf_puts_check(s) ret = KM_ZFPUTS(file->zf->fp, s);                  \
+    if (ret < 0) {return -2;}                                               \
+    else res_len += ret;                                                    \
     ret = 0
 
     int ret = 0;
