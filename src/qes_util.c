@@ -18,7 +18,7 @@
 
 #include "qes_util.h"
 
-/* Pull LIBQES_VERSION in from CMAKE */
+/* Pull LIBQES_VERSION in from qes_config.h */
 const char *libqes_version = LIBQES_VERSION;
 
 /* Valid non-function to pass to libqes functions */

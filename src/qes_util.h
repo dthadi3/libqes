@@ -29,6 +29,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <strings.h>
+#include "qes_config.h"
 
 /*
  * Cross-platform bollocks. Thanks windows.
@@ -174,51 +175,6 @@ qes_roundup64 (uint64_t u64)
 
 
 /* IO helpers */
-
-/* Definitions to make changing fp type easy */
-#ifdef HAVE_ZLIB
-#   include <zlib.h>
-#   define    QES_ZTYPE gzFile
-#   define    QES_ZOPEN gzopen
-#   define    QES_ZDOPEN gzdopen
-#   define    QES_ZCLOSE gzclose
-#   define    QES_ZREAD gzread
-#   define    QES_ZWRITE gzwrite
-#   define    QES_ZFLUSH gzflush
-#   define    QES_ZFPRINTF gzprintf
-#   define    QES_ZFPUTS gzputs
-#   define    QES_ZFPUTC gzputc
-#   define    QES_ZFGETS gzgets
-#   define    QES_ZFGETC gzgetc
-#   define    QES_ZFUNGETC gzungetc
-#   define    QES_ZERR gzerror
-#   define    QES_ZEOF gzeof
-#   define    QES_ZBUFFER gzbuffer
-#   define    QES_ZSEEK gzseek
-#   define    QES_ZTELL gztell
-#   define    QES_ZREWIND gzrewind
-#else
-#   define    QES_ZTYPE FILE*
-#   define    QES_ZOPEN fopen
-#   define    QES_ZCLOSE fclose
-#   define    QES_ZDOPEN fdopen
-#   define    QES_ZCLOSE fclose
-#   define    QES_ZREAD fread
-#   define    QES_ZWRITE fwrite
-#   define    QES_ZFLUSH fflush
-#   define    QES_ZFPRINTF fprintf
-#   define    QES_ZFPUTS fputs
-#   define    QES_ZFPUTC fputc
-#   define    QES_ZFGETS fgets
-#   define    QES_ZFGETC fgetc
-#   define    QES_ZFUNGETC fungetc
-#   define    QES_ZERR ferror
-#   define    QES_ZEOF feof
-#   define    QES_ZBUFFER fbuffer
-#   define    QES_ZSEEK fseek
-#   define    QES_ZTELL ftell
-#   define    QES_ZREWIND frewind
-#endif
 
 typedef enum __rwmode {
     RW_UNKNOWN,

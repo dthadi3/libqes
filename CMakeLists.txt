@@ -1,9 +1,8 @@
 CMAKE_MINIMUM_REQUIRED(VERSION 2.8)
 PROJECT(libqes C)
-SET(LIBQES_MAJOR_VERSION 0)
-SET(LIBQES_MINOR_VERSION 1)
-SET(LIBQES_PATCH_VERSION 1)
-SET(LIBQES_VERSION "${LIBQES_MAJOR_VERSION}.${LIBQES_MINOR_VERSION}.${LIBQES_PATCH_VERSION}a4")
+
+# Append cmake-modules to module path
+SET(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake-modules")
 
 #############################
 ## Setup CMAKE Environment ##
@@ -15,11 +14,30 @@ IF (DEV)
 ENDIF()
 
 IF (NOT CMAKE_BUILD_TYPE)
-	SET(CMAKE_BUILD_TYPE Debug)
+	SET(CMAKE_BUILD_TYPE Release)
 ENDIF()
 
-# Append cmake-modules to module path
-SET(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake-modules")
+# git versioning
+INCLUDE(GetGitRevisionDescription)
+get_git_head_revision(rev hash)
+git_get_exact_tag(tag)
+
+IF ("${tag}")
+	set(LIBQES_VERSION "${tag}")
+ELSE()
+	git_describe(gitdesc "--abbrev=0")
+	if(NOT "${gitdesc}" STREQUAL "")
+		set(LIBQES_VERSION "${gitdesc}")
+	ELSE()
+		set(LIBQES_VERSION "dirty")
+	ENDIF()
+ENDIF()
+IF (NOT "${hash}" STREQUAL "")
+	STRING(SUBSTRING ${hash} 0 7 hash)
+	set(LIBQES_VERSION "${LIBQES_VERSION}+git.${hash}")
+ENDIF()
+
+MESSAGE(STATUS "${CMAKE_BUILD_TYPE} build of libqes version: ${LIBQES_VERSION}")
 
 # Set output directories
 SET(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
@@ -48,28 +66,37 @@ SET(LIBQES_DEPENDS_LIBS
     ${LIBQES_DEPENDS_LIBS} ${ZLIB_LIBRARIES})
 SET(LIBQES_DEPENDS_INCLUDE_DIRS
     ${LIBQES_DEPENDS_INCLUDE_DIRS} ${ZLIB_INCLUDE_DIRS})
-SET(LIBQES_DEPENDS_CFLAGS
-    "${LIBQES_DEPENDS_CFLAGS} -DHAVE_ZLIB")
+SET(HAVE_ZLIB ${ZLIB_FOUND})
 
 ##########################
 ## Set Compiler Options ##
 ##########################
 
-# When STATIC is TRUE, then cmake only looks for static libraries
-IF(LINUX)
-    IF(STATIC)
-        SET(CMAKE_FIND_LIBRARY_SUFFIXES ".a")
-    ENDIF(STATIC)
-ENDIF(LINUX)
+# Set GCC-specific options
+IF (CMAKE_COMPILER_IS_GNUCC)
+	SET(WEXTRA_FLAGS "${WEXTRA_FLAGS} -Woverride-init -Wnormalized=id -Wlogical-op")
+	EXECUTE_PROCESS(COMMAND ${CMAKE_C_COMPILER} -dumpversion
+			OUTPUT_VARIABLE GCC_VERSION)
+	IF (${GCC_VERSION} VERSION_GREATER 4.9 OR ${GCC_VERSION} VERSION_EQUAL 4.9)
+		SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fdiagnostics-color=always")
+	ENDIF()
+ENDIF()
 
 # Set CFLAGS
-SET(EXTRA_WARNING_FLAGS "-fstack-protector-all -Wstack-protector -Wfloat-equal -Wundef -Wpointer-arith -Wstrict-prototypes -Wmissing-prototypes -Wwrite-strings -Wredundant-decls -Wchar-subscripts -Wcomment -Wformat=2 -Wwrite-strings -Wmissing-declarations -Wredundant-decls -Wnested-externs -Wbad-function-cast -Wswitch-enum -Winit-self -Wmissing-field-initializers -Wdeclaration-after-statement -Wold-style-definition -Waddress -Wmissing-noreturn -Wstrict-overflow=1 -Wnormalized=id -Woverride-init -Wextra -Warray-bounds -Wlogical-op")
-SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=gnu99 -Wall ${LIBQES_DEPENDS_CFLAGS}")
-SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DLIBQES_VERSION=\\\"${LIBQES_VERSION}\\\" ${EXTRA_WARNING_FLAGS}")
+SET(WEXTRA_FLAGS "${WEXTRA_FLAGS} -fstack-protector-all -Wstack-protector -Wfloat-equal")
+SET(WEXTRA_FLAGS "${WEXTRA_FLAGS} -Wundef -Wpointer-arith -Wstrict-prototypes")
+SET(WEXTRA_FLAGS "${WEXTRA_FLAGS} -Wmissing-prototypes -Wwrite-strings -Wredundant-decls")
+SET(WEXTRA_FLAGS "${WEXTRA_FLAGS} -Wchar-subscripts -Wcomment -Wformat=2 -Wwrite-strings")
+SET(WEXTRA_FLAGS "${WEXTRA_FLAGS} -Wmissing-declarations -Wredundant-decls -Wnested-externs")
+SET(WEXTRA_FLAGS "${WEXTRA_FLAGS} -Wbad-function-cast -Wswitch-enum -Winit-self")
+SET(WEXTRA_FLAGS "${WEXTRA_FLAGS} -Wmissing-field-initializers -Wdeclaration-after-statement")
+SET(WEXTRA_FLAGS "${WEXTRA_FLAGS} -Wold-style-definition -Waddress -Wmissing-noreturn ")
+SET(WEXTRA_FLAGS "${WEXTRA_FLAGS} -Wstrict-overflow=1 -Wextra -Warray-bounds")
+
+SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=gnu99 -Wall")
+SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${WEXTRA_FLAGS}")
 IF (NOT NO_OPENMP)
 	SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fopenmp")
-ELSE()
-	SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DLIBQES_NO_OPENMP")
 ENDIF()
 SET(CMAKE_C_FLAGS_DEBUG "-ggdb")
 SET(CMAKE_C_FLAGS_RELEASE "-O3")
@@ -77,6 +104,7 @@ SET(CMAKE_C_FLAGS_RELEASE "-O3")
 
 # Set include dirs
 INCLUDE_DIRECTORIES(
+    ${CMAKE_BINARY_DIR}
     ${CMAKE_CURRENT_SOURCE_DIR}/src
     ${CMAKE_CURRENT_SOURCE_DIR}/test
     ${CMAKE_CURRENT_SOURCE_DIR}/test/tinytest
