@@ -1,7 +1,7 @@
 /*
  * ============================================================================
  *
- *       Filename:  kmsequtil.h
+ *       Filename:  qes_sequtil.h
  *
  *    Description:  Sequence utility functions
  *
@@ -15,13 +15,13 @@
  *
  * ============================================================================
  */
-#ifndef KMSEQUTIL_H
-#define KMSEQUTIL_H
+#ifndef QES_SEQUTIL_H
+#define QES_SEQUTIL_H
 
-#include <kmutil.h>
+#include <qes_util.h>
 
-extern char translate_codon(const char *codon);
-extern char *revcomp(const char *seq, size_t len);
-extern void revcomp_inplace(char *seq, size_t len);
+extern char qes_sequtil_translate_codon(const char *codon);
+extern char *qes_sequtil_revcomp(const char *seq, size_t len);
+extern void qes_sequtil_revcomp_inplace(char *seq, size_t len);
 
-#endif /* KMSEQUTIL_H */
+#endif /* QES_SEQUTIL_H */

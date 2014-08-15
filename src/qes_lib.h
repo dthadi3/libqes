@@ -1,7 +1,7 @@
 /*
  * ==========================================================================
  *
- *       Filename:  kmlib.h
+ *       Filename:  qes.h
  *
  *    Description:  Some common sequence analysis stuff
  *
@@ -16,17 +16,17 @@
  * ===========================================================================
  */
 
-#ifndef KMLIB_H
-#define KMLIB_H
+#ifndef LIBQES_H
+#define LIBQES_H
 
 
 /* #####   HEADER FILE INCLUDES   ########################################## */
-#include <kmmatch.h>
-#include <kmseqfile.h>
-#include <kmseq.h>
-#include <kmsequtil.h>
-#include <kmstr.h>
-#include <kmutil.h>
-#include <kmzfile.h>
+#include <qes_match.h>
+#include <qes_seqfile.h>
+#include <qes_seq.h>
+#include <qes_sequtil.h>
+#include <qes_str.h>
+#include <qes_util.h>
+#include <qes_zfile.h>
 
-#endif /* KMLIB_H */
+#endif /* LIBQES_H */

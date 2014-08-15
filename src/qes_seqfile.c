@@ -1,9 +1,9 @@
 /*
  * ============================================================================
  *
- *       Filename:  kmseqfile.c
+ *       Filename:  qes_seqfile.c
  *
- *    Description:  kmseqfile -- read sequences in FASTA or FASTQ format.
+ *    Description:  qes_seqfile -- read sequences in FASTA or FASTQ format.
  *
  *        Version:  1.0
  *        Created:  14/05/14 15:56:38
@@ -16,10 +16,10 @@
  * ============================================================================
  */
 
-#include "kmseqfile.h"
+#include "qes_seqfile.h"
 
 static inline ssize_t
-read_fastq_seqfile(seqfile_t *file, seq_t *seq)
+read_fastq_seqfile(struct qes_seqfile *seqfile, seq_t *seq)
 {
     /* Convenience macro, this happens a lot */
 #define CHECK_AND_TRIM(subrec) if (len < 1) { \
@@ -32,52 +32,52 @@ read_fastq_seqfile(seqfile_t *file, seq_t *seq)
     int next = '\0';
 
     /* Fast-forward past the delimiter '@', ensuring it exists */
-    next = zfgetc(file->zf);
+    next = qes_file_getc(seqfile->qf);
     if (next == EOF) {
         return EOF;
     } else if (next != FASTQ_DELIM) {
         /* This ain't a fastq! WTF! */
         goto error;
     }
-    len = zfreadline_str(file->zf, &file->scratch);
+    len = qes_file_readline_str(seqfile->qf, &seqfile->scratch);
     if (len < 1) {
         goto error;
     }
-    seq_fill_header(seq, file->scratch.s, file->scratch.l);
+    seq_fill_header(seq, seqfile->scratch.s, seqfile->scratch.l);
     /* Fill the actual sequence directly */
-    len = zfreadline_str(file->zf, &seq->seq);
+    len = qes_file_readline_str(seqfile->qf, &seq->seq);
     CHECK_AND_TRIM(seq->seq)
     /* read the qual header, but don't store it. */
-    next = zfgetc(file->zf);
+    next = qes_file_getc(seqfile->qf);
     if (next != FASTQ_QUAL_DELIM) {
         goto error;
     }
-    while ((next = zfgetc(file->zf)) != '\n') {
+    while ((next = qes_file_getc(seqfile->qf)) != '\n') {
         if (next == EOF) {
             goto error;
         }
     }
     /* Fill the qual score string directly */
-    len = zfreadline_str(file->zf, &seq->qual);
+    len = qes_file_readline_str(seqfile->qf, &seq->qual);
     CHECK_AND_TRIM(seq->qual)
     if ((size_t)len != seq->seq.l) {
         /* Error out on different len qual/seq entries */
         goto error;
     }
     /* return seq/qual len */
-    file->n_records++;
+    seqfile->n_records++;
     return seq->seq.l;
 error:
-    str_nullify(&seq->name);
-    str_nullify(&seq->comment);
-    str_nullify(&seq->seq);
-    str_nullify(&seq->qual);
+    qes_str_nullify(&seq->name);
+    qes_str_nullify(&seq->comment);
+    qes_str_nullify(&seq->seq);
+    qes_str_nullify(&seq->qual);
     return -2;
 #undef CHECK_AND_TRIM
 }
 
 static inline ssize_t
-read_fasta_seqfile(seqfile_t *file, seq_t *seq)
+read_fasta_seqfile(struct qes_seqfile *seqfile, seq_t *seq)
 {
     /* Convenience macro, this happens a lot */
 #define CHECK_AND_TRIM(subrec) if (len < 1) { \
@@ -90,7 +90,7 @@ read_fasta_seqfile(seqfile_t *file, seq_t *seq)
     int next = '\0';
     /* This bit is basically a copy-paste from above */
     /* Fast-forward past the delimiter '>', ensuring it exists */
-    next = zfgetc(file->zf);
+    next = qes_file_getc(seqfile->qf);
     if (next == EOF) {
         return EOF;
     } else if (next != FASTA_DELIM) {
@@ -98,18 +98,18 @@ read_fasta_seqfile(seqfile_t *file, seq_t *seq)
         goto error;
     }
     /* Get until the first space, which is the seq name */
-    len = zfgetuntil_realloc(file->zf, ' ', &seq->name.s, &seq->name.m);
+    len = qes_file_getuntil_realloc(seqfile->qf, ' ', &seq->name.s, &seq->name.m);
     CHECK_AND_TRIM(seq->name)
     /* Fill the comment, from first space to EOL */
-    len = zfreadline_realloc(file->zf, &seq->comment.s, &seq->comment.m);
+    len = qes_file_readline_realloc(seqfile->qf, &seq->comment.s, &seq->comment.m);
     CHECK_AND_TRIM(seq->comment)
     /* End fastq parser copypaste */
     /* we need to nullify seq, as we rely on seq.l being 0 as we enter this
      *  while loop */
-    str_nullify(&seq->seq);
+    qes_str_nullify(&seq->seq);
     /* While the next char is not a '>', i.e. until next header line */
-    while ((next = zfpeek(file->zf)) != EOF && next != FASTA_DELIM) {
-        len = zfreadline(file->zf, seq->seq.s + seq->seq.l,
+    while ((next = qes_file_peek(seqfile->qf)) != EOF && next != FASTA_DELIM) {
+        len = qes_file_readline(seqfile->qf, seq->seq.s + seq->seq.l,
                 seq->seq.m - seq->seq.l - 1);
         if (len < 0) {
             goto error;
@@ -117,8 +117,8 @@ read_fasta_seqfile(seqfile_t *file, seq_t *seq)
         seq->seq.l += len - 1;
         seq->seq.s[seq->seq.l] = '\0';
         if (seq->seq.m -  1 <= seq->seq.l) {
-            seq->seq.m = kmroundupz(seq->seq.m);
-            seq->seq.s = km_realloc(seq->seq.s,
+            seq->seq.m = qes_roundupz(seq->seq.m);
+            seq->seq.s = qes_realloc(seq->seq.s,
                     sizeof(*seq->seq.s) * seq->seq.m);
             if (seq->seq.s == NULL) {
                 goto error;
@@ -127,99 +127,101 @@ read_fasta_seqfile(seqfile_t *file, seq_t *seq)
     }
     seq->seq.s[seq->seq.l] = '\0';
     /* return seq len */
-    file->n_records++;
-    str_nullify(&seq->qual);
+    seqfile->n_records++;
+    qes_str_nullify(&seq->qual);
     return seq->seq.l;
 error:
-    str_nullify(&seq->name);
-    str_nullify(&seq->comment);
-    str_nullify(&seq->seq);
-    str_nullify(&seq->qual);
+    qes_str_nullify(&seq->name);
+    qes_str_nullify(&seq->comment);
+    qes_str_nullify(&seq->seq);
+    qes_str_nullify(&seq->qual);
     return -2;
 #undef CHECK_AND_TRIM
 }
-inline ssize_t
-seqfile_read (seqfile_t *file, seq_t *seq)
+
+ssize_t
+qes_seqfile_read (struct qes_seqfile *seqfile, seq_t *seq)
 {
-    if (!seqfile_ok(file) || !seq_ok(seq)) {
+    if (!qes_seqfile_ok(seqfile) || !seq_ok(seq)) {
         return -2;
     }
-    if (file->zf->eof) {
+    if (seqfile->qf->eof) {
         return EOF;
     }
-    if (file->flags.format == FASTQ_FMT) {
-        return read_fastq_seqfile(file, seq);
-    } else if (file->flags.format == FASTA_FMT) {
-        return read_fasta_seqfile(file, seq);
+    if (seqfile->format == FASTQ_FMT) {
+        return read_fastq_seqfile(seqfile, seq);
+    } else if (seqfile->format == FASTA_FMT) {
+        return read_fasta_seqfile(seqfile, seq);
     }
     /* If we reach here, bail out with an error */
-    str_nullify(&seq->name);
-    str_nullify(&seq->comment);
-    str_nullify(&seq->seq);
-    str_nullify(&seq->qual);
+    qes_str_nullify(&seq->name);
+    qes_str_nullify(&seq->comment);
+    qes_str_nullify(&seq->seq);
+    qes_str_nullify(&seq->qual);
     return -2;
 }
 
-seqfile_t *
-seqfile_create (const char *path, const char *mode)
+struct qes_seqfile *
+qes_seqfile_create (const char *path, const char *mode)
 {
-    seqfile_t *sf = NULL;
+    struct qes_seqfile *sf = NULL;
     if (path == NULL || mode == NULL) return NULL;
-    sf = km_calloc(1, sizeof(*sf));
-    sf->zf = zfopen(path, mode);
-    if (sf->zf == NULL) {
-        km_free(sf->zf);
-        km_free(sf);
+    sf = qes_calloc(1, sizeof(*sf));
+    sf->qf = qes_file_open(path, mode);
+    if (sf->qf == NULL) {
+        qes_free(sf->qf);
+        qes_free(sf);
         return NULL;
     }
-    init_str(&sf->scratch, __INIT_LINE_LEN);
+    qes_str_init(&sf->scratch, __INIT_LINE_LEN);
     sf->n_records = 0;
-    seqfile_guess_format(sf);
+    qes_seqfile_guess_format(sf);
     return sf;
 }
 
-seqfile_format_t
-seqfile_guess_format (seqfile_t *file)
+enum qes_seqfile_format
+qes_seqfile_guess_format (struct qes_seqfile *seqfile)
 {
     int first_char = '\0';
-    if (!seqfile_ok(file)) return UNKNOWN_FMT;
-    if (!zfile_readable(file->zf)) return UNKNOWN_FMT;
-    first_char = zfpeek(file->zf);
+    if (!qes_seqfile_ok(seqfile)) return UNKNOWN_FMT;
+    if (!qes_file_readable(seqfile->qf)) return UNKNOWN_FMT;
+    first_char = qes_file_peek(seqfile->qf);
     switch (first_char) {
         case FASTQ_DELIM:
-            file->flags.format = FASTQ_FMT;
+            seqfile->format = FASTQ_FMT;
             return FASTQ_FMT;
             break;
         case FASTA_DELIM:
-            file->flags.format = FASTA_FMT;
+            seqfile->format = FASTA_FMT;
             return FASTA_FMT;
             break;
         default:
-            file->flags.format = UNKNOWN_FMT;
+            seqfile->format = UNKNOWN_FMT;
             return UNKNOWN_FMT;
     }
 }
 
 void
-seqfile_set_format (seqfile_t *file, seqfile_format_t format)
+qes_seqfile_set_format (struct qes_seqfile *seqfile,
+                        enum qes_seqfile_format format)
 {
-    if (!seqfile_ok(file)) return;
-    file->flags.format = format;
+    if (!qes_seqfile_ok(seqfile)) return;
+    seqfile->format = format;
 }
 
 void
-seqfile_destroy_(seqfile_t *seqfile)
+qes_seqfile_destroy_(struct qes_seqfile *seqfile)
 {
     if (seqfile != NULL) {
-        zfclose(seqfile->zf);
+        qes_file_close(seqfile->qf);
         destroy_str_cp(&seqfile->scratch);
-        km_free(seqfile);
+        qes_free(seqfile);
     }
 }
 
-inline size_t
-seqfile_format_seq(const seq_t *seq, seqfile_format_t fmt, char *buffer,
-        size_t maxlen)
+size_t
+qes_seqfile_format_seq(const seq_t *seq, enum qes_seqfile_format fmt,
+                       char *buffer, size_t maxlen)
 {
     size_t len = 0;
     if (buffer == NULL || maxlen < 1) {
@@ -255,14 +257,14 @@ seqfile_format_seq(const seq_t *seq, seqfile_format_t fmt, char *buffer,
 }
 
 
-inline ssize_t
-seqfile_write (seqfile_t *file, seq_t *seq)
+ssize_t
+qes_seqfile_write (struct qes_seqfile *seqfile, seq_t *seq)
 {
-#define sf_putc_check(c) ret = KM_ZFPUTC(file->zf->fp, c);                  \
+#define sf_putc_check(c) ret = QES_ZFPUTC(seqfile->qf->fp, c);                  \
     if (ret != c) {return -2;}                                              \
     else res_len += 1;                                                      \
     ret = 0
-#define sf_puts_check(s) ret = KM_ZFPUTS(file->zf->fp, s);                  \
+#define sf_puts_check(s) ret = QES_ZFPUTS(seqfile->qf->fp, s);                  \
     if (ret < 0) {return -2;}                                               \
     else res_len += ret;                                                    \
     ret = 0
@@ -270,10 +272,10 @@ seqfile_write (seqfile_t *file, seq_t *seq)
     int ret = 0;
     ssize_t res_len = 0;
 
-    if (!seqfile_ok(file) || !seq_ok(seq)) {
+    if (!qes_seqfile_ok(seqfile) || !seq_ok(seq)) {
         return -2;
     }
-    switch (file->flags.format) {
+    switch (seqfile->format) {
         case FASTA_FMT:
             sf_putc_check(FASTA_DELIM);
             sf_puts_check(seq->name.s);

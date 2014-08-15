@@ -1,7 +1,7 @@
 /*
  * ============================================================================
  *
- *       Filename:  kmzfile.h
+ *       Filename:  qes_file.h
  *
  *    Description:  Compressed file IO
  *
@@ -16,14 +16,14 @@
  * ============================================================================
  */
 
-#ifndef KMZFILE_H
-#define KMZFILE_H
+#ifndef QES_FILE_H
+#define QES_FILE_H
 
-#include <kmutil.h>
-#include <kmstr.h>
+#include <qes_util.h>
+#include <qes_str.h>
 
-typedef struct __zfile_t {
-    KM_ZTYPE fp;
+struct qes_file {
+    QES_ZTYPE fp;
     char *path;
     off_t filepos;
     rwmode_t mode;
@@ -34,44 +34,44 @@ typedef struct __zfile_t {
     int eof  :1;
     /* Is the fp at EOF */
     int feof :1;
-} zfile_t;
+};
 
-/* zfopen:
-    Create a `zfile_t` and open `path` with mode `mode` and errorhandler
+/* qes_file_open:
+    Create a `struct qes_file` and open `path` with mode `mode` and errorhandler
     `onerr`
  */
-zfile_t *zfopen_ (const char *path, const char *mode, errhandler_t onerr,
+struct qes_file *qes_file_open_ (const char *path, const char *mode, qes_errhandler_func onerr,
         const char *file, int line);
-#define    zfopen(pth, mod) \
-    zfopen_(pth, mod, KM_DEFAULT_ERR_FN, __FILE__, __LINE__)
-#define    zfopen_errnil(pth, mod) \
-    zfopen_(pth, mod, errnil, __FILE__, __LINE__)
-#define    zfopen_errprint(pth, mod) \
-    zfopen_(pth, mod, errprint, __FILE__, __LINE__)
-#define    zfopen_errprintexit(pth, mod) \
-    zfopen_(pth, mod, errprintexit, __FILE__, __LINE__)
+#define    qes_file_open(pth, mod) \
+    qes_file_open_(pth, mod, QES_DEFAULT_ERR_FN, __FILE__, __LINE__)
+#define    qes_file_open_errnil(pth, mod) \
+    qes_file_open_(pth, mod, errnil, __FILE__, __LINE__)
+#define    qes_file_open_errprint(pth, mod) \
+    qes_file_open_(pth, mod, errprint, __FILE__, __LINE__)
+#define    qes_file_open_errprintexit(pth, mod) \
+    qes_file_open_(pth, mod, errprintexit, __FILE__, __LINE__)
 
 
-extern int zfile_guess_mode (const char *mode);
-extern int zfgetc (zfile_t *file);
-extern void zfrewind (zfile_t *file);
+extern int qes_file_guess_mode (const char *mode);
+extern int qes_file_getc (struct qes_file *file);
+extern void qes_file_rewind (struct qes_file *file);
 
 /*===  FUNCTION  ============================================================*
-Name:           zfclose
-Paramters:      zfile_t *file: file to close.
+Name:           qes_file_close
+Paramters:      struct qes_file *file: file to close.
 Description:    Closes the file pointer in ``file``, frees dynamically
                 allocated members of ``file`` and sets ``file`` to NULL.
 Returns:        void
  *===========================================================================*/
-void zfclose_ (zfile_t *file);
-#define zfclose(file) do {                      \
-            zfclose_ (file);                    \
+void qes_file_close_ (struct qes_file *file);
+#define qes_file_close(file) do {                      \
+            qes_file_close_ (file);                    \
             file = NULL;                        \
         } while(0)
 
 /*===  FUNCTION  ============================================================*
-Name:           zfreadline
-Paramters:      zfile_t *file: File to read
+Name:           qes_file_readline
+Paramters:      struct qes_file *file: File to read
                 char *dest: Destination buffer
                 size_t maxlen: size of destination buffer
 Description:    Reads at most ``maxlen - 1`` bytes of the next '\n' delimited
@@ -80,11 +80,11 @@ Description:    Reads at most ``maxlen - 1`` bytes of the next '\n' delimited
 Returns:        ssize_t: EOF, -2 (error), or length of bytes copied, i.e.
                 ``strlen(dest);``
  *===========================================================================*/
-extern ssize_t zfreadline (zfile_t *file, char *dest, size_t maxlen);
+extern ssize_t qes_file_readline (struct qes_file *file, char *dest, size_t maxlen);
 
 /*===  FUNCTION  ============================================================*
-Name:           zfgetuntil
-Paramters:      zfile_t *file: File to read
+Name:           qes_file_getuntil
+Paramters:      struct qes_file *file: File to read
                 const int delim: Delimiter char.
 Description:    Reads ``file`` into ``dest`` until ``delim`` is found or
                 ``maxlen - `` bytes have been read. ``delim`` is copied into
@@ -92,12 +92,12 @@ Description:    Reads ``file`` into ``dest`` until ``delim`` is found or
                 other thing that fits in a ``char``.
 Returns:        ssize_t: EOF, -2 (error) or size of data read.
  *===========================================================================*/
-extern ssize_t zfgetuntil (zfile_t *file, const int delim, char *dest,
+extern ssize_t qes_file_getuntil (struct qes_file *file, const int delim, char *dest,
                            size_t maxlen);
 
 /*===  FUNCTION  ============================================================*
-Name:           zfgetuntil_realloc
-Paramters:      zfile *file: File to read.
+Name:           qes_file_getuntil_realloc
+Paramters:      qes_file *file: File to read.
                 int delim: Delimiter char.
                 char **bufref: reference to a `char *` containing the buffer.
                     Must not refer to a ``char[]`` that cannot be resized with
@@ -113,31 +113,31 @@ Description:    Read a string from `file` into a
 Returns:        ssize_t set to either the length of the line copied to
                 `*bufref`, or one of -1 (EOF) or -2 (error).
 *============================================================================*/
-extern ssize_t zfgetuntil_realloc_ (zfile_t *file, int delim, char **bufref,
-        size_t *sizeref, errhandler_t onerr, const char *src, const int line);
-#define zfgetuntil_realloc(fp, dlm, buf, sz) \
-    zfgetuntil_realloc_(fp, dlm, buf, sz, KM_DEFAULT_ERR_FN, __FILE__, __LINE__)
-#define zfgetuntil_realloc_errnil(fp, dlm, buf, sz) \
-    zfgetuntil_realloc_(fp, dlm, buf, sz, errnil, __FILE__, __LINE__)
-#define zfgetuntil_realloc_errprint(fp, dlm, buf, sz) \
-    zfgetuntil_realloc_(fp, dlm, buf, sz, errprint, __FILE__, __LINE__)
-#define zfgetuntil_realloc_errprintexit(fp, dlm, buf, sz) \
-    zfgetuntil_realloc_(fp, dlm, buf, sz, errprintexit, __FILE__, __LINE__)
+extern ssize_t qes_file_getuntil_realloc_ (struct qes_file *file, int delim, char **bufref,
+        size_t *sizeref, qes_errhandler_func onerr, const char *src, const int line);
+#define qes_file_getuntil_realloc(fp, dlm, buf, sz) \
+    qes_file_getuntil_realloc_(fp, dlm, buf, sz, QES_DEFAULT_ERR_FN, __FILE__, __LINE__)
+#define qes_file_getuntil_realloc_errnil(fp, dlm, buf, sz) \
+    qes_file_getuntil_realloc_(fp, dlm, buf, sz, errnil, __FILE__, __LINE__)
+#define qes_file_getuntil_realloc_errprint(fp, dlm, buf, sz) \
+    qes_file_getuntil_realloc_(fp, dlm, buf, sz, errprint, __FILE__, __LINE__)
+#define qes_file_getuntil_realloc_errprintexit(fp, dlm, buf, sz) \
+    qes_file_getuntil_realloc_(fp, dlm, buf, sz, errprintexit, __FILE__, __LINE__)
 
 /*===  FUNCTION  ============================================================*
-Name:           zfreadline_str
-Paramters:      zfile_t *file: File to read.
-                str_t *str: str_t object to read into.
-Description:    Convenience wrapper around zfreadline_realloc, which reads a
-                line into a str_t object, passing str->s to and str->m to
-                zfreadline_realloc.
+Name:           qes_file_readline_str
+Paramters:      struct qes_file *file: File to read.
+                struct qes_str *str: struct qes_str object to read into.
+Description:    Convenience wrapper around qes_file_readline_realloc, which reads a
+                line into a struct qes_str object, passing str->s to and str->m to
+                qes_file_readline_realloc.
 Returns:        ssize_t set to either the length of the line copied to the
-                str_t, or one of -1 (EOF) or -2 (error).
+                struct qes_str, or one of -1 (EOF) or -2 (error).
 * ===========================================================================*/
-extern ssize_t zfreadline_str (zfile_t *file, str_t *str);
+extern ssize_t qes_file_readline_str (struct qes_file *file, struct qes_str *str);
 
 /* ===  FUNCTION  =============================================================
-          Name: zfreadline_realloc
+          Name: qes_file_readline_realloc
    Description: Read a line from `file` into a `char *` pointed to by `buf`.
                 This function has the added benefit of `realloc`-ing `buf`
                 to the next highest base-2 power, if we run out of space.
@@ -146,47 +146,47 @@ extern ssize_t zfreadline_str (zfile_t *file, str_t *str);
        Returns: ssize_t set to either the length of the line copied to `*buf`,
                 or one of -1 (EOF) or -2 (error).
  * ==========================================================================*/
-extern ssize_t zfreadline_realloc_ (zfile_t *file, char **buf, size_t *size,
-              errhandler_t onerr, const char *src, const int line);
-#define zfreadline_realloc(fp, buf, sz) \
-    zfreadline_realloc_(fp, buf, sz, KM_DEFAULT_ERR_FN, __FILE__, __LINE__)
-#define zfreadline_realloc_errnil(fp, buf, sz) \
-    zfreadline_realloc_(fp, buf, sz, errnil, __FILE__, __LINE__)
-#define zfreadline_realloc_errprint(fp, buf, sz) \
-    zfreadline_realloc_(fp, buf, sz, errprint, __FILE__, __LINE__)
-#define zfreadline_realloc_errprintexit(fp, buf, sz) \
-    zfreadline_realloc_(fp, buf, sz, errprintexit, __FILE__, __LINE__)
+extern ssize_t qes_file_readline_realloc_ (struct qes_file *file, char **buf, size_t *size,
+              qes_errhandler_func onerr, const char *src, const int line);
+#define qes_file_readline_realloc(fp, buf, sz) \
+    qes_file_readline_realloc_(fp, buf, sz, QES_DEFAULT_ERR_FN, __FILE__, __LINE__)
+#define qes_file_readline_realloc_errnil(fp, buf, sz) \
+    qes_file_readline_realloc_(fp, buf, sz, errnil, __FILE__, __LINE__)
+#define qes_file_readline_realloc_errprint(fp, buf, sz) \
+    qes_file_readline_realloc_(fp, buf, sz, errprint, __FILE__, __LINE__)
+#define qes_file_readline_realloc_errprintexit(fp, buf, sz) \
+    qes_file_readline_realloc_(fp, buf, sz, errprintexit, __FILE__, __LINE__)
 
-extern void zfprint_str (zfile_t *stream, const str_t *str);
-const char * zferror (zfile_t *file);
+extern void qes_file_print_str (struct qes_file *stream, const struct qes_str *str);
+const char * qes_file_error (struct qes_file *file);
 
 /* INLINE FUNCTIONS */
 static inline int
-zfile_ok(const zfile_t *zf)
+qes_file_ok(const struct qes_file *qf)
 {
-    /* zfile_ok just check we won't dereference NULLs, so we check pointer
+    /* qes_file_ok just check we won't dereference NULLs, so we check pointer
      * NULLness for all pointers we care about in current modes. Which, unless
      * we're Write-only, is all of them */
-    return  zf != NULL && \
-            zf->fp != NULL && \
-            (zf->mode == RW_WRITE || \
-                (zf->bufiter != NULL && \
-                 zf->buffer != NULL)
+    return  qf != NULL && \
+            qf->fp != NULL && \
+            (qf->mode == RW_WRITE || \
+                (qf->bufiter != NULL && \
+                 qf->buffer != NULL)
             );
 }
 
 static inline int
-__zfile_fill_buffer (zfile_t *file)
+__qes_file_fill_buffer (struct qes_file *file)
 {
     ssize_t res = 0;
-    if (!zfile_ok(file)) {
+    if (!qes_file_ok(file)) {
         return 0;
     }
     if (file->feof || file->eof) {
         file->eof = 1;
         return EOF;
     }
-    res = KM_ZREAD(file->fp, file->buffer, (KM_FILEBUFFER_LEN) - 1);
+    res = QES_ZREAD(file->fp, file->buffer, (QES_FILEBUFFER_LEN) - 1);
     if (res < 0) {
         /* Errored */
         return 0;
@@ -195,7 +195,7 @@ __zfile_fill_buffer (zfile_t *file)
         file->eof = 1;
         file->feof = 1;
         return EOF;
-    } else if (res < (KM_FILEBUFFER_LEN) - 1) {
+    } else if (res < (QES_FILEBUFFER_LEN) - 1) {
         /* At file EOF */
         file->feof = 1;
     }
@@ -206,11 +206,11 @@ __zfile_fill_buffer (zfile_t *file)
 }
 
 static inline int
-zfile_readable(zfile_t *file)
+qes_file_readable(struct qes_file *file)
 {
     /* Here we check that reads won't fail. We refil if we need to. */
     /* Can we possibly read from this file? */
-    if (!zfile_ok(file) || file->mode == RW_UNKNOWN || \
+    if (!qes_file_ok(file) || file->mode == RW_UNKNOWN || \
             file->mode == RW_WRITE || file->eof) {
         return 0;
     }
@@ -219,7 +219,7 @@ zfile_readable(zfile_t *file)
         return 1;
     }
     /* Buffer needs a refil */
-    if (__zfile_fill_buffer(file) != 0) {
+    if (__qes_file_fill_buffer(file) != 0) {
         /* we either successfully refilled, or are at EOF */
         return file->eof ? EOF : 1;
     } else {
@@ -229,9 +229,9 @@ zfile_readable(zfile_t *file)
 }
 
 static inline int
-zfpeek(zfile_t *file)
+qes_file_peek(struct qes_file *file)
 {
-    if (!zfile_ok(file) || zfile_readable(file) == 0) {
+    if (!qes_file_ok(file) || qes_file_readable(file) == 0) {
         return -2;
     } else if (file->eof) {
         return EOF;
@@ -240,4 +240,4 @@ zfpeek(zfile_t *file)
 }
 
 
-#endif /* KMZFILE_H */
+#endif /* QES_FILE_H */

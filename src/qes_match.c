@@ -1,7 +1,7 @@
 /*
  * ============================================================================
  *
- *       Filename:  kmmatch.c
+ *       Filename:  qes_match.c
  *
  *    Description:  Sequence matching and finding functions used in
  *                  bioinformatic tasks
@@ -13,15 +13,14 @@
  *       Compiler:  gcc, clang
  *
  *         Author:  Kevin Murray, spam@kdmurray.id.au
- *                                [include word penguin in subject]
  *
  * ============================================================================
  */
 
-#include "kmmatch.h"
+#include "qes_match.h"
 
 inline int_fast32_t
-hamming (const char *seq1, const char *seq2, size_t len)
+qes_match_hamming (const char *seq1, const char *seq2, size_t len)
 {
     int_fast32_t mismatches = 0;
     size_t iii = 0;
@@ -39,8 +38,8 @@ hamming (const char *seq1, const char *seq2, size_t len)
             len = len2;
         }
     }
-    /* Count mismatches. See comment on analagous loop in hamming_max for an
-       explanation. */
+    /* Count mismatches. See comment on analagous loop in qes_match_hamming_max
+     * for an explanation. */
     while(iii < len) {
         if (seq2[iii] != seq1[iii]) {
             mismatches++;
@@ -52,7 +51,8 @@ hamming (const char *seq1, const char *seq2, size_t len)
 
 
 inline int_fast32_t
-hamming_max(const char *seq1, const char *seq2, size_t len, int_fast32_t max)
+qes_match_hamming_max(const char *seq1, const char *seq2, size_t len,
+                      int_fast32_t max)
 {
     int_fast32_t mismatches = 0;
     size_t iii = 0;

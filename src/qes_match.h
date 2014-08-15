@@ -1,7 +1,7 @@
 /*
  * ============================================================================
  *
- *       Filename:  kmmatch.h
+ *       Filename:  qes_match.h
  *
  *    Description:  Sequence matching and finding functions used in
  *                  bioinformatic tasks
@@ -17,14 +17,14 @@
  * ============================================================================
  */
 
-#ifndef KMMATCH_H
-#define KMMATCH_H
+#ifndef QES_MATCH_H
+#define QES_MATCH_H
 
-#include <kmutil.h>
+#include <qes_util.h>
 
 
 /*===  FUNCTION  ============================================================*
-Name:           hamming
+Name:           qes_match_hamming
 Paramters:      const char *seq1, *seq2: Two strings to compare.
                 size_t len: Compare ``len`` chars. If 0, guess length with
                 strlen (may be unsafe).
@@ -33,11 +33,11 @@ Description:    Find the hamming distance between two strings. The strings are
 Returns:        The hamming distance between ``seq1`` and ``seq2``, or -1 on
                 error.
  *===========================================================================*/
-extern int_fast32_t hamming(const char *seq1, const char *seq2, size_t len);
+extern int_fast32_t qes_match_hamming(const char *seq1, const char *seq2, size_t len);
 
 
 /*===  FUNCTION  ============================================================*
-Name:           hamming_max
+Name:           qes_match_hamming_max
 Paramters:      const char *seq1, *seq2: Two strings to compare.
                 size_t len: Compare ``len`` chars. If 0, guess length with
                 strlen (may be unsafe).
@@ -50,7 +50,7 @@ Returns:        The hamming distance between ``seq1`` and ``seq2``, or
                 ``max + 1`` if the hamming distance exceeds ``max``, or -1 on
                 error.
  *===========================================================================*/
-extern int_fast32_t hamming_max(const char *seq1, const char *seq2, size_t len,
+extern int_fast32_t qes_match_hamming_max(const char *seq1, const char *seq2, size_t len,
         int_fast32_t max);
 
-#endif /* KMMATCH_H */
+#endif /* QES_MATCH_H */

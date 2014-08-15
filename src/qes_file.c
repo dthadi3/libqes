@@ -1,7 +1,7 @@
 /*
  * ============================================================================
  *
- *       Filename:  kmzfile.c
+ *       Filename:  qes_file.c
  *
  *    Description:  Compressed file IO
  *
@@ -16,71 +16,71 @@
  * ============================================================================
  */
 
-#include "kmzfile.h"
+#include "qes_file.h"
 
-zfile_t *
-zfopen_ (const char *path, const char *mode, errhandler_t onerr,
+struct qes_file *
+qes_file_open_ (const char *path, const char *mode, qes_errhandler_func onerr,
         const char *file, int line)
 {
     /* create file struct */
-    zfile_t *zf = NULL;
+    struct qes_file *qf = NULL;
     if (path == NULL || mode == NULL) return NULL;
-    zf = km_calloc(1, sizeof(*zf));
+    qf = qes_calloc(1, sizeof(*qf));
     /* Open file, handling any errors */
-    zf->fp = KM_ZOPEN(path, mode);
-    if (zf->fp == NULL) {
+    qf->fp = QES_ZOPEN(path, mode);
+    if (qf->fp == NULL) {
         (*onerr)("Opening file %s failed:\n%s\n", file, line,
                 path, strerror(errno));
-        km_free(zf);
+        qes_free(qf);
         return(NULL);
     }
-    zf->mode = zfile_guess_mode(mode);
-    if (zf->mode == RW_UNKNOWN) {
-        KM_ZCLOSE(zf->fp);
-        km_free(zf);
+    qf->mode = qes_file_guess_mode(mode);
+    if (qf->mode == RW_UNKNOWN) {
+        QES_ZCLOSE(qf->fp);
+        qes_free(qf);
         return NULL;
     }
     /* Use a larger than default IO buffer, speeds things up.
      * Using 2x our buffer len for no particular reason. */
-    KM_ZBUFFER(zf->fp, (KM_FILEBUFFER_LEN) << 1);
-    if (zf->mode == RW_READ || zf-> mode == RW_READWRITE) {
+    QES_ZBUFFER(qf->fp, (QES_FILEBUFFER_LEN) << 1);
+    if (qf->mode == RW_READ || qf-> mode == RW_READWRITE) {
 #ifdef HAVE_POSIX_MEMALIGN
-        posix_memalign((void *)&(zf->buffer), getpagesize(),
-                (KM_FILEBUFFER_LEN * sizeof(*zf->buffer)));
-        if (zf->buffer == NULL) {
-            KM_ZCLOSE(zf->fp);
-            km_free(zf);
+        posix_memalign((void *)&(qf->buffer), getpagesize(),
+                (QES_FILEBUFFER_LEN * sizeof(*qf->buffer)));
+        if (qf->buffer == NULL) {
+            QES_ZCLOSE(qf->fp);
+            qes_free(qf);
             (*onerr)("Coudn't allocate aligned memory", file, line);
             return NULL;
         }
 #else
-        zf->buffer = km_malloc_((KM_FILEBUFFER_LEN * sizeof(*zf->buffer)),
+        qf->buffer = qes_malloc_((QES_FILEBUFFER_LEN * sizeof(*qf->buffer)),
                 onerr, file, line);
-        if (zf->buffer == NULL) {
-            KM_ZCLOSE(zf->fp);
-            km_free(zf);
+        if (qf->buffer == NULL) {
+            QES_ZCLOSE(qf->fp);
+            qes_free(qf);
             (*onerr)("Coudn't allocate aligned memory", file, line);
             return NULL;
         }
 #endif
-        zf->bufiter = zf->buffer;
-        zf->buffer[0] = '\0';
-        zf->bufend = zf->buffer;
-        if (__zfile_fill_buffer(zf) == 0) {
-            km_free(zf->buffer);
-            km_free(zf);
+        qf->bufiter = qf->buffer;
+        qf->buffer[0] = '\0';
+        qf->bufend = qf->buffer;
+        if (__qes_file_fill_buffer(qf) == 0) {
+            qes_free(qf->buffer);
+            qes_free(qf);
             return NULL;
         }
     }
     /* init struct fields */
-    zf->eof = 0;
-    zf->filepos = 0;
-    zf->path = strndup(path, KM_MAX_FN_LEN);
-    return(zf);
+    qf->eof = 0;
+    qf->filepos = 0;
+    qf->path = strndup(path, QES_MAX_FN_LEN);
+    return(qf);
 }
 
 inline int
-zfile_guess_mode (const char *mode)
+qes_file_guess_mode (const char *mode)
 {
     if (mode[0] == 'r') {
         return RW_READ;
@@ -91,10 +91,10 @@ zfile_guess_mode (const char *mode)
 }
 
 inline void
-zfrewind (zfile_t *file)
+qes_file_rewind (struct qes_file *file)
 {
-    if (zfile_ok(file)) {
-        KM_ZSEEK(file->fp, 0, SEEK_SET);
+    if (qes_file_ok(file)) {
+        QES_ZSEEK(file->fp, 0, SEEK_SET);
         file->filepos = 0;
         file->eof = 0;
         file->feof = 0;
@@ -104,30 +104,30 @@ zfrewind (zfile_t *file)
 }
 
 void
-zfclose_ (zfile_t *file)
+qes_file_close_ (struct qes_file *file)
 {
     if (file != NULL) {
         if (file->fp != NULL) {
-            KM_ZCLOSE(file->fp);
+            QES_ZCLOSE(file->fp);
         }
-        km_free(file->path);
-        km_free(file->buffer);
+        qes_free(file->path);
+        qes_free(file->buffer);
         file->bufiter = NULL;
         file->bufend = NULL;
-        km_free(file);
+        qes_free(file);
     }
 }
 
 inline ssize_t
-zfreadline_realloc_ (zfile_t *file, char **buf, size_t *size,
-        errhandler_t onerr, const char *src, const int line)
+qes_file_readline_realloc_ (struct qes_file *file, char **buf, size_t *size,
+        qes_errhandler_func onerr, const char *src, const int line)
 {
-    return zfgetuntil_realloc_(file, '\n', buf, size, onerr, src, line);
+    return qes_file_getuntil_realloc_(file, '\n', buf, size, onerr, src, line);
 }
 
 inline ssize_t
-zfgetuntil_realloc_ (zfile_t *file, int delim, char **bufref, size_t *sizeref,
-        errhandler_t onerr, const char *src, const int line)
+qes_file_getuntil_realloc_ (struct qes_file *file, int delim, char **bufref, size_t *sizeref,
+        qes_errhandler_func onerr, const char *src, const int line)
 {
     size_t len = 0;
     size_t tocpy = 0;
@@ -136,7 +136,7 @@ zfgetuntil_realloc_ (zfile_t *file, int delim, char **bufref, size_t *sizeref,
     char *end = NULL;
     size_t size = 0;
     int ret = 0;
-    if (bufref == NULL || !zfile_ok(file) || sizeref == NULL) {
+    if (bufref == NULL || !qes_file_ok(file) || sizeref == NULL) {
         return -2;
     }
     if (file->eof) {
@@ -147,7 +147,7 @@ zfgetuntil_realloc_ (zfile_t *file, int delim, char **bufref, size_t *sizeref,
     size = *sizeref;
     /* Alloc the buffer if it's NULL */
     if (buf == NULL) {
-        buf = km_malloc_(__INIT_LINE_LEN * sizeof(*buf), onerr, src, line);
+        buf = qes_malloc_(__INIT_LINE_LEN * sizeof(*buf), onerr, src, line);
         size = __INIT_LINE_LEN;
         buf[0] = '\0';
     }
@@ -162,8 +162,8 @@ zfgetuntil_realloc_ (zfile_t *file, int delim, char **bufref, size_t *sizeref,
         tocpy = file->bufend - file->bufiter;
         len += tocpy;
         while (len + 1 >= size) {
-            size = kmroundupz(size);
-            buf = km_realloc_(buf, sizeof(*buf) * size, onerr, src, line);
+            size = qes_roundupz(size);
+            buf = qes_realloc_(buf, sizeof(*buf) * size, onerr, src, line);
             if (buf == NULL) {
                 /* We bail out here, and *bufref is untouched. This means we
                  * can check for errors, and free *bufref from the calling
@@ -180,7 +180,7 @@ zfgetuntil_realloc_ (zfile_t *file, int delim, char **bufref, size_t *sizeref,
         /* Null-terminate buf */
         buf[len] = '\0';
         /* file->buffer should now be empty, so fill 'er up! */
-        ret = __zfile_fill_buffer(file);
+        ret = __qes_file_fill_buffer(file);
         if (ret == 0) {
             /* Couln't fill, error out */
             return -2;
@@ -204,8 +204,8 @@ zfgetuntil_realloc_ (zfile_t *file, int delim, char **bufref, size_t *sizeref,
      * This happens as above */
     len += tocpy;
     while (len + 1 >= size) {
-        size = kmroundupz(size + 1);
-        buf = km_realloc_(buf, sizeof(*buf) * size, onerr, src, line);
+        size = qes_roundupz(size + 1);
+        buf = qes_realloc_(buf, sizeof(*buf) * size, onerr, src, line);
         if (buf == NULL) {
             /* We bail out here, and *bufref is untouched. This means we
              * can check for errors, and free *bufref from the calling
@@ -236,18 +236,18 @@ done:
 }
 
 inline ssize_t
-zfgetuntil (zfile_t *file, const int delim, char *dest, size_t maxlen)
+qes_file_getuntil (struct qes_file *file, const int delim, char *dest, size_t maxlen)
 {
     size_t len = 0;
     char *nextbuf = dest;
     size_t tocpy = 0;
     char *end = NULL;
     int ret = 0 ;
-    if (dest == NULL || !zfile_ok(file) || maxlen < 1 || delim > 255) {
+    if (dest == NULL || !qes_file_ok(file) || maxlen < 1 || delim > 255) {
         /* EOF is normally == -1, so use -2 to differentiate them */
         return -2;
     }
-    /* For detailed commentary, see zfgetuntil_realloc */
+    /* For detailed commentary, see qes_file_getuntil_realloc */
     /* Get out early if we're at EOF already */
     if (file->eof) {
         return EOF;
@@ -263,7 +263,7 @@ zfgetuntil (zfile_t *file, const int delim, char *dest, size_t maxlen)
         nextbuf += tocpy;
         file->bufiter += tocpy;
         dest[len] = '\0'; /* Null-terminate buf */
-        ret = __zfile_fill_buffer(file);
+        ret = __qes_file_fill_buffer(file);
         if (ret == 0) {
             return -2;
         } else if (ret == EOF) {
@@ -301,22 +301,22 @@ done:
 }
 
 inline ssize_t
-zfreadline (zfile_t *file, char *dest, size_t maxlen)
+qes_file_readline (struct qes_file *file, char *dest, size_t maxlen)
 {
-    return zfgetuntil(file, '\n', dest, maxlen);
+    return qes_file_getuntil(file, '\n', dest, maxlen);
 }
 
 inline ssize_t
-zfreadline_str (zfile_t *file, str_t *str)
+qes_file_readline_str (struct qes_file *file, struct qes_str *str)
 {
     ssize_t ln = 0;
 
-    if (file == NULL || !str_ok(str)) {
+    if (file == NULL || !qes_str_ok(str)) {
         return -2; /* ERROR, not EOF */
     }
-    ln = zfreadline_realloc(file, &(str->s), &(str->m));
+    ln = qes_file_readline_realloc(file, &(str->s), &(str->m));
     if (ln < 0) {
-        str_nullify(str);
+        qes_str_nullify(str);
         return ln;
     } else {
         str->l = ln;
@@ -325,15 +325,15 @@ zfreadline_str (zfile_t *file, str_t *str)
 }
 
 inline void
-zfprint_str (zfile_t *stream, const str_t *str)
+qes_file_print_str (struct qes_file *stream, const struct qes_str *str)
 {
-    KM_ZWRITE(stream->fp, str->s, str->l);
+    QES_ZWRITE(stream->fp, str->s, str->l);
 }
 
 inline int
-zfgetc(zfile_t *file)
+qes_file_getc(struct qes_file *file)
 {
-    if (!zfile_ok(file) || zfile_readable(file) == 0) {
+    if (!qes_file_ok(file) || qes_file_readable(file) == 0) {
         return -2;
     }
     if (file->eof) {
@@ -343,12 +343,12 @@ zfgetc(zfile_t *file)
 }
 
 const char *
-zferror (zfile_t *file)
+qes_file_error (struct qes_file *file)
 {
     int error = 0;
     const char *errstr = "";
 
-    if (!zfile_ok(file)) {
+    if (!qes_file_ok(file)) {
         /* Never return NULL, or we'll SIGSEGV printf */
         return "BAD FILE";
     }

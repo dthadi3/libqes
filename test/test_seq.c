@@ -3,7 +3,7 @@
  *
  *       Filename:  test_seq.c
  *
- *    Description:  Test kmseq.c
+ *    Description:  Test qes_seq.c
  *
  *        Version:  1.0
  *        Created:  04/05/14 15:58:53
@@ -17,10 +17,10 @@
  */
 #include "tests.h"
 
-#include <kmseq.h>
+#include <qes_seq.h>
 
 void
-test_seq_create (void *ptr)
+test_qes_seq_create (void *ptr)
 {
     seq_t *seq = NULL;
     (void) ptr;
@@ -39,16 +39,16 @@ test_seq_create (void *ptr)
     tt_ptr_op(seq->qual.s, !=, NULL);
     tt_int_op(seq->qual.m, >, 0);
     tt_int_op(seq->qual.l, ==, 0);
-    tt_assert(str_ok(&seq->name));
-    tt_assert(str_ok(&seq->comment));
-    tt_assert(str_ok(&seq->seq));
-    tt_assert(str_ok(&seq->qual));
+    tt_assert(qes_str_ok(&seq->name));
+    tt_assert(qes_str_ok(&seq->comment));
+    tt_assert(qes_str_ok(&seq->seq));
+    tt_assert(qes_str_ok(&seq->qual));
 end:
     seq_destroy(seq);
 }
 
 void
-test_seq_create_no_qual (void *ptr)
+test_qes_seq_create_no_qual (void *ptr)
 {
     seq_t *seq = NULL;
     (void) ptr;
@@ -67,16 +67,16 @@ test_seq_create_no_qual (void *ptr)
     tt_ptr_op(seq->qual.s, ==, NULL);
     tt_int_op(seq->qual.m, ==, 0);
     tt_int_op(seq->qual.l, ==, 0);
-    tt_assert(str_ok(&seq->name));
-    tt_assert(str_ok(&seq->comment));
-    tt_assert(str_ok(&seq->seq));
-    tt_assert(!str_ok(&seq->qual));
+    tt_assert(qes_str_ok(&seq->name));
+    tt_assert(qes_str_ok(&seq->comment));
+    tt_assert(qes_str_ok(&seq->seq));
+    tt_assert(!qes_str_ok(&seq->qual));
 end:
     seq_destroy(seq);
 }
 
 void
-test_seq_create_no_qual_or_comment (void *ptr)
+test_qes_seq_create_no_qual_or_comment (void *ptr)
 {
     seq_t *seq = NULL;
     (void) ptr;
@@ -95,16 +95,16 @@ test_seq_create_no_qual_or_comment (void *ptr)
     tt_ptr_op(seq->qual.s, ==, NULL);
     tt_int_op(seq->qual.m, ==, 0);
     tt_int_op(seq->qual.l, ==, 0);
-    tt_assert(str_ok(&seq->name));
-    tt_assert(!str_ok(&seq->comment));
-    tt_assert(str_ok(&seq->seq));
-    tt_assert(!str_ok(&seq->qual));
+    tt_assert(qes_str_ok(&seq->name));
+    tt_assert(!qes_str_ok(&seq->comment));
+    tt_assert(qes_str_ok(&seq->seq));
+    tt_assert(!qes_str_ok(&seq->qual));
 end:
     seq_destroy(seq);
 }
 
 void
-test_seq_ok (void *ptr)
+test_qes_seq_ok (void *ptr)
 {
     seq_t *seq = NULL;
     (void) ptr;
@@ -146,7 +146,7 @@ end:
 }
 
 void
-test_seq_ok_no_comment (void *ptr)
+test_qes_seq_ok_no_comment (void *ptr)
 {
     seq_t *seq = NULL;
 
@@ -189,7 +189,7 @@ end:
 }
 
 void
-test_seq_ok_no_qual (void *ptr)
+test_qes_seq_ok_no_qual (void *ptr)
 {
     seq_t *seq = NULL;
     (void) ptr;
@@ -231,7 +231,7 @@ end:
 }
 
 void
-test_seq_ok_no_comment_or_qual (void *ptr)
+test_qes_seq_ok_no_comment_or_qual (void *ptr)
 {
     seq_t *seq = NULL;
 
@@ -275,7 +275,7 @@ end:
 
 
 void
-test_seq_destroy (void *ptr)
+test_qes_seq_destroy (void *ptr)
 {
     seq_t *seq = NULL;
 
@@ -292,7 +292,7 @@ end:
 }
 
 void
-test_seq_fill_funcs(void *ptr)
+test_qes_seq_fill_funcs(void *ptr)
 {
 #define CHECK_FILLING(submember, str, len)          \
     seq = seq_create();                             \
@@ -379,15 +379,16 @@ end:
 }
 
 
-struct testcase_t seq_tests[] = {
-    { "seq_create", test_seq_create, 0, NULL, NULL},
-    { "seq_create_no_qual", test_seq_create_no_qual, 0, NULL, NULL},
-    { "seq_create_no_qual_or_comment", test_seq_create_no_qual_or_comment, 0, NULL, NULL},
-    { "seq_ok", test_seq_ok, 0, NULL, NULL},
-    { "seq_ok_no_comment", test_seq_ok_no_comment, 0, NULL, NULL},
-    { "seq_ok_no_qual", test_seq_ok_no_qual, 0, NULL, NULL},
-    { "seq_ok_no_comment_or_qual", test_seq_ok_no_comment_or_qual, 0, NULL, NULL},
-    { "seq_destroy", test_seq_destroy, 0, NULL, NULL},
-    { "seq_fill", test_seq_fill_funcs, 0, NULL, NULL},
+struct testcase_t qes_seq_tests[] = {
+    { "seq_create", test_qes_seq_create, 0, NULL, NULL},
+    { "seq_create_no_qual", test_qes_seq_create_no_qual, 0, NULL, NULL},
+    { "seq_create_no_qual_or_comment", test_qes_seq_create_no_qual_or_comment,
+      0, NULL, NULL},
+    { "seq_ok", test_qes_seq_ok, 0, NULL, NULL},
+    { "seq_ok_no_comment", test_qes_seq_ok_no_comment, 0, NULL, NULL},
+    { "seq_ok_no_qual", test_qes_seq_ok_no_qual, 0, NULL, NULL},
+    { "seq_ok_no_comment_or_qual", test_qes_seq_ok_no_comment_or_qual, 0, NULL, NULL},
+    { "seq_destroy", test_qes_seq_destroy, 0, NULL, NULL},
+    { "seq_fill", test_qes_seq_fill_funcs, 0, NULL, NULL},
     END_OF_TESTCASES
 };

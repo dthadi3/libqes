@@ -1,9 +1,9 @@
 /*
  * ============================================================================
  *
- *       Filename:  kmseq.c
+ *       Filename:  qes_seq.c
  *
- *    Description:  A kseq.h-like buffered sequence file parser
+ *    Description:  Sequence structures
  *
  *        Version:  1.0
  *        Created:  11/08/13 21:34:38
@@ -17,28 +17,28 @@
  * ============================================================================
  */
 
-#include "kmseq.h"
+#include "qes_seq.h"
 
 seq_t *
 seq_create (void)
 {
-    seq_t *seq = km_malloc(sizeof(*seq));
+    seq_t *seq = qes_malloc(sizeof(*seq));
 
-    init_str(&seq->name, __INIT_LINE_LEN);
-    init_str(&seq->comment, __INIT_LINE_LEN);
-    init_str(&seq->seq, __INIT_LINE_LEN);
-    init_str(&seq->qual, __INIT_LINE_LEN);
+    qes_str_init(&seq->name, __INIT_LINE_LEN);
+    qes_str_init(&seq->comment, __INIT_LINE_LEN);
+    qes_str_init(&seq->seq, __INIT_LINE_LEN);
+    qes_str_init(&seq->qual, __INIT_LINE_LEN);
     return seq;
 }
 
 seq_t *
 seq_create_no_qual (void)
 {
-    seq_t *seq = km_malloc(sizeof(*seq));
+    seq_t *seq = qes_malloc(sizeof(*seq));
 
-    init_str(&seq->name, __INIT_LINE_LEN);
-    init_str(&seq->comment, __INIT_LINE_LEN);
-    init_str(&seq->seq, __INIT_LINE_LEN);
+    qes_str_init(&seq->name, __INIT_LINE_LEN);
+    qes_str_init(&seq->comment, __INIT_LINE_LEN);
+    qes_str_init(&seq->seq, __INIT_LINE_LEN);
     seq->qual.m = 0;
     seq->qual.l = 0;
     seq->qual.s = NULL;
@@ -48,9 +48,9 @@ seq_create_no_qual (void)
 seq_t *
 seq_create_no_qual_or_comment (void)
 {
-    seq_t *seq = km_malloc(sizeof(*seq));
-    init_str(&seq->name, __INIT_LINE_LEN);
-    init_str(&seq->seq, __INIT_LINE_LEN);
+    seq_t *seq = qes_malloc(sizeof(*seq));
+    qes_str_init(&seq->name, __INIT_LINE_LEN);
+    qes_str_init(&seq->seq, __INIT_LINE_LEN);
     seq->qual.m = 0;
     seq->qual.l = 0;
     seq->qual.s = NULL;
@@ -121,7 +121,7 @@ seq_fill_header (seq_t *seqobj, char *header, size_t len)
         str_fill_charptr(&seqobj->comment, tmp + 1, 0);
     } else {
         str_fill_charptr(&seqobj->name, header + startfrom, len - startfrom);
-        str_nullify(&seqobj->comment);
+        qes_str_nullify(&seqobj->comment);
     }
     return 1;
 }
@@ -140,6 +140,6 @@ seq_destroy_ (seq_t *seq)
         destroy_str_cp(&seq->comment);
         destroy_str_cp(&seq->seq);
         destroy_str_cp(&seq->qual);
-        km_free(seq);
+        qes_free(seq);
     }
 }

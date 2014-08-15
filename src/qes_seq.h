@@ -1,9 +1,9 @@
 /*
  * ============================================================================
  *
- *       Filename:  kmseq.h
+ *       Filename:  qes_seq.h
  *
- *    Description:  A kseq.h-like buffered sequence file parser
+ *    Description:  Sequence structures
  *
  *        Version:  1.0
  *        Created:  31/07/13 12:51:02
@@ -16,24 +16,24 @@
  * ============================================================================
  */
 
-#ifndef KMSEQ_H
-#define KMSEQ_H
+#ifndef QES_SEQ_H
+#define QES_SEQ_H
 
-#include <kmutil.h>
-#include <kmstr.h>
+#include <qes_util.h>
+#include <qes_str.h>
 #include <ctype.h>
 
 
 /*---------------------------------------------------------------------------
-  | kmseq module -- data structures to hold NGS sequences                   |
+  | qes_seq module -- data structures to hold NGS sequences                   |
   ---------------------------------------------------------------------------*/
 
 /* TYPE DEFINITIONS */
 typedef struct _seq {
-    str_t name;
-    str_t comment;
-    str_t seq;
-    str_t qual;
+    struct qes_str name;
+    struct qes_str comment;
+    struct qes_str seq;
+    struct qes_str qual;
 } seq_t;
 
 /* PROTOTYPES */
@@ -63,10 +63,10 @@ seq_ok (const seq_t *seq)
 {
     return \
        seq != NULL && \
-       str_ok(&seq->name) && \
-       str_ok(&seq->comment) && \
-       str_ok(&seq->seq) && \
-       str_ok(&seq->qual);
+       qes_str_ok(&seq->name) && \
+       qes_str_ok(&seq->comment) && \
+       qes_str_ok(&seq->seq) && \
+       qes_str_ok(&seq->qual);
 }
 
 static inline int
@@ -74,9 +74,9 @@ seq_ok_no_comment (const seq_t *seq)
 {
     return \
        seq != NULL && \
-       str_ok(&seq->name) && \
-       str_ok(&seq->seq) && \
-       str_ok(&seq->qual);
+       qes_str_ok(&seq->name) && \
+       qes_str_ok(&seq->seq) && \
+       qes_str_ok(&seq->qual);
 }
 
 static inline int
@@ -84,9 +84,9 @@ seq_ok_no_qual (const seq_t *seq)
 {
     return \
         seq != NULL && \
-        str_ok(&seq->name) && \
-        str_ok(&seq->comment) && \
-        str_ok(&seq->seq);
+        qes_str_ok(&seq->name) && \
+        qes_str_ok(&seq->comment) && \
+        qes_str_ok(&seq->seq);
 }
 
 static inline int
@@ -94,8 +94,8 @@ seq_ok_no_comment_or_qual (const seq_t *seq)
 {
     return \
         seq != NULL && \
-        str_ok(&seq->name) && \
-        str_ok(&seq->seq);
+        qes_str_ok(&seq->name) && \
+        qes_str_ok(&seq->seq);
 }
 
 static inline int
@@ -152,7 +152,7 @@ extern int seq_fill_comment(seq_t *seqobj, const char *comment, size_t len);
 /*===  FUNCTION  ============================================================*
 Name:           seq_print
 Paramters:      const seq_t *: seq to print
-                seqfile_format_t: file format to print in.
+                qes_seqfile_format_t: file format to print in.
                 FILE *: open file stream to print to.
 Description:    Print ``seq`` in formatted per ``format`` to ``stream``.
 Returns:        int: 1 on success, 0 on failure.
@@ -172,4 +172,4 @@ void seq_destroy_(seq_t *seq);
         } while(0)
 
 
-#endif /* KMSEQ_H */
+#endif /* QES_SEQ_H */

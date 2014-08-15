@@ -1,7 +1,7 @@
 /*
  * ============================================================================
  *
- *       Filename:  kmsequtil.c
+ *       Filename:  qes_sequtil.c
  *
  *    Description:  Sequence utility functions
  *
@@ -12,22 +12,21 @@
  *       Compiler:  gcc, clang
  *
  *         Author:  Kevin Murray, spam@kdmurray.id.au
- *                                [include word penguin in subject]
- *
+ 
  * ============================================================================
  */
 
-#include "kmsequtil.h"
+#include "qes_sequtil.h"
 
 /*
  * ===  FUNCTION  =============================================================
- *         Name:  translate_codon
+ *         Name:  qes_sequtil_translate_codon
  *  Description:  translate a codon to an amino acid.
  * ============================================================================
  */
 
 inline char
-translate_codon (const char *codon)
+qes_sequtil_translate_codon (const char *codon)
 {
     if (codon == NULL || strnlen(codon, 4) != 3) {
         return -1;
@@ -222,7 +221,7 @@ translate_codon (const char *codon)
 
 
 inline char *
-revcomp (const char *seq, size_t len)
+qes_sequtil_revcomp (const char *seq, size_t len)
 {
     size_t seqlen = strlen(seq);
     char *outseq = strdup(seq);
@@ -233,12 +232,12 @@ revcomp (const char *seq, size_t len)
         seqlen--;
     }
 
-    revcomp_inplace(outseq, len);
+    qes_sequtil_revcomp_inplace(outseq, len);
     return outseq;
 }
 
 inline void
-revcomp_inplace (char *seq, size_t len)
+qes_sequtil_revcomp_inplace (char *seq, size_t len)
 {
     size_t iii;
     /* Trim trailing whitespace */

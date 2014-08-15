@@ -17,8 +17,8 @@
  */
 #include <stdlib.h>
 
-#include <kmzfile.h>
-#include <kmseqfile.h>
+#include <qes_file.h>
+#include <qes_seqfile.h>
 #include <time.h>
 #include <zlib.h>
 #include <assert.h>
@@ -27,14 +27,14 @@
 
 #include "kseq.h"
 
-void bench_zfreadline_realloc_file(int silent);
-void bench_zfreadline_file(int silent);
+void bench_qes_file_readline_realloc_file(int silent);
+void bench_qes_file_readline_file(int silent);
 void bench_gnu_getline_file(int silent);
-void bench_seqfile_parse_fq(int silent);
+void bench_qes_seqfile_parse_fq(int silent);
 void bench_kseq_parse_fq(int silent);
-void bench_seqfile_write(int silent);
-#ifndef KMLIB_NO_OPENMP
-void bench_seqfile_par_iter_fq_macro(int silent);
+void bench_qes_seqfile_write(int silent);
+#ifndef LIBQES_NO_OPENMP
+void bench_qes_seqfile_par_iter_fq_macro(int silent);
 #endif
 
 
@@ -48,39 +48,39 @@ typedef struct __bench {
 } bench_t;
 
 void
-bench_zfreadline_realloc_file(int silent)
+bench_qes_file_readline_realloc_file(int silent)
 {
     size_t bsz = 1<<4;
     char *buf = malloc(bsz);
     ssize_t len = 0;
     off_t flen = 0;
-    zfile_t *file = zfopen(infile, "r");
+    struct qes_file *file = qes_file_open(infile, "r");
 
     assert(buf != NULL);
-    while ((len = zfreadline_realloc(file, &buf, &bsz)) != EOF) {
+    while ((len = qes_file_readline_realloc(file, &buf, &bsz)) != EOF) {
         flen += len;
     }
     if (!silent)
-        printf("[zfreadline_realloc]\tFile of %zu chars\n", flen);
-    zfclose(file);
+        printf("[qes_file_readline_realloc]\tFile of %zu chars\n", flen);
+    qes_file_close(file);
     free(buf);
 }
 
 void
-bench_zfreadline_file(int silent)
+bench_qes_file_readline_file(int silent)
 {
     size_t bsz = 1<<10;
     char buf[bsz];
     ssize_t len = 0;
     off_t flen = 0;
 
-    zfile_t *file = zfopen(infile, "r");
-    while ((len = zfreadline(file, buf, bsz)) != EOF) {
+    struct qes_file *file = qes_file_open(infile, "r");
+    while ((len = qes_file_readline(file, buf, bsz)) != EOF) {
         flen += len;
     }
     if (!silent)
-        printf("[zfreadline]\t\tFile of %zu chars\n", flen);
-    zfclose(file);
+        printf("[qes_file_readline]\t\tFile of %zu chars\n", flen);
+    qes_file_close(file);
 }
 
 void
@@ -103,38 +103,38 @@ bench_gnu_getline_file(int silent)
 }
 
 
-#ifndef KMLIB_NO_OPENMP
+#ifndef LIBQES_NO_OPENMP
 void
-bench_seqfile_par_iter_fq_macro(int silent)
+bench_qes_seqfile_par_iter_fq_macro(int silent)
 {
-    seqfile_t *sf = seqfile_create(infile, "r");
+    struct qes_seqfile *sf = qes_seqfile_create(infile, "r");
     size_t total_len = 0;
 
-    SEQFILE_ITER_PARALLEL_SINGLE_BEGIN(sf, seq, seq_len, shared(total_len))
+    QES_SEQFILE_ITER_PARALLEL_SINGLE_BEGIN(sf, seq, seq_len, shared(total_len))
         #pragma omp critical
         {
         total_len += seq->seq.l;
         }
-    SEQFILE_ITER_PARALLEL_SINGLE_END(seq)
+    QES_SEQFILE_ITER_PARALLEL_SINGLE_END(seq)
 
     if (!silent) {
-        printf("[seqfile_iter_fq_macro] Total seq len %zu\n", total_len);
+        printf("[qes_seqfile_iter_fq_macro] Total seq len %zu\n", total_len);
     }
-    seqfile_destroy(sf);
+    qes_seqfile_destroy(sf);
 }
 #endif
 
 void
-bench_seqfile_parse_fq(int silent)
+bench_qes_seqfile_parse_fq(int silent)
 {
     seq_t *seq = seq_create();
-    seqfile_t *sf = seqfile_create(infile, "r");
+    struct qes_seqfile *sf = qes_seqfile_create(infile, "r");
     ssize_t res = 0;
     size_t n_recs = 0;
     size_t seq_len = 0;
 
     while (res != EOF) {
-        res = seqfile_read(sf, seq);
+        res = qes_seqfile_read(sf, seq);
         if (res < 1) {
             break;
         }
@@ -142,9 +142,9 @@ bench_seqfile_parse_fq(int silent)
         n_recs++;
     }
     if (!silent) {
-        printf("[seqfile_fq] Total seq len %zu\n", seq_len);
+        printf("[qes_seqfile_fq] Total seq len %zu\n", seq_len);
     }
-    seqfile_destroy(sf);
+    qes_seqfile_destroy(sf);
     seq_destroy(seq);
 }
 
@@ -169,11 +169,11 @@ bench_kseq_parse_fq(int silent)
 }
 
 void
-bench_seqfile_write(int silent)
+bench_qes_seqfile_write(int silent)
 {
     seq_t *seq = seq_create();
     ssize_t res = 0;
-    seqfile_t *sf = NULL;
+    struct qes_seqfile *sf = NULL;
     char *fname = tmpnam(NULL);
     size_t iii = 0;
 
@@ -183,30 +183,30 @@ bench_seqfile_write(int silent)
     seq_fill_seq(seq, "ACTCAATT", 8);
     seq_fill_qual(seq, "IIIIIIII", 8);
     /* Setup file for writing */
-    sf = seqfile_create(fname, "wT");
-    seqfile_set_format(sf, FASTQ_FMT);
+    sf = qes_seqfile_create(fname, "wT");
+    qes_seqfile_set_format(sf, FASTQ_FMT);
     for (iii = 0; iii < 1<<11; iii++) {
-        res += seqfile_write(sf, seq);
+        res += qes_seqfile_write(sf, seq);
     }
     if (!silent) {
-        printf("[seqfile_write] Total file len %zu to %s\n", res, fname);
+        printf("[qes_seqfile_write] Total file len %zu to %s\n", res, fname);
     }
-    seqfile_destroy(sf);
+    qes_seqfile_destroy(sf);
     seq_destroy(seq);
     remove(fname);
 
 }
 
 static const bench_t benchmarks[] = {
-    { "zfreadline", &bench_zfreadline_file},
-    { "zfreadline_realloc", &bench_zfreadline_realloc_file},
+    { "qes_file_readline", &bench_qes_file_readline_file},
+    { "qes_file_readline_realloc", &bench_qes_file_readline_realloc_file},
     { "gnu_getline", &bench_gnu_getline_file},
-    { "seqfile_parse_fq", &bench_seqfile_parse_fq},
-#ifndef KMLIB_NO_OPENMP
-    { "seqfile_par_iter_fq_macro", &bench_seqfile_par_iter_fq_macro},
+    { "qes_seqfile_parse_fq", &bench_qes_seqfile_parse_fq},
+#ifndef LIBQES_NO_OPENMP
+    { "qes_seqfile_par_iter_fq_macro", &bench_qes_seqfile_par_iter_fq_macro},
 #endif
     { "kseq_parse_fq", &bench_kseq_parse_fq},
-    { "seqfile_write", &bench_seqfile_write},
+    { "qes_seqfile_write", &bench_qes_seqfile_write},
     { NULL, NULL}
 };
 
