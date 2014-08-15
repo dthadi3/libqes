@@ -10,6 +10,7 @@ SET(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake-modules")
 
 # Shortcut to enable dev compile options
 IF (DEV)
+	SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS}  -fsanitize=address -fsanitize=leak -fsanitize=undefined")
 	SET(CMAKE_BUILD_TYPE Coverage)
 ENDIF()
 
@@ -91,9 +92,9 @@ SET(WEXTRA_FLAGS "${WEXTRA_FLAGS} -Wmissing-declarations -Wredundant-decls -Wnes
 SET(WEXTRA_FLAGS "${WEXTRA_FLAGS} -Wbad-function-cast -Wswitch-enum -Winit-self")
 SET(WEXTRA_FLAGS "${WEXTRA_FLAGS} -Wmissing-field-initializers -Wdeclaration-after-statement")
 SET(WEXTRA_FLAGS "${WEXTRA_FLAGS} -Wold-style-definition -Waddress -Wmissing-noreturn ")
-SET(WEXTRA_FLAGS "${WEXTRA_FLAGS} -Wstrict-overflow=1 -Wextra -Warray-bounds")
+SET(WEXTRA_FLAGS "${WEXTRA_FLAGS} -Wstrict-overflow=1 -Wextra -Warray-bounds -Wall")
 
-SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=gnu99 -Wall")
+SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=gnu99")
 SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${WEXTRA_FLAGS}")
 IF (NOT NO_OPENMP)
 	SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fopenmp")
