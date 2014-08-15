@@ -155,7 +155,7 @@ Description:    Tests the qes_seqfile_read function from qes_seqfile.c
 void
 test_qes_seqfile_read (void *ptr)
 {
-    seq_t *seq = seq_create();
+    struct qes_seq *seq = qes_seq_create();
     ssize_t res = 0;
     struct qes_seqfile *sf = NULL;
     char *fname = NULL;
@@ -215,7 +215,7 @@ test_qes_seqfile_read (void *ptr)
     tt_int_op(res, ==, -2);
 end:
     qes_seqfile_destroy(sf);
-    seq_destroy(seq);
+    qes_seq_destroy(seq);
     if (fname != NULL) {
         free(fname);
     }
@@ -226,7 +226,7 @@ end:
 void
 test_qes_seqfile_read_vs_kseq (void *ptr)
 {
-    seq_t *seq = seq_create();
+    struct qes_seq *seq = qes_seq_create();
     char *fname = find_data_file("test.fastq.gz");
     struct qes_seqfile *sf = qes_seqfile_create(fname, "r");
     gzFile fp = gzopen(fname, "r");
@@ -254,12 +254,12 @@ test_qes_seqfile_read_vs_kseq (void *ptr)
     tt_int_op(my_res, ==, kseq_res);
     tt_int_op(my_res, ==, EOF);
     qes_seqfile_destroy(sf);
-    seq_destroy(seq);
+    qes_seq_destroy(seq);
     kseq_destroy(kseq);
     gzclose(fp);
     free(fname);
     /* Try again, with fasta */
-    seq = seq_create();
+    seq = qes_seq_create();
     fname = find_data_file("test.fasta");
     tt_assert(fname != NULL);
     sf = qes_seqfile_create(fname, "r");
@@ -281,7 +281,7 @@ test_qes_seqfile_read_vs_kseq (void *ptr)
     }
 end:
     qes_seqfile_destroy(sf);
-    seq_destroy(seq);
+    qes_seq_destroy(seq);
     kseq_destroy(kseq);
     gzclose(fp);
     if (fname != NULL) {
@@ -298,7 +298,7 @@ Description:    Tests the qes_seqfile_write function from qes_seqfile.c
 void
 test_qes_seqfile_write (void *ptr)
 {
-    seq_t *seq = seq_create();
+    struct qes_seq *seq = qes_seq_create();
     size_t expt_bytes = 0;
     ssize_t res = 0;
     struct qes_seqfile *sf = NULL;
@@ -307,10 +307,10 @@ test_qes_seqfile_write (void *ptr)
 
     (void) ptr;
     /* Make a seq to write */
-    seq_fill_name(seq, "HWI-TEST", 8);
-    seq_fill_comment(seq, "testseq 1 2 3", 13);
-    seq_fill_seq(seq, "ACTCAATT", 8);
-    seq_fill_qual(seq, "IIIIIIII", 8);
+    qes_seq_fill_name(seq, "HWI-TEST", 8);
+    qes_seq_fill_comment(seq, "testseq 1 2 3", 13);
+    qes_seq_fill_seq(seq, "ACTCAATT", 8);
+    qes_seq_fill_qual(seq, "IIIIIIII", 8);
     expt_bytes = 1 + 8 + 1 + 13 + 1 +   /* @ + name + ' ' + comment + '\n' */
                  8 + 1 + 2 + 8 + 1;     /* seq + '\n' + "+\n" + qual + '\n' */
     /* Test with a FASTQ seqfile */
@@ -349,7 +349,7 @@ test_qes_seqfile_write (void *ptr)
     tt_int_op(res, ==, -2);
 end:
     qes_seqfile_destroy(sf);
-    seq_destroy(seq);
+    qes_seq_destroy(seq);
     if (fname != NULL) free(fname);
     if (crc != NULL) free(crc);
 }

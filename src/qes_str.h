@@ -76,7 +76,7 @@ qes_str_create (size_t capacity)
 }
 
 static inline int
-str_fill_charptr (struct qes_str *str, const char *cp, size_t len)
+qes_str_fill_charptr (struct qes_str *str, const char *cp, size_t len)
 {
     if (str == NULL || cp == NULL) return 0;
     if (len == 0) {
@@ -103,24 +103,24 @@ Returns:        int: True or False, indicating success or failure.
  *===========================================================================*/
 extern int qes_str_nullify(struct qes_str *str);
 
-extern void print_str (const struct qes_str *str, FILE *stream);
+extern void qes_str_print (const struct qes_str *str, FILE *stream);
 
 /*===  FUNCTION  ============================================================*
-Name:           destroy_str
+Name:           qes_str_destroy
 Paramters:      struct qes_str *: `struct qes_str` to destroy.
 Description:    Frees `str->s` and the struct qes_str struct itself.
 Returns:        void
  *===========================================================================*/
-extern void destroy_str (struct qes_str *str);
+extern void qes_str_destroy (struct qes_str *str);
 
 /*===  FUNCTION  ============================================================*
-Name:           destroy_str_cp
+Name:           qes_str_destroy_cp
 Paramters:      struct qes_str *: String to destrop
 Description:    Frees `str->s` without freeing the struct qes_str struct itself. For use
                 on `struct qes_str`s allocated on the stack.
 Returns:        void
  *===========================================================================*/
-extern void destroy_str_cp (struct qes_str *str);
+extern void qes_str_destroy_cp (struct qes_str *str);
 
 
 #endif /* QES_STR_H */

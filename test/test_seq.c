@@ -22,10 +22,10 @@
 void
 test_qes_seq_create (void *ptr)
 {
-    seq_t *seq = NULL;
+    struct qes_seq *seq = NULL;
     (void) ptr;
     tt_ptr_op(seq, ==, NULL);
-    seq = seq_create();
+    seq = qes_seq_create();
     tt_ptr_op(seq, !=, NULL);
     tt_ptr_op(seq->name.s, !=, NULL);
     tt_int_op(seq->name.m, >, 0);
@@ -44,16 +44,16 @@ test_qes_seq_create (void *ptr)
     tt_assert(qes_str_ok(&seq->seq));
     tt_assert(qes_str_ok(&seq->qual));
 end:
-    seq_destroy(seq);
+    qes_seq_destroy(seq);
 }
 
 void
 test_qes_seq_create_no_qual (void *ptr)
 {
-    seq_t *seq = NULL;
+    struct qes_seq *seq = NULL;
     (void) ptr;
     tt_ptr_op(seq, ==, NULL);
-    seq = seq_create_no_qual();
+    seq = qes_seq_create_no_qual();
     tt_ptr_op(seq, !=, NULL);
     tt_ptr_op(seq->name.s, !=, NULL);
     tt_int_op(seq->name.m, >, 0);
@@ -72,16 +72,16 @@ test_qes_seq_create_no_qual (void *ptr)
     tt_assert(qes_str_ok(&seq->seq));
     tt_assert(!qes_str_ok(&seq->qual));
 end:
-    seq_destroy(seq);
+    qes_seq_destroy(seq);
 }
 
 void
 test_qes_seq_create_no_qual_or_comment (void *ptr)
 {
-    seq_t *seq = NULL;
+    struct qes_seq *seq = NULL;
     (void) ptr;
     tt_ptr_op(seq, ==, NULL);
-    seq = seq_create_no_qual_or_comment();
+    seq = qes_seq_create_no_qual_or_comment();
     tt_ptr_op(seq, !=, NULL);
     tt_ptr_op(seq->name.s, !=, NULL);
     tt_int_op(seq->name.m, >, 0);
@@ -100,219 +100,219 @@ test_qes_seq_create_no_qual_or_comment (void *ptr)
     tt_assert(qes_str_ok(&seq->seq));
     tt_assert(!qes_str_ok(&seq->qual));
 end:
-    seq_destroy(seq);
+    qes_seq_destroy(seq);
 }
 
 void
 test_qes_seq_ok (void *ptr)
 {
-    seq_t *seq = NULL;
+    struct qes_seq *seq = NULL;
     (void) ptr;
     /* Test null seq */
-    tt_assert(!seq_ok(seq));
+    tt_assert(!qes_seq_ok(seq));
     /* Make valid seq */
-    seq = seq_create();
-    tt_assert(seq_ok(seq));
+    seq = qes_seq_create();
+    tt_assert(qes_seq_ok(seq));
     /* invalidate name, should fail */
-    destroy_str_cp(&seq->name);
-    tt_assert(!seq_ok(seq));
-    seq_destroy(seq);
+    qes_str_destroy_cp(&seq->name);
+    tt_assert(!qes_seq_ok(seq));
+    qes_seq_destroy(seq);
     /* remake */
-    seq = seq_create();
-    tt_assert(seq_ok(seq));
+    seq = qes_seq_create();
+    tt_assert(qes_seq_ok(seq));
     /* invalidate comment, should fail */
-    destroy_str_cp(&seq->comment);
-    tt_assert(!seq_ok(seq));
-    seq_destroy(seq);
+    qes_str_destroy_cp(&seq->comment);
+    tt_assert(!qes_seq_ok(seq));
+    qes_seq_destroy(seq);
     /* remake */
-    seq = seq_create();
-    tt_assert(seq_ok(seq));
+    seq = qes_seq_create();
+    tt_assert(qes_seq_ok(seq));
     /* invalidate seq, should fail */
-    destroy_str_cp(&seq->seq);
-    tt_assert(!seq_ok(seq));
-    seq_destroy(seq);
+    qes_str_destroy_cp(&seq->seq);
+    tt_assert(!qes_seq_ok(seq));
+    qes_seq_destroy(seq);
     /* remake */
-    seq = seq_create();
-    tt_assert(seq_ok(seq));
+    seq = qes_seq_create();
+    tt_assert(qes_seq_ok(seq));
     /* invalidate qual, should fail */
-    destroy_str_cp(&seq->qual);
-    tt_assert(!seq_ok(seq));
-    seq_destroy(seq);
+    qes_str_destroy_cp(&seq->qual);
+    tt_assert(!qes_seq_ok(seq));
+    qes_seq_destroy(seq);
     /* Destroy seq, invalidating it */
-    seq_destroy(seq);
-    tt_assert(!seq_ok(seq));
+    qes_seq_destroy(seq);
+    tt_assert(!qes_seq_ok(seq));
 end:
-    seq_destroy(seq);
+    qes_seq_destroy(seq);
 }
 
 void
 test_qes_seq_ok_no_comment (void *ptr)
 {
-    seq_t *seq = NULL;
+    struct qes_seq *seq = NULL;
 
     (void) ptr;
     /* Test null seq */
-    tt_assert(!seq_ok_no_comment(seq));
+    tt_assert(!qes_seq_ok_no_comment(seq));
     /* Make valid seq */
-    seq = seq_create();
-    tt_assert(seq_ok_no_comment(seq));
+    seq = qes_seq_create();
+    tt_assert(qes_seq_ok_no_comment(seq));
     /* invalidate name, should fail */
-    destroy_str_cp(&seq->name);
-    tt_assert(!seq_ok_no_comment(seq));
-    seq_destroy(seq);
+    qes_str_destroy_cp(&seq->name);
+    tt_assert(!qes_seq_ok_no_comment(seq));
+    qes_seq_destroy(seq);
     /* remake */
-    seq = seq_create();
-    tt_assert(seq_ok_no_comment(seq));
+    seq = qes_seq_create();
+    tt_assert(qes_seq_ok_no_comment(seq));
     /* invalidate comment, should still pass */
-    destroy_str_cp(&seq->comment);
-    tt_assert(seq_ok_no_comment(seq));
-    seq_destroy(seq);
+    qes_str_destroy_cp(&seq->comment);
+    tt_assert(qes_seq_ok_no_comment(seq));
+    qes_seq_destroy(seq);
     /* remake */
-    seq = seq_create();
-    tt_assert(seq_ok_no_comment(seq));
+    seq = qes_seq_create();
+    tt_assert(qes_seq_ok_no_comment(seq));
     /* invalidate seq, should fail */
-    destroy_str_cp(&seq->seq);
-    tt_assert(!seq_ok_no_comment(seq));
-    seq_destroy(seq);
+    qes_str_destroy_cp(&seq->seq);
+    tt_assert(!qes_seq_ok_no_comment(seq));
+    qes_seq_destroy(seq);
     /* remake */
-    seq = seq_create();
-    tt_assert(seq_ok_no_comment(seq));
+    seq = qes_seq_create();
+    tt_assert(qes_seq_ok_no_comment(seq));
     /* invalidate qual, should fail */
-    destroy_str_cp(&seq->qual);
-    tt_assert(!seq_ok_no_comment(seq));
-    seq_destroy(seq);
+    qes_str_destroy_cp(&seq->qual);
+    tt_assert(!qes_seq_ok_no_comment(seq));
+    qes_seq_destroy(seq);
     /* Destroy seq, invalidating it */
-    seq_destroy(seq);
-    tt_assert(!seq_ok_no_comment(seq));
+    qes_seq_destroy(seq);
+    tt_assert(!qes_seq_ok_no_comment(seq));
 end:
-    seq_destroy(seq);
+    qes_seq_destroy(seq);
 }
 
 void
 test_qes_seq_ok_no_qual (void *ptr)
 {
-    seq_t *seq = NULL;
+    struct qes_seq *seq = NULL;
     (void) ptr;
     /* Test null seq */
-    tt_assert(!seq_ok_no_qual(seq));
+    tt_assert(!qes_seq_ok_no_qual(seq));
     /* Make valid seq */
-    seq = seq_create();
-    tt_assert(seq_ok_no_qual(seq));
+    seq = qes_seq_create();
+    tt_assert(qes_seq_ok_no_qual(seq));
     /* invalidate name, should fail */
-    destroy_str_cp(&seq->name);
-    tt_assert(!seq_ok_no_qual(seq));
-    seq_destroy(seq);
+    qes_str_destroy_cp(&seq->name);
+    tt_assert(!qes_seq_ok_no_qual(seq));
+    qes_seq_destroy(seq);
     /* remake */
-    seq = seq_create();
-    tt_assert(seq_ok_no_qual(seq));
+    seq = qes_seq_create();
+    tt_assert(qes_seq_ok_no_qual(seq));
     /* invalidate comment, should fail */
-    destroy_str_cp(&seq->comment);
-    tt_assert(!seq_ok_no_qual(seq));
-    seq_destroy(seq);
+    qes_str_destroy_cp(&seq->comment);
+    tt_assert(!qes_seq_ok_no_qual(seq));
+    qes_seq_destroy(seq);
     /* remake */
-    seq = seq_create();
-    tt_assert(seq_ok_no_qual(seq));
+    seq = qes_seq_create();
+    tt_assert(qes_seq_ok_no_qual(seq));
     /* invalidate seq, should fail */
-    destroy_str_cp(&seq->seq);
-    tt_assert(!seq_ok_no_qual(seq));
-    seq_destroy(seq);
+    qes_str_destroy_cp(&seq->seq);
+    tt_assert(!qes_seq_ok_no_qual(seq));
+    qes_seq_destroy(seq);
     /* remake */
-    seq = seq_create();
-    tt_assert(seq_ok_no_qual(seq));
+    seq = qes_seq_create();
+    tt_assert(qes_seq_ok_no_qual(seq));
     /* invalidate qual, should PASS */
-    destroy_str_cp(&seq->qual);
-    tt_assert(seq_ok_no_qual(seq));
-    seq_destroy(seq);
+    qes_str_destroy_cp(&seq->qual);
+    tt_assert(qes_seq_ok_no_qual(seq));
+    qes_seq_destroy(seq);
     /* Destroy seq, invalidating it */
-    seq_destroy(seq);
-    tt_assert(!seq_ok_no_qual(seq));
+    qes_seq_destroy(seq);
+    tt_assert(!qes_seq_ok_no_qual(seq));
 end:
-    seq_destroy(seq);
+    qes_seq_destroy(seq);
 }
 
 void
 test_qes_seq_ok_no_comment_or_qual (void *ptr)
 {
-    seq_t *seq = NULL;
+    struct qes_seq *seq = NULL;
 
     (void) ptr;
     /* Test null seq */
-    tt_assert(!seq_ok_no_comment_or_qual(seq));
+    tt_assert(!qes_seq_ok_no_comment_or_qual(seq));
     /* Make valid seq */
-    seq = seq_create();
-    tt_assert(seq_ok_no_comment_or_qual(seq));
+    seq = qes_seq_create();
+    tt_assert(qes_seq_ok_no_comment_or_qual(seq));
     /* invalidate name, should fail */
-    destroy_str_cp(&seq->name);
-    tt_assert(!seq_ok_no_comment_or_qual(seq));
-    seq_destroy(seq);
+    qes_str_destroy_cp(&seq->name);
+    tt_assert(!qes_seq_ok_no_comment_or_qual(seq));
+    qes_seq_destroy(seq);
     /* remake */
-    seq = seq_create();
-    tt_assert(seq_ok_no_comment_or_qual(seq));
+    seq = qes_seq_create();
+    tt_assert(qes_seq_ok_no_comment_or_qual(seq));
     /* invalidate comment, should still pass */
-    destroy_str_cp(&seq->comment);
-    tt_assert(seq_ok_no_comment_or_qual(seq));
-    seq_destroy(seq);
+    qes_str_destroy_cp(&seq->comment);
+    tt_assert(qes_seq_ok_no_comment_or_qual(seq));
+    qes_seq_destroy(seq);
     /* remake */
-    seq = seq_create();
-    tt_assert(seq_ok_no_comment_or_qual(seq));
+    seq = qes_seq_create();
+    tt_assert(qes_seq_ok_no_comment_or_qual(seq));
     /* invalidate seq, should fail */
-    destroy_str_cp(&seq->seq);
-    tt_assert(!seq_ok_no_comment_or_qual(seq));
-    seq_destroy(seq);
+    qes_str_destroy_cp(&seq->seq);
+    tt_assert(!qes_seq_ok_no_comment_or_qual(seq));
+    qes_seq_destroy(seq);
     /* remake */
-    seq = seq_create();
-    tt_assert(seq_ok_no_comment_or_qual(seq));
+    seq = qes_seq_create();
+    tt_assert(qes_seq_ok_no_comment_or_qual(seq));
     /* invalidate qual, should fail */
-    destroy_str_cp(&seq->qual);
-    tt_assert(seq_ok_no_comment_or_qual(seq));
-    seq_destroy(seq);
+    qes_str_destroy_cp(&seq->qual);
+    tt_assert(qes_seq_ok_no_comment_or_qual(seq));
+    qes_seq_destroy(seq);
     /* Destroy seq, invalidating it */
-    seq_destroy(seq);
-    tt_assert(!seq_ok_no_comment_or_qual(seq));
+    qes_seq_destroy(seq);
+    tt_assert(!qes_seq_ok_no_comment_or_qual(seq));
 end:
-    seq_destroy(seq);
+    qes_seq_destroy(seq);
 }
 
 
 void
 test_qes_seq_destroy (void *ptr)
 {
-    seq_t *seq = NULL;
+    struct qes_seq *seq = NULL;
 
     (void) ptr;
     tt_ptr_op(seq, ==, NULL);
-    seq = seq_create();
+    seq = qes_seq_create();
     tt_ptr_op(seq, !=, NULL);
-    seq_destroy(seq);
+    qes_seq_destroy(seq);
     tt_ptr_op(seq, ==, NULL);
     seq = NULL; /* Best be sure */
-    seq_destroy(seq);
+    qes_seq_destroy(seq);
 end:
-    seq_destroy(seq);
+    qes_seq_destroy(seq);
 }
 
 void
 test_qes_seq_fill_funcs(void *ptr)
 {
 #define CHECK_FILLING(submember, str, len)          \
-    seq = seq_create();                             \
+    seq = qes_seq_create();                             \
     tt_str_op(seq->submember.s, ==, "");            \
-    res = seq_fill_ ##submember (seq, str, len);    \
+    res = qes_seq_fill_ ##submember (seq, str, len);    \
     tt_int_op(res, ==, 1);                          \
     tt_str_op(seq->submember.s, ==, str);           \
     tt_int_op(seq->submember.l, ==, len);           \
     tt_int_op(seq->submember.m, >=, len);           \
-    seq_destroy(seq);
+    qes_seq_destroy(seq);
 #define CHECK_FILLING_FAIL(submember, str, len)     \
-    seq = seq_create();                             \
+    seq = qes_seq_create();                             \
     tt_str_op(seq->submember.s, ==, "");            \
-    res = seq_fill_ ##submember (seq, str, len);    \
+    res = qes_seq_fill_ ##submember (seq, str, len);    \
     tt_int_op(res, ==, 0);                          \
     tt_str_op(seq->submember.s, ==, "");            \
     tt_int_op(seq->submember.l, ==, 0);             \
-    seq_destroy(seq);
+    qes_seq_destroy(seq);
 
-    seq_t *seq = NULL;
+    struct qes_seq *seq = NULL;
     int res = 0;
     char *tmp = NULL;
 
@@ -331,18 +331,18 @@ test_qes_seq_fill_funcs(void *ptr)
     CHECK_FILLING_FAIL(seq, "BAD", 0)
     CHECK_FILLING_FAIL(qual, NULL, 1)
     CHECK_FILLING_FAIL(qual, "BAD", 0)
-    tt_int_op(seq_fill_name(NULL, "BAD", 3), ==, 0);
-    tt_int_op(seq_fill_comment(NULL, "BAD", 3), ==, 0);
-    tt_int_op(seq_fill_seq(NULL, "BAD", 3), ==, 0);
-    tt_int_op(seq_fill_qual(NULL, "BAD", 3), ==, 0);
+    tt_int_op(qes_seq_fill_name(NULL, "BAD", 3), ==, 0);
+    tt_int_op(qes_seq_fill_comment(NULL, "BAD", 3), ==, 0);
+    tt_int_op(qes_seq_fill_seq(NULL, "BAD", 3), ==, 0);
+    tt_int_op(qes_seq_fill_qual(NULL, "BAD", 3), ==, 0);
 
     /* Fill header */
 #define CHECK_FILL_HEADER(str, len, nm, nmlen, com, comlen)     \
     tmp = strdup(str);                                          \
-    seq = seq_create();                                         \
+    seq = qes_seq_create();                                         \
     tt_str_op(seq->name.s, ==, "");                             \
     tt_str_op(seq->comment.s, ==, "");                          \
-    res = seq_fill_header(seq, tmp, len);                       \
+    res = qes_seq_fill_header(seq, tmp, len);                       \
     tt_int_op(res, ==, 1);                                      \
     tt_str_op(seq->name.s, ==, nm);                             \
     tt_int_op(seq->name.l, ==, nmlen);                          \
@@ -350,7 +350,7 @@ test_qes_seq_fill_funcs(void *ptr)
     tt_str_op(seq->comment.s, ==, com);                         \
     tt_int_op(seq->comment.l, ==, comlen);                      \
     tt_int_op(seq->comment.m, >=, comlen);                      \
-    seq_destroy(seq);                                           \
+    qes_seq_destroy(seq);                                           \
     free(tmp);                                                  \
     tmp = NULL;
     CHECK_FILL_HEADER("@HWI_TEST COMM\n", 15, "HWI_TEST", 8, "COMM", 4)
@@ -362,17 +362,17 @@ test_qes_seq_fill_funcs(void *ptr)
     CHECK_FILL_HEADER(">HWI_TEST", 9, "HWI_TEST", 8, "", 0)
     CHECK_FILL_HEADER("HWI_TEST", 8, "HWI_TEST", 8, "", 0)
     /* Check bad values */
-    seq = seq_create();
+    seq = qes_seq_create();
     tmp = strdup("BAD");
-    tt_int_op(seq_fill_header(NULL, tmp, 3), ==, 0);
-    tt_int_op(seq_fill_header(seq, NULL, 3), ==, 0);
-    tt_int_op(seq_fill_header(seq, tmp, 0), ==, 0);
-    seq_destroy(seq);
+    tt_int_op(qes_seq_fill_header(NULL, tmp, 3), ==, 0);
+    tt_int_op(qes_seq_fill_header(seq, NULL, 3), ==, 0);
+    tt_int_op(qes_seq_fill_header(seq, tmp, 0), ==, 0);
+    qes_seq_destroy(seq);
 end:
     if (tmp != NULL) {
         free(tmp);
     }
-    seq_destroy(seq);
+    qes_seq_destroy(seq);
 #undef CHECK_FILLING
 #undef CHECK_FILLING_FAIL
 #undef CHECK_FILL_HEADER
@@ -380,15 +380,15 @@ end:
 
 
 struct testcase_t qes_seq_tests[] = {
-    { "seq_create", test_qes_seq_create, 0, NULL, NULL},
-    { "seq_create_no_qual", test_qes_seq_create_no_qual, 0, NULL, NULL},
-    { "seq_create_no_qual_or_comment", test_qes_seq_create_no_qual_or_comment,
+    { "qes_seq_create", test_qes_seq_create, 0, NULL, NULL},
+    { "qes_seq_create_no_qual", test_qes_seq_create_no_qual, 0, NULL, NULL},
+    { "qes_seq_create_no_qual_or_comment", test_qes_seq_create_no_qual_or_comment,
       0, NULL, NULL},
-    { "seq_ok", test_qes_seq_ok, 0, NULL, NULL},
-    { "seq_ok_no_comment", test_qes_seq_ok_no_comment, 0, NULL, NULL},
-    { "seq_ok_no_qual", test_qes_seq_ok_no_qual, 0, NULL, NULL},
-    { "seq_ok_no_comment_or_qual", test_qes_seq_ok_no_comment_or_qual, 0, NULL, NULL},
-    { "seq_destroy", test_qes_seq_destroy, 0, NULL, NULL},
-    { "seq_fill", test_qes_seq_fill_funcs, 0, NULL, NULL},
+    { "qes_seq_ok", test_qes_seq_ok, 0, NULL, NULL},
+    { "qes_seq_ok_no_comment", test_qes_seq_ok_no_comment, 0, NULL, NULL},
+    { "qes_seq_ok_no_qual", test_qes_seq_ok_no_qual, 0, NULL, NULL},
+    { "qes_seq_ok_no_comment_or_qual", test_qes_seq_ok_no_comment_or_qual, 0, NULL, NULL},
+    { "qes_seq_destroy", test_qes_seq_destroy, 0, NULL, NULL},
+    { "qes_seq_fill", test_qes_seq_fill_funcs, 0, NULL, NULL},
     END_OF_TESTCASES
 };

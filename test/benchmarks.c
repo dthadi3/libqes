@@ -127,7 +127,7 @@ bench_qes_seqfile_par_iter_fq_macro(int silent)
 void
 bench_qes_seqfile_parse_fq(int silent)
 {
-    seq_t *seq = seq_create();
+    struct qes_seq *seq = qes_seq_create();
     struct qes_seqfile *sf = qes_seqfile_create(infile, "r");
     ssize_t res = 0;
     size_t n_recs = 0;
@@ -145,7 +145,7 @@ bench_qes_seqfile_parse_fq(int silent)
         printf("[qes_seqfile_fq] Total seq len %zu\n", seq_len);
     }
     qes_seqfile_destroy(sf);
-    seq_destroy(seq);
+    qes_seq_destroy(seq);
 }
 
 void
@@ -171,17 +171,17 @@ bench_kseq_parse_fq(int silent)
 void
 bench_qes_seqfile_write(int silent)
 {
-    seq_t *seq = seq_create();
+    struct qes_seq *seq = qes_seq_create();
     ssize_t res = 0;
     struct qes_seqfile *sf = NULL;
     char *fname = tmpnam(NULL);
     size_t iii = 0;
 
     /* Make a seq to write */
-    seq_fill_name(seq, "HWI-TEST", 8);
-    seq_fill_comment(seq, "testseq 1 2 3", 13);
-    seq_fill_seq(seq, "ACTCAATT", 8);
-    seq_fill_qual(seq, "IIIIIIII", 8);
+    qes_seq_fill_name(seq, "HWI-TEST", 8);
+    qes_seq_fill_comment(seq, "testseq 1 2 3", 13);
+    qes_seq_fill_seq(seq, "ACTCAATT", 8);
+    qes_seq_fill_qual(seq, "IIIIIIII", 8);
     /* Setup file for writing */
     sf = qes_seqfile_create(fname, "wT");
     qes_seqfile_set_format(sf, FASTQ_FMT);
@@ -192,7 +192,7 @@ bench_qes_seqfile_write(int silent)
         printf("[qes_seqfile_write] Total file len %zu to %s\n", res, fname);
     }
     qes_seqfile_destroy(sf);
-    seq_destroy(seq);
+    qes_seq_destroy(seq);
     remove(fname);
 
 }

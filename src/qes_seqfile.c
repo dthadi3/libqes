@@ -19,7 +19,7 @@
 #include "qes_seqfile.h"
 
 static inline ssize_t
-read_fastq_seqfile(struct qes_seqfile *seqfile, seq_t *seq)
+read_fastq_seqfile(struct qes_seqfile *seqfile, struct qes_seq *seq)
 {
     /* Convenience macro, this happens a lot */
 #define CHECK_AND_TRIM(subrec) if (len < 1) { \
@@ -43,7 +43,7 @@ read_fastq_seqfile(struct qes_seqfile *seqfile, seq_t *seq)
     if (len < 1) {
         goto error;
     }
-    seq_fill_header(seq, seqfile->scratch.s, seqfile->scratch.l);
+    qes_seq_fill_header(seq, seqfile->scratch.s, seqfile->scratch.l);
     /* Fill the actual sequence directly */
     len = qes_file_readline_str(seqfile->qf, &seq->seq);
     CHECK_AND_TRIM(seq->seq)
@@ -77,7 +77,7 @@ error:
 }
 
 static inline ssize_t
-read_fasta_seqfile(struct qes_seqfile *seqfile, seq_t *seq)
+read_fasta_seqfile(struct qes_seqfile *seqfile, struct qes_seq *seq)
 {
     /* Convenience macro, this happens a lot */
 #define CHECK_AND_TRIM(subrec) if (len < 1) { \
@@ -140,9 +140,9 @@ error:
 }
 
 ssize_t
-qes_seqfile_read (struct qes_seqfile *seqfile, seq_t *seq)
+qes_seqfile_read (struct qes_seqfile *seqfile, struct qes_seq *seq)
 {
-    if (!qes_seqfile_ok(seqfile) || !seq_ok(seq)) {
+    if (!qes_seqfile_ok(seqfile) || !qes_seq_ok(seq)) {
         return -2;
     }
     if (seqfile->qf->eof) {
@@ -214,13 +214,13 @@ qes_seqfile_destroy_(struct qes_seqfile *seqfile)
 {
     if (seqfile != NULL) {
         qes_file_close(seqfile->qf);
-        destroy_str_cp(&seqfile->scratch);
+        qes_str_destroy_cp(&seqfile->scratch);
         qes_free(seqfile);
     }
 }
 
 size_t
-qes_seqfile_format_seq(const seq_t *seq, enum qes_seqfile_format fmt,
+qes_seqfile_format_seq(const struct qes_seq *seq, enum qes_seqfile_format fmt,
                        char *buffer, size_t maxlen)
 {
     size_t len = 0;
@@ -229,7 +229,7 @@ qes_seqfile_format_seq(const seq_t *seq, enum qes_seqfile_format fmt,
     }
     switch (fmt) {
         case FASTQ_FMT:
-            if (!seq_ok(seq)) {
+            if (!qes_seq_ok(seq)) {
                 buffer[0] = '\0';
                 return 0;
             }
@@ -241,7 +241,7 @@ qes_seqfile_format_seq(const seq_t *seq, enum qes_seqfile_format fmt,
             return len;
             break;
         case FASTA_FMT:
-            if (!seq_ok_no_qual(seq)) {
+            if (!qes_seq_ok_no_qual(seq)) {
                 buffer[0] = '\0';
                 return 0;
             }
@@ -258,7 +258,7 @@ qes_seqfile_format_seq(const seq_t *seq, enum qes_seqfile_format fmt,
 
 
 ssize_t
-qes_seqfile_write (struct qes_seqfile *seqfile, seq_t *seq)
+qes_seqfile_write (struct qes_seqfile *seqfile, struct qes_seq *seq)
 {
 #define sf_putc_check(c) ret = QES_ZFPUTC(seqfile->qf->fp, c);                  \
     if (ret != c) {return -2;}                                              \
@@ -272,14 +272,14 @@ qes_seqfile_write (struct qes_seqfile *seqfile, seq_t *seq)
     int ret = 0;
     ssize_t res_len = 0;
 
-    if (!qes_seqfile_ok(seqfile) || !seq_ok(seq)) {
+    if (!qes_seqfile_ok(seqfile) || !qes_seq_ok(seq)) {
         return -2;
     }
     switch (seqfile->format) {
         case FASTA_FMT:
             sf_putc_check(FASTA_DELIM);
             sf_puts_check(seq->name.s);
-            if (seq_has_comment(seq)) {
+            if (qes_seq_has_comment(seq)) {
                 sf_putc_check(' ');
                 sf_puts_check(seq->comment.s);
             }
@@ -290,14 +290,14 @@ qes_seqfile_write (struct qes_seqfile *seqfile, seq_t *seq)
         case FASTQ_FMT:
             sf_putc_check(FASTQ_DELIM);
             sf_puts_check(seq->name.s);
-            if (seq_has_comment(seq)) {
+            if (qes_seq_has_comment(seq)) {
                 sf_putc_check(' ');
                 sf_puts_check(seq->comment.s);
             }
             sf_putc_check('\n');
             sf_puts_check(seq->seq.s);
             sf_putc_check('\n');
-            if (seq_has_qual(seq)) {
+            if (qes_seq_has_qual(seq)) {
                 sf_putc_check('+');
                 sf_putc_check('\n');
                 sf_puts_check(seq->qual.s);

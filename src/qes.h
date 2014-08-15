@@ -27,6 +27,6 @@
 #include <qes_sequtil.h>
 #include <qes_str.h>
 #include <qes_util.h>
-#include <qes_zfile.h>
+#include <qes_file.h>
 
 #endif /* LIBQES_H */

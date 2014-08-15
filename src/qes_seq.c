@@ -19,10 +19,10 @@
 
 #include "qes_seq.h"
 
-seq_t *
-seq_create (void)
+struct qes_seq *
+qes_seq_create (void)
 {
-    seq_t *seq = qes_malloc(sizeof(*seq));
+    struct qes_seq *seq = qes_malloc(sizeof(*seq));
 
     qes_str_init(&seq->name, __INIT_LINE_LEN);
     qes_str_init(&seq->comment, __INIT_LINE_LEN);
@@ -31,10 +31,10 @@ seq_create (void)
     return seq;
 }
 
-seq_t *
-seq_create_no_qual (void)
+struct qes_seq *
+qes_seq_create_no_qual (void)
 {
-    seq_t *seq = qes_malloc(sizeof(*seq));
+    struct qes_seq *seq = qes_malloc(sizeof(*seq));
 
     qes_str_init(&seq->name, __INIT_LINE_LEN);
     qes_str_init(&seq->comment, __INIT_LINE_LEN);
@@ -45,10 +45,10 @@ seq_create_no_qual (void)
     return seq;
 }
 
-seq_t *
-seq_create_no_qual_or_comment (void)
+struct qes_seq *
+qes_seq_create_no_qual_or_comment (void)
 {
-    seq_t *seq = qes_malloc(sizeof(*seq));
+    struct qes_seq *seq = qes_malloc(sizeof(*seq));
     qes_str_init(&seq->name, __INIT_LINE_LEN);
     qes_str_init(&seq->seq, __INIT_LINE_LEN);
     seq->qual.m = 0;
@@ -62,47 +62,47 @@ seq_create_no_qual_or_comment (void)
 
 
 inline int
-seq_fill_name (seq_t *seqobj, const char *name, size_t len)
+qes_seq_fill_name (struct qes_seq *seqobj, const char *name, size_t len)
 {
     if (seqobj == NULL || name == NULL || len < 1) {
         return 0;
     }
-    str_fill_charptr(&seqobj->name, name, len);
+    qes_str_fill_charptr(&seqobj->name, name, len);
     return 1;
 }
 
 inline int
-seq_fill_comment (seq_t *seqobj, const char *comment, size_t len)
+qes_seq_fill_comment (struct qes_seq *seqobj, const char *comment, size_t len)
 {
     if (seqobj == NULL || comment == NULL || len < 1) {
         return 0;
     }
-    str_fill_charptr(&seqobj->comment, comment, len);
+    qes_str_fill_charptr(&seqobj->comment, comment, len);
     return 1;
 }
 
 inline int
-seq_fill_seq (seq_t *seqobj, const char *seq, size_t len)
+qes_seq_fill_seq (struct qes_seq *seqobj, const char *seq, size_t len)
 {
     if (seqobj == NULL || seq == NULL || len < 1) {
         return 0;
     }
-    str_fill_charptr(&seqobj->seq, seq, len);
+    qes_str_fill_charptr(&seqobj->seq, seq, len);
     return 1;
 }
 
 inline int
-seq_fill_qual (seq_t *seqobj, const char *qual, size_t len)
+qes_seq_fill_qual (struct qes_seq *seqobj, const char *qual, size_t len)
 {
     if (seqobj == NULL || qual == NULL || len < 1) {
         return 0;
     }
-    str_fill_charptr(&seqobj->qual, qual, len);
+    qes_str_fill_charptr(&seqobj->qual, qual, len);
     return 1;
 }
 
 inline int
-seq_fill_header (seq_t *seqobj, char *header, size_t len)
+qes_seq_fill_header (struct qes_seq *seqobj, char *header, size_t len)
 {
     char *tmp = NULL;
     size_t startfrom = 0;
@@ -116,30 +116,30 @@ seq_fill_header (seq_t *seqobj, char *header, size_t len)
     tmp = memchr(header, ' ', len);
     startfrom = header[0] == '@' || header[0] == '>' ? 1 : 0;
     if (tmp != NULL) {
-        str_fill_charptr(&seqobj->name, header + startfrom,
+        qes_str_fill_charptr(&seqobj->name, header + startfrom,
                 tmp - header - startfrom);
-        str_fill_charptr(&seqobj->comment, tmp + 1, 0);
+        qes_str_fill_charptr(&seqobj->comment, tmp + 1, 0);
     } else {
-        str_fill_charptr(&seqobj->name, header + startfrom, len - startfrom);
+        qes_str_fill_charptr(&seqobj->name, header + startfrom, len - startfrom);
         qes_str_nullify(&seqobj->comment);
     }
     return 1;
 }
 
 /*===  FUNCTION  ============================================================*
-Name:           seq_destroy
-Paramters:      seq_t *: seq to destroy.
-Description:    Deallocate and set to NULL a seq_t on the heap.
+Name:           qes_seq_destroy
+Paramters:      struct qes_seq *: seq to destroy.
+Description:    Deallocate and set to NULL a struct qes_seq on the heap.
 Returns:        void.
  *===========================================================================*/
 void
-seq_destroy_ (seq_t *seq)
+qes_seq_destroy_ (struct qes_seq *seq)
 {
     if (seq != NULL) {
-        destroy_str_cp(&seq->name);
-        destroy_str_cp(&seq->comment);
-        destroy_str_cp(&seq->seq);
-        destroy_str_cp(&seq->qual);
+        qes_str_destroy_cp(&seq->name);
+        qes_str_destroy_cp(&seq->comment);
+        qes_str_destroy_cp(&seq->seq);
+        qes_str_destroy_cp(&seq->qual);
         qes_free(seq);
     }
 }

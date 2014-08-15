@@ -90,11 +90,11 @@ enum qes_seqfile_format qes_seqfile_guess_format(struct qes_seqfile *file);
 void qes_seqfile_set_format (struct qes_seqfile *file,
                              enum qes_seqfile_format format);
 
-ssize_t qes_seqfile_read (struct qes_seqfile *file, seq_t *seq);
+ssize_t qes_seqfile_read (struct qes_seqfile *file, struct qes_seq *seq);
 
-ssize_t qes_seqfile_write (struct qes_seqfile *file, seq_t *seq);
+ssize_t qes_seqfile_write (struct qes_seqfile *file, struct qes_seq *seq);
 
-size_t qes_seqfile_format_seq(const seq_t *seq, enum qes_seqfile_format fmt,
+size_t qes_seqfile_format_seq(const struct qes_seq *seq, enum qes_seqfile_format fmt,
         char *buffer, size_t maxlen);
 
 void qes_seqfile_destroy_(struct qes_seqfile *seqfile);
@@ -107,7 +107,7 @@ void qes_seqfile_destroy_(struct qes_seqfile *seqfile);
 #define QES_SEQFILE_ITER_PARALLEL_SINGLE_BEGIN(fle, sq, ln, opts)               \
     _Pragma(STRINGIFY(omp parallel shared(fle) opts default(none)))         \
     {                                                                       \
-        seq_t *sq = seq_create();                                           \
+        struct qes_seq *sq = qes_seq_create();                                           \
         ssize_t ln = 0;                                                     \
         while(1) {                                                          \
             _Pragma(STRINGIFY(omp critical))                                \
@@ -120,14 +120,14 @@ void qes_seqfile_destroy_(struct qes_seqfile *seqfile);
 
 #define QES_SEQFILE_ITER_PARALLEL_SINGLE_END(sq)                                \
         }                                                                   \
-        seq_destroy(sq);                                                    \
+        qes_seq_destroy(sq);                                                    \
     }
 
 #define QES_SEQFILE_ITER_PARALLEL_PAIRED_BEGIN(fle1, fle2, sq1, sq2, ln1, ln2, opts)\
     _Pragma(STRINGIFY(omp parallel shared(fle1, fle2) opts default(none)))  \
     {                                                                       \
-        seq_t *sq1 = seq_create();                                          \
-        seq_t *sq2 = seq_create();                                          \
+        struct qes_seq *sq1 = qes_seq_create();                                          \
+        struct qes_seq *sq2 = qes_seq_create();                                          \
         ssize_t ln1 = 0;                                                    \
         ssize_t ln2 = 0;                                                    \
         while(1) {                                                          \
@@ -142,15 +142,15 @@ void qes_seqfile_destroy_(struct qes_seqfile *seqfile);
 
 #define QES_SEQFILE_ITER_PARALLEL_PAIRED_END(sq1, sq2)                          \
         }                                                                   \
-        seq_destroy(sq1);                                                   \
-        seq_destroy(sq2);                                                   \
+        qes_seq_destroy(sq1);                                                   \
+        qes_seq_destroy(sq2);                                                   \
     }
 
 #define QES_SEQFILE_ITER_PARALLEL_INTERLEAVED_BEGIN(fle, sq1, sq2, ln1, ln2, opts)\
     _Pragma(STRINGIFY(omp parallel shared(fle) opts default(none)))         \
     {                                                                       \
-        seq_t *sq1 = seq_create();                                          \
-        seq_t *sq2 = seq_create();                                          \
+        struct qes_seq *sq1 = qes_seq_create();                                          \
+        struct qes_seq *sq2 = qes_seq_create();                                          \
         ssize_t ln1 = 0;                                                    \
         ssize_t ln2 = 0;                                                    \
         while(1) {                                                          \
@@ -165,15 +165,15 @@ void qes_seqfile_destroy_(struct qes_seqfile *seqfile);
 
 #define QES_SEQFILE_ITER_PARALLEL_INTERLEAVED_END(sq1, sq2)                     \
         }                                                                   \
-        seq_destroy(sq1);                                                   \
-        seq_destroy(sq2);                                                   \
+        qes_seq_destroy(sq1);                                                   \
+        qes_seq_destroy(sq2);                                                   \
     }
 
 #endif /* LIBQES_NO_OPENMP */
 
 #define QES_SEQFILE_ITER_SINGLE_BEGIN(fle, sq, ln)                              \
     {                                                                       \
-        seq_t *sq = seq_create();                                           \
+        struct qes_seq *sq = qes_seq_create();                                           \
         /* TODO MUSTFIX check for null sq */                                \
         ssize_t ln = 0;                                                     \
         while(1) {                                                          \
@@ -184,13 +184,13 @@ void qes_seqfile_destroy_(struct qes_seqfile *seqfile);
 
 #define QES_SEQFILE_ITER_SINGLE_END(sq)                                         \
         }                                                                   \
-        seq_destroy(sq);                                                    \
+        qes_seq_destroy(sq);                                                    \
     }
 
 #define QES_SEQFILE_ITER_PAIRED_BEGIN(fle1, fle2, sq1, sq2, ln1, ln2)           \
     {                                                                       \
-        seq_t *sq1 = seq_create();                                          \
-        seq_t *sq2 = seq_create();                                          \
+        struct qes_seq *sq1 = qes_seq_create();                                          \
+        struct qes_seq *sq2 = qes_seq_create();                                          \
         ssize_t ln1 = 0;                                                    \
         ssize_t ln2 = 0;                                                    \
         while(1) {                                                          \
@@ -202,14 +202,14 @@ void qes_seqfile_destroy_(struct qes_seqfile *seqfile);
 
 #define QES_SEQFILE_ITER_PAIRED_END(sq1, sq2)                                   \
         }                                                                   \
-        seq_destroy(sq1);                                                   \
-        seq_destroy(sq2);                                                   \
+        qes_seq_destroy(sq1);                                                   \
+        qes_seq_destroy(sq2);                                                   \
     }
 
 #define QES_SEQFILE_ITER_INTERLEAVED_BEGIN(fle, sq1, sq2, ln1, ln2)             \
     {                                                                       \
-        seq_t *sq1 = seq_create();                                          \
-        seq_t *sq2 = seq_create();                                          \
+        struct qes_seq *sq1 = qes_seq_create();                                          \
+        struct qes_seq *sq2 = qes_seq_create();                                          \
         ssize_t ln1 = 0;                                                    \
         ssize_t ln2 = 0;                                                    \
         while(1) {                                                          \
@@ -221,8 +221,8 @@ void qes_seqfile_destroy_(struct qes_seqfile *seqfile);
 
 #define QES_SEQFILE_ITER_INTERLEAVED_END(sq1, sq2)                              \
         }                                                                   \
-        seq_destroy(sq1);                                                   \
-        seq_destroy(sq2);                                                   \
+        qes_seq_destroy(sq1);                                                   \
+        qes_seq_destroy(sq2);                                                   \
     }
 
 #endif /* QES_SEQFILE_H */
