@@ -305,6 +305,7 @@ qes_seqfile_write (struct qes_seqfile *seqfile, struct qes_seq *seq)
 
             }
             break;
+        case UNKNOWN_FMT:
         default:
             return -2;
             break;
