@@ -88,6 +88,7 @@ read_fasta_seqfile(struct qes_seqfile *seqfile, struct qes_seq *seq)
         }
     ssize_t len = 0;
     int next = '\0';
+
     /* This bit is basically a copy-paste from above */
     /* Fast-forward past the delimiter '>', ensuring it exists */
     next = qes_file_getc(seqfile->qf);
@@ -97,13 +98,11 @@ read_fasta_seqfile(struct qes_seqfile *seqfile, struct qes_seq *seq)
         /* This ain't a fasta! WTF! */
         goto error;
     }
-    /* Get until the first space, which is the seq name */
-    len = qes_file_getuntil_realloc(seqfile->qf, ' ', &seq->name.s, &seq->name.m);
-    CHECK_AND_TRIM(seq->name)
-    /* Fill the comment, from first space to EOL */
-    len = qes_file_readline_realloc(seqfile->qf, &seq->comment.s, &seq->comment.m);
-    CHECK_AND_TRIM(seq->comment)
-    /* End fastq parser copypaste */
+    len = qes_file_readline_str(seqfile->qf, &seqfile->scratch);
+    if (len < 1) {
+        goto error;
+    }
+    qes_seq_fill_header(seq, seqfile->scratch.s, seqfile->scratch.l);
     /* we need to nullify seq, as we rely on seq.l being 0 as we enter this
      *  while loop */
     qes_str_nullify(&seq->seq);

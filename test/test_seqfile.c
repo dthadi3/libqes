@@ -198,6 +198,21 @@ test_qes_seqfile_read (void *ptr)
     (void) ptr;
     /* Test file opening for reading */
     CHECK_SEQFILE_READ("test.fastq", first_fastq_len, CHECK_SEQ_FIRST);
+    CHECK_SEQFILE_READ("test.fasta", 33,
+        tt_str_op(seq->name.s, ==, "HWI-ST960:105:D10GVACXX:2:1101:1122:2186");
+        tt_str_op(seq->comment.s, ==, "1:N:0: bcd:RPI8 seq:CACACTTGAATC");
+        tt_str_op(seq->seq.s, ==, "CACACTTGAATCCAGTTTAAAGTTAACTCATTG");
+        tt_int_op(seq->qual.l, ==, 0);
+        tt_str_op(seq->qual.s, ==, "")
+        );
+    CHECK_SEQFILE_READ("nocomment.fasta", 33,
+        tt_str_op(seq->name.s, ==, "HWI-ST960:105:D10GVACXX:2:1101:1122:2186");
+        tt_int_op(seq->comment.l, ==, 0);
+        tt_str_op(seq->comment.s, ==, "");
+        tt_str_op(seq->seq.s, ==, "CACACTTGAATCCAGTTTAAAGTTAACTCATTG");
+        tt_int_op(seq->qual.l, ==, 0);
+        tt_str_op(seq->qual.s, ==, "")
+        );
     /* Test with bad fastqs, ensure all code paths are taken */
     CHECK_SEQFILE_READ("loremipsum.txt", -2, CHECK_SEQ_EMPTY);
     CHECK_SEQFILE_READ("bad_nohdr.fastq", -2, CHECK_SEQ_EMPTY);
