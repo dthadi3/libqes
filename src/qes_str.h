@@ -99,9 +99,26 @@ qes_str_fill_charptr (struct qes_str *str, const char *cp, size_t len)
 Name:           qes_str_nullify
 Paramters:      struct qes_str *str: `struct qes_str` to nullify.
 Description:    Invalidates a `struct qes_str` without freeing the `char []`.
-Returns:        int: True or False, indicating success or failure.
+Returns:        int: 0 on success, otherwise 1.
  *===========================================================================*/
-extern int qes_str_nullify(struct qes_str *str);
+static inline int
+qes_str_nullify (struct qes_str *str)
+{
+    if (!qes_str_ok(str)) return 1;
+    str->s[0] = '\0';
+    str->l = 0;
+    return 0;
+}
+
+static inline int
+qes_str_copy (struct qes_str *dest, const struct qes_str *src)
+{
+    if (!qes_str_ok(src) || dest == NULL) return 1;
+    if (!qes_str_ok(dest)) qes_str_init(dest, src->m);
+    memcpy(dest->s, src->s, src->m);
+    return 0;
+}
+
 
 extern void qes_str_print (const struct qes_str *str, FILE *stream);
 

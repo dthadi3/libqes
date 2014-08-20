@@ -12,7 +12,6 @@
  *       Compiler:  gcc, clang
  *
  *         Author:  Kevin Murray, spam@kdmurray.id.au
- *                                [include word penguin in subject]
  *
  * ============================================================================
  */
@@ -124,6 +123,21 @@ qes_seq_fill_header (struct qes_seq *seqobj, char *header, size_t len)
         qes_str_nullify(&seqobj->comment);
     }
     return 1;
+}
+
+inline int
+qes_seq_fill(struct qes_seq *seqobj, const char *name, const char *comment,
+             const char *seq, const char *qual)
+{
+    if (!qes_seq_ok(seqobj) || name == NULL || comment == NULL || seq == NULL \
+            || qual == NULL) {
+        return 1;
+    }
+    if (qes_seq_fill_name(seqobj, name, 0) != 0) return 1;
+    if (qes_seq_fill_comment(seqobj, comment, 0) != 0) return 1;
+    if (qes_seq_fill_seq(seqobj, seq, 0) != 0) return 1;
+    if (qes_seq_fill_qual(seqobj, qual, 0) != 0) return 1;
+    return 0;
 }
 
 /*===  FUNCTION  ============================================================*

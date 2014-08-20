@@ -133,19 +133,24 @@ extern int qes_seq_fill_header(struct qes_seq *seqobj, char *header, size_t len)
 
 /*===  FUNCTION  ============================================================*
 Name:           qes_seq_fill_X
-Paramters:      These functions take a ``struct qes_seq``, a char array and the length
-                of the char array as a size_t.
-Description:    Fill a struct qes_seq's name, comment, seq or qual member from a char
-                array. If a non-zero value is given to ``len``, it is assumed
-                to be the length of the string, otherwise the length of the
-                string is calculated using strlen.
+Paramters:      These functions take a ``struct qes_seq``, a char array and
+                the length of the char array as a size_t.
+Description:    Fill a struct qes_seq's name, comment, seq or qual member from
+                a char array. If a non-zero value is given to ``len``, it is
+                assumed to be the length of the string, otherwise the length of
+                the string is calculated using strlen.
 Returns:        int: 1 on success, 0 on failure.
  *===========================================================================*/
-extern int qes_seq_fill_seq(struct qes_seq *seqobj, const char *seq, size_t len);
-extern int qes_seq_fill_qual(struct qes_seq *seqobj, const char *qual, size_t len);
-extern int qes_seq_fill_name(struct qes_seq *seqobj, const char *name, size_t len);
-extern int qes_seq_fill_comment(struct qes_seq *seqobj, const char *comment, size_t len);
-
+extern int qes_seq_fill_name(struct qes_seq *seqobj, const char *name,
+                             size_t len);
+extern int qes_seq_fill_comment(struct qes_seq *seqobj, const char *comment,
+                                size_t len);
+extern int qes_seq_fill_seq(struct qes_seq *seqobj, const char *seq,
+                            size_t len);
+extern int qes_seq_fill_qual(struct qes_seq *seqobj, const char *qual,
+                             size_t len);
+extern int qes_seq_fill(struct qes_seq *seqobj, const char *name,
+                        const char *comment, const char *seq, const char *qual);
 
 #if 0
 /*===  FUNCTION  ============================================================*
@@ -172,5 +177,16 @@ void qes_seq_destroy_(struct qes_seq *seq);
             seq = NULL;             \
         } while(0)
 
+static inline int
+qes_seq_copy(struct qes_seq *dest, const struct qes_seq *src)
+{
+    if (!qes_seq_ok(dest) || !qes_seq_ok(src)) return 1;
+
+    qes_str_copy(&dest->name, &src->name);
+    qes_str_copy(&dest->comment, &src->comment);
+    qes_str_copy(&dest->seq, &src->seq);
+    qes_str_copy(&dest->qual, &src->qual);
+    return 0;
+}
 
 #endif /* QES_SEQ_H */

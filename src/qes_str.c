@@ -18,7 +18,7 @@
 
 #include "qes_str.h"
 
-inline void
+void
 qes_str_print (const struct qes_str *str, FILE *stream)
 {
     if (qes_likely(qes_str_ok(str))) {
@@ -26,25 +26,16 @@ qes_str_print (const struct qes_str *str, FILE *stream)
     }
 }
 
-inline void
+void
 qes_str_destroy_cp (struct qes_str *str)
 {
     if (qes_unlikely(str != NULL)) qes_free(str->s);
 }
 
-inline void
+void
 qes_str_destroy (struct qes_str *str)
 {
     qes_str_destroy_cp(str);
     qes_free(str);
-}
-
-inline int
-qes_str_nullify (struct qes_str *str)
-{
-    if (qes_unlikely(str == NULL)) return 0;
-    str->s[0] = '\0';
-    str->l = 0;
-    return 1;
 }
 
