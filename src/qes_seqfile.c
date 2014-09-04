@@ -30,6 +30,7 @@ read_fastq_seqfile(struct qes_seqfile *seqfile, struct qes_seq *seq)
         }
     ssize_t len = 0;
     int next = '\0';
+    int errcode = -1;
 
     /* Fast-forward past the delimiter '@', ensuring it exists */
     next = qes_file_getc(seqfile->qf);
@@ -37,31 +38,39 @@ read_fastq_seqfile(struct qes_seqfile *seqfile, struct qes_seq *seq)
         return EOF;
     } else if (next != FASTQ_DELIM) {
         /* This ain't a fastq! WTF! */
+        errcode = -2;
         goto error;
     }
     len = qes_file_readline_str(seqfile->qf, &seqfile->scratch);
     if (len < 1) {
+        /* Weird truncated file */
+        errcode = -3;
         goto error;
     }
     qes_seq_fill_header(seq, seqfile->scratch.s, seqfile->scratch.l);
     /* Fill the actual sequence directly */
     len = qes_file_readline_str(seqfile->qf, &seq->seq);
+    errcode = -4;
     CHECK_AND_TRIM(seq->seq)
     /* read the qual header, but don't store it. */
     next = qes_file_getc(seqfile->qf);
     if (next != FASTQ_QUAL_DELIM) {
+        errcode = -5;
         goto error;
     }
     while ((next = qes_file_getc(seqfile->qf)) != '\n') {
         if (next == EOF) {
+            errcode = -6;
             goto error;
         }
     }
     /* Fill the qual score string directly */
     len = qes_file_readline_str(seqfile->qf, &seq->qual);
+    errcode = -7;
     CHECK_AND_TRIM(seq->qual)
     if ((size_t)len != seq->seq.l) {
         /* Error out on different len qual/seq entries */
+        errcode = -8;
         goto error;
     }
     /* return seq/qual len */
@@ -72,7 +81,7 @@ error:
     qes_str_nullify(&seq->comment);
     qes_str_nullify(&seq->seq);
     qes_str_nullify(&seq->qual);
-    return -2;
+    return errcode;
 #undef CHECK_AND_TRIM
 }
 
