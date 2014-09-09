@@ -101,8 +101,8 @@ SET(WEXTRA_FLAGS "${WEXTRA_FLAGS} -Wstrict-overflow=1 -Wextra -Warray-bounds -Wa
 
 SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=gnu99")
 SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${WEXTRA_FLAGS}")
-SET(CMAKE_C_FLAGS_DEBUG "-ggdb")
-SET(CMAKE_C_FLAGS_RELEASE "-O3")
+SET(CMAKE_C_FLAGS_DEBUG "-ggdb -march=native")
+SET(CMAKE_C_FLAGS_RELEASE "-O3 -march=native")
 # Coverage target set in CodeCoverage.cmake
 
 # Set include dirs
