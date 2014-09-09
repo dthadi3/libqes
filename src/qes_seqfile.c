@@ -38,7 +38,7 @@ read_fastq_seqfile(struct qes_seqfile *seqfile, struct qes_seq *seq)
         return EOF;
     } else if (next != FASTQ_DELIM) {
         /* This ain't a fastq! WTF! */
-        errcode = -2;
+        errcode = -3;
         goto error;
     }
     len = qes_file_readline_str(seqfile->qf, &seqfile->scratch);
@@ -60,17 +60,17 @@ read_fastq_seqfile(struct qes_seqfile *seqfile, struct qes_seq *seq)
     }
     while ((next = qes_file_getc(seqfile->qf)) != '\n') {
         if (next == EOF) {
-            errcode = -6;
+            errcode = -5;
             goto error;
         }
     }
     /* Fill the qual score string directly */
     len = qes_file_readline_str(seqfile->qf, &seq->qual);
-    errcode = -7;
+    errcode = -6;
     CHECK_AND_TRIM(seq->qual)
     if ((size_t)len != seq->seq.l) {
         /* Error out on different len qual/seq entries */
-        errcode = -8;
+        errcode = -7;
         goto error;
     }
     /* return seq/qual len */
