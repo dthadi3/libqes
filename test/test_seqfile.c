@@ -217,12 +217,12 @@ test_qes_seqfile_read (void *ptr)
     CHECK_SEQFILE_READ("loremipsum.txt", -2, CHECK_SEQ_EMPTY);
     CHECK_SEQFILE_READ("bad_nohdr.fastq", -2, CHECK_SEQ_EMPTY);
     CHECK_SEQFILE_READ("loremipsum.txt", -2, CHECK_SEQ_EMPTY);
-    CHECK_SEQFILE_READ_FORCE("loremipsum.txt", -2, CHECK_SEQ_EMPTY);
+    CHECK_SEQFILE_READ_FORCE("loremipsum.txt", -3, CHECK_SEQ_EMPTY);
     CHECK_SEQFILE_READ("empty.fastq", -3, CHECK_SEQ_EMPTY);
-    CHECK_SEQFILE_READ("bad_noqual.fastq", -7, CHECK_SEQ_EMPTY);
+    CHECK_SEQFILE_READ("bad_noqual.fastq", -6, CHECK_SEQ_EMPTY);
     CHECK_SEQFILE_READ("bad_noqualhdrchr.fastq", -5, CHECK_SEQ_EMPTY);
-    CHECK_SEQFILE_READ("bad_noqualhdreol.fastq", -6, CHECK_SEQ_EMPTY);
-    CHECK_SEQFILE_READ("bad_diff_lens.fastq", -8, CHECK_SEQ_EMPTY);
+    CHECK_SEQFILE_READ("bad_noqualhdreol.fastq", -5, CHECK_SEQ_EMPTY);
+    CHECK_SEQFILE_READ("bad_diff_lens.fastq", -7, CHECK_SEQ_EMPTY);
     /* Check with bad params that it returns -2 */
     res = qes_seqfile_read(NULL, seq);
     tt_int_op(res, ==, -2);

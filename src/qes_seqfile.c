@@ -53,17 +53,17 @@ read_fastq_seqfile(struct qes_seqfile *seqfile, struct qes_seq *seq)
     errcode = -4;
     CHECK_AND_TRIM(seq->seq)
     /* read the qual header, but don't store it. */
+    errcode = -5;
     next = qes_file_getc(seqfile->qf);
     if (next != FASTQ_QUAL_DELIM) {
-        errcode = -5;
         goto error;
     }
     while ((next = qes_file_getc(seqfile->qf)) != '\n') {
         if (next == EOF) {
-            errcode = -5;
             goto error;
         }
     }
+    if (next != '\n') goto error;
     /* Fill the qual score string directly */
     len = qes_file_readline_str(seqfile->qf, &seq->qual);
     errcode = -6;
