@@ -92,6 +92,7 @@ void test_qes_seq_ok_no_qual (void *);
 void test_qes_seq_ok_no_comment_or_qual (void *);
 void test_qes_seq_destroy (void *);
 void test_qes_seq_fill_funcs(void *);
+void test_qes_seq_copy(void *);
 extern struct testcase_t qes_seq_tests[];
 
 /* test_sequtil tests */

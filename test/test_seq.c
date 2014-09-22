@@ -292,13 +292,41 @@ end:
 }
 
 void
+test_qes_seq_copy(void *ptr)
+{
+    struct qes_seq *seq = NULL;
+    struct qes_seq *copy = NULL;
+    int res = 1;
+
+    (void) ptr;
+    seq = qes_seq_create();
+    copy = qes_seq_create();
+    res = qes_seq_fill(seq, "TEST", "Comment 1", "AGCT", "IIII");
+    tt_int_op(res, ==, 0);
+    tt_str_op(seq->name.s, ==, "TEST");
+    tt_str_op(seq->comment.s, ==, "Comment 1");
+    tt_str_op(seq->seq.s, ==, "AGCT");
+    tt_str_op(seq->qual.s, ==, "IIII");
+    res = qes_seq_copy(copy, seq);
+    tt_int_op(res, ==, 0);
+    tt_str_op(copy->name.s, ==, "TEST");
+    tt_str_op(copy->comment.s, ==, "Comment 1");
+    tt_str_op(copy->seq.s, ==, "AGCT");
+    tt_str_op(copy->qual.s, ==, "IIII");
+
+end:
+    qes_seq_destroy(seq);
+    qes_seq_destroy(copy);
+}
+
+void
 test_qes_seq_fill_funcs(void *ptr)
 {
 #define CHECK_FILLING(submember, str, len)          \
     seq = qes_seq_create();                             \
     tt_str_op(seq->submember.s, ==, "");            \
     res = qes_seq_fill_ ##submember (seq, str, len);    \
-    tt_int_op(res, ==, 1);                          \
+    tt_int_op(res, ==, 0);                          \
     tt_str_op(seq->submember.s, ==, str);           \
     tt_int_op(seq->submember.l, ==, len);           \
     tt_int_op(seq->submember.m, >=, len);           \
@@ -307,7 +335,7 @@ test_qes_seq_fill_funcs(void *ptr)
     seq = qes_seq_create();                             \
     tt_str_op(seq->submember.s, ==, "");            \
     res = qes_seq_fill_ ##submember (seq, str, len);    \
-    tt_int_op(res, ==, 0);                          \
+    tt_int_op(res, ==, 1);                          \
     tt_str_op(seq->submember.s, ==, "");            \
     tt_int_op(seq->submember.l, ==, 0);             \
     qes_seq_destroy(seq);
@@ -331,10 +359,10 @@ test_qes_seq_fill_funcs(void *ptr)
     CHECK_FILLING_FAIL(seq, "BAD", 0)
     CHECK_FILLING_FAIL(qual, NULL, 1)
     CHECK_FILLING_FAIL(qual, "BAD", 0)
-    tt_int_op(qes_seq_fill_name(NULL, "BAD", 3), ==, 0);
-    tt_int_op(qes_seq_fill_comment(NULL, "BAD", 3), ==, 0);
-    tt_int_op(qes_seq_fill_seq(NULL, "BAD", 3), ==, 0);
-    tt_int_op(qes_seq_fill_qual(NULL, "BAD", 3), ==, 0);
+    tt_int_op(qes_seq_fill_name(NULL, "BAD", 3), ==, 1);
+    tt_int_op(qes_seq_fill_comment(NULL, "BAD", 3), ==, 1);
+    tt_int_op(qes_seq_fill_seq(NULL, "BAD", 3), ==, 1);
+    tt_int_op(qes_seq_fill_qual(NULL, "BAD", 3), ==, 1);
 
     /* Fill header */
 #define CHECK_FILL_HEADER(str, len, nm, nmlen, com, comlen)     \
@@ -343,7 +371,7 @@ test_qes_seq_fill_funcs(void *ptr)
     tt_str_op(seq->name.s, ==, "");                             \
     tt_str_op(seq->comment.s, ==, "");                          \
     res = qes_seq_fill_header(seq, tmp, len);                       \
-    tt_int_op(res, ==, 1);                                      \
+    tt_int_op(res, ==, 0);                                      \
     tt_str_op(seq->name.s, ==, nm);                             \
     tt_int_op(seq->name.l, ==, nmlen);                          \
     tt_int_op(seq->name.m, >=, nmlen);                          \
@@ -354,6 +382,7 @@ test_qes_seq_fill_funcs(void *ptr)
     free(tmp);                                                  \
     tmp = NULL;
     CHECK_FILL_HEADER("@HWI_TEST COMM\n", 15, "HWI_TEST", 8, "COMM", 4)
+    CHECK_FILL_HEADER("@HWI_TEST COMM\n", 0, "HWI_TEST", 8, "COMM", 4)
     CHECK_FILL_HEADER("@HWI_TEST COMM \r\n", 17, "HWI_TEST", 8, "COMM", 4)
     CHECK_FILL_HEADER("@HWI_TEST COMM", 14, "HWI_TEST", 8, "COMM", 4)
     CHECK_FILL_HEADER(">HWI_TEST COMM", 14, "HWI_TEST", 8, "COMM", 4)
@@ -364,9 +393,8 @@ test_qes_seq_fill_funcs(void *ptr)
     /* Check bad values */
     seq = qes_seq_create();
     tmp = strdup("BAD");
-    tt_int_op(qes_seq_fill_header(NULL, tmp, 3), ==, 0);
-    tt_int_op(qes_seq_fill_header(seq, NULL, 3), ==, 0);
-    tt_int_op(qes_seq_fill_header(seq, tmp, 0), ==, 0);
+    tt_int_op(qes_seq_fill_header(NULL, tmp, 3), ==, 1);
+    tt_int_op(qes_seq_fill_header(seq, NULL, 3), ==, 1);
     qes_seq_destroy(seq);
 end:
     if (tmp != NULL) {
@@ -390,5 +418,6 @@ struct testcase_t qes_seq_tests[] = {
     { "qes_seq_ok_no_comment_or_qual", test_qes_seq_ok_no_comment_or_qual, 0, NULL, NULL},
     { "qes_seq_destroy", test_qes_seq_destroy, 0, NULL, NULL},
     { "qes_seq_fill", test_qes_seq_fill_funcs, 0, NULL, NULL},
+    { "qes_seq_copy", test_qes_seq_copy, 0, NULL, NULL},
     END_OF_TESTCASES
 };
