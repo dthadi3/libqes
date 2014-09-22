@@ -64,40 +64,40 @@ inline int
 qes_seq_fill_name (struct qes_seq *seqobj, const char *name, size_t len)
 {
     if (seqobj == NULL || name == NULL || len < 1) {
-        return 0;
+        return 1;
     }
     qes_str_fill_charptr(&seqobj->name, name, len);
-    return 1;
+    return 0;
 }
 
 inline int
 qes_seq_fill_comment (struct qes_seq *seqobj, const char *comment, size_t len)
 {
     if (seqobj == NULL || comment == NULL || len < 1) {
-        return 0;
+        return 1;
     }
     qes_str_fill_charptr(&seqobj->comment, comment, len);
-    return 1;
+    return 0;
 }
 
 inline int
 qes_seq_fill_seq (struct qes_seq *seqobj, const char *seq, size_t len)
 {
     if (seqobj == NULL || seq == NULL || len < 1) {
-        return 0;
+        return 1;
     }
     qes_str_fill_charptr(&seqobj->seq, seq, len);
-    return 1;
+    return 0;
 }
 
 inline int
 qes_seq_fill_qual (struct qes_seq *seqobj, const char *qual, size_t len)
 {
     if (seqobj == NULL || qual == NULL || len < 1) {
-        return 0;
+        return 1;
     }
     qes_str_fill_charptr(&seqobj->qual, qual, len);
-    return 1;
+    return 0;
 }
 
 inline int
@@ -106,8 +106,11 @@ qes_seq_fill_header (struct qes_seq *seqobj, char *header, size_t len)
     char *tmp = NULL;
     size_t startfrom = 0;
 
-    if (seqobj == NULL || header == NULL || len < 1) {
-        return 0;
+    if (seqobj == NULL || header == NULL) {
+        return 1;
+    }
+    if (len < 1) {
+        len = strlen(header);
     }
     while (isspace(header[len-1])) {
         header[--len] = '\0';
@@ -122,7 +125,7 @@ qes_seq_fill_header (struct qes_seq *seqobj, char *header, size_t len)
         qes_str_fill_charptr(&seqobj->name, header + startfrom, len - startfrom);
         qes_str_nullify(&seqobj->comment);
     }
-    return 1;
+    return 0;
 }
 
 inline int
@@ -133,10 +136,10 @@ qes_seq_fill(struct qes_seq *seqobj, const char *name, const char *comment,
             || qual == NULL) {
         return 1;
     }
-    if (qes_seq_fill_name(seqobj, name, 0) != 0) return 1;
-    if (qes_seq_fill_comment(seqobj, comment, 0) != 0) return 1;
-    if (qes_seq_fill_seq(seqobj, seq, 0) != 0) return 1;
-    if (qes_seq_fill_qual(seqobj, qual, 0) != 0) return 1;
+    if (qes_seq_fill_name(seqobj, name, strlen(name)) != 0) return 1;
+    if (qes_seq_fill_comment(seqobj, comment, strlen(comment)) != 0) return 1;
+    if (qes_seq_fill_seq(seqobj, seq, strlen(seq)) != 0) return 1;
+    if (qes_seq_fill_qual(seqobj, qual, strlen(qual)) != 0) return 1;
     return 0;
 }
 
