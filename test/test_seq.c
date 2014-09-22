@@ -313,6 +313,9 @@ test_qes_seq_copy(void *ptr)
     tt_str_op(copy->comment.s, ==, "Comment 1");
     tt_str_op(copy->seq.s, ==, "AGCT");
     tt_str_op(copy->qual.s, ==, "IIII");
+    tt_int_op(qes_seq_copy(NULL, seq), ==, 1);
+    tt_int_op(qes_seq_copy(seq, NULL), ==, 1);
+    tt_int_op(qes_seq_copy(seq, seq), ==, 1);
 
 end:
     qes_seq_destroy(seq);

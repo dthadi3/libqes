@@ -180,12 +180,12 @@ void qes_seq_destroy_(struct qes_seq *seq);
 static inline int
 qes_seq_copy(struct qes_seq *dest, const struct qes_seq *src)
 {
-    if (!qes_seq_ok(dest) || !qes_seq_ok(src)) return 1;
+    if (dest == src || !qes_seq_ok(dest) || !qes_seq_ok(src)) return 1;
 
-    qes_str_copy(&dest->name, &src->name);
-    qes_str_copy(&dest->comment, &src->comment);
-    qes_str_copy(&dest->seq, &src->seq);
-    qes_str_copy(&dest->qual, &src->qual);
+    if (qes_str_copy(&dest->name, &src->name) != 0) return 1;
+    if (qes_str_copy(&dest->comment, &src->comment) != 0) return 1;
+    if (qes_str_copy(&dest->seq, &src->seq) != 0) return 1;
+    if (qes_str_copy(&dest->qual, &src->qual) != 0) return 1;
     return 0;
 }
 
