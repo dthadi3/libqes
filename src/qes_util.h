@@ -53,7 +53,7 @@ extern const char *libqes_version;
 
 #define QES_MAX_FN_LEN (1<<16)
 /* Size of buffers for file IO */
-#define    QES_FILEBUFFER_LEN (1<<20)
+#define    QES_FILEBUFFER_LEN (16384)
 /* Starting point for allocing a char pointer. Set to slightly larger than the
    standard size of whatever you're reading in. */
 #define    __INIT_LINE_LEN (128)
