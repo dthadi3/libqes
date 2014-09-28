@@ -23,7 +23,7 @@ const char *libqes_version = LIBQES_VERSION;
 
 /* Valid non-function to pass to libqes functions */
 void
-errnil (ERRFN_ARGS)
+errnil (QES_ERRFN_ARGS)
 {
     (void) (msg);
     (void) (file);
@@ -32,7 +32,7 @@ errnil (ERRFN_ARGS)
 
 /* Function to pass to libqes functions which prints out errors to stderr */
 void
-errprint (ERRFN_ARGS)
+errprint (QES_ERRFN_ARGS)
 {
     char msg_fmt[1<<8] = "";
     va_list args;
@@ -48,7 +48,7 @@ errprint (ERRFN_ARGS)
 /* Function to pass to libqes functions which prints out errors to stderr and
    calls `exit(EXIT_FAILURE)` */
 void
-errprintexit (ERRFN_ARGS)
+errprintexit (QES_ERRFN_ARGS)
 {
     char msg_fmt[1<<8] = "";
     va_list args;

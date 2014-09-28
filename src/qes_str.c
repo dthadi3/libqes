@@ -21,7 +21,7 @@
 void
 qes_str_print (const struct qes_str *str, FILE *stream)
 {
-    if (qes_likely(qes_str_ok(str))) {
+    if (qes_str_ok(str)) {
         fprintf(stream, "%s", str->s);
     }
 }
@@ -29,7 +29,7 @@ qes_str_print (const struct qes_str *str, FILE *stream)
 void
 qes_str_destroy_cp (struct qes_str *str)
 {
-    if (qes_unlikely(str != NULL)) qes_free(str->s);
+    if (str != NULL) qes_free(str->s);
 }
 
 void

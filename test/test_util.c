@@ -147,20 +147,6 @@ end:
     ;
 }
 
-void
-test_expects (void *ptr)
-{
-    int t = 1;
-    int f = 0;
-
-    (void) ptr;
-    tt_assert(qes_likely(t));
-    tt_assert(!qes_likely(f));
-    tt_assert(qes_unlikely(t));
-    tt_assert(!qes_unlikely(f));
-end:
-    ;
-}
 
 struct testcase_t qes_util_tests[] = {
     { "qes_calloc", test_qes_calloc, 0, NULL, NULL},
@@ -169,6 +155,5 @@ struct testcase_t qes_util_tests[] = {
     { "qes_free", test_qes_free, 0, NULL, NULL},
     { "qes_roundup32", test_qes_roundup32, 0, NULL, NULL},
     { "qes_roundup64", test_qes_roundup64, 0, NULL, NULL},
-    { "expects", test_expects, 0, NULL, NULL},
     END_OF_TESTCASES
 };

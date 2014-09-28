@@ -43,8 +43,6 @@
 #include <unistd.h>
 #endif
 
-
-
 /*
  * Misc constants
  */
@@ -88,34 +86,27 @@ extern const char *libqes_version;
 #endif
 
 /*
- * General helper macros
- */
-#define qes_likely(x)      __builtin_expect(!!(x), 1)
-#define qes_unlikely(x)    __builtin_expect(!!(x), 0)
-
-
-/*
  * Error handling functions
  */
 
 /* use the stdlib exit function by default, during testing we can #define this
-   to some kind of error handler if we need to. */
+ * to some kind of error handler if we need to. */
 #ifndef  QES_EXIT_FN
-    #define  QES_EXIT_FN exit
+    #define QES_EXIT_FN exit
 #endif
 
 
 /* By default, we use this error handler. At compile or include time, we can
-   chose another more appropriate one if we need to. */
+ * chose another more appropriate one if we need to. */
 #ifndef  QES_DEFAULT_ERR_FN
-    #define  QES_DEFAULT_ERR_FN errprintexit
+    #define QES_DEFAULT_ERR_FN errprintexit
 #endif
 
 
-#define ERRFN_ARGS const char *msg,  const char *file, int line, ...
-void errnil(ERRFN_ARGS);
-void errprint (ERRFN_ARGS);
-void errprintexit (ERRFN_ARGS)  __attribute__ ((noreturn));
+#define QES_ERRFN_ARGS const char *msg,  const char *file, int line, ...
+void errnil(QES_ERRFN_ARGS);
+void errprint (QES_ERRFN_ARGS);
+void errprintexit (QES_ERRFN_ARGS)  __attribute__ ((noreturn));
 typedef void (*qes_errhandler_func) (const char*, const char *, int, ...);
 
 /* qes_roundupz:
@@ -123,13 +114,12 @@ typedef void (*qes_errhandler_func) (const char*, const char *, int, ...);
  */
 /* Flogged from http://stackoverflow.com/a/1322548 and
    http://graphics.stanford.edu/~seander/bithacks.html, and kseq.h */
-/* Round a 32-bit int up to nearest base-2 number */
 static inline size_t
 qes_roundupz (size_t sz)
 {
     /* Decrement v only if v is not already a power of 2 */
     /* I.e, roundup things already a power of 2 */
-    if (qes_unlikely((sz & (sz - 1)) != 0)) sz--;
+    if ((sz & (sz - 1)) != 0) sz--;
     /* mask all bits below MSB to 1 */
     sz |= sz>>1;
     sz |= sz>>2;
@@ -174,9 +164,7 @@ qes_roundup64 (uint64_t u64)
 
 /*  INLINE FUNCTIONS */
 
-/*
- * Memory allocation/deallocation
- */
+/* Memory allocation/deallocation */
 static inline void *
 qes_calloc_ (size_t n, size_t size, qes_errhandler_func onerr, const char *file,
         int line)
