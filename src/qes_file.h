@@ -22,11 +22,18 @@
 #include <qes_util.h>
 #include <qes_str.h>
 
+enum qes_read_mode {
+    QES_READ_MODE_UNKNOWN,
+    QES_READ_MODE_READ,
+    QES_READ_MODE_WRITE,
+    QES_READ_MODE_READWRITE,
+};
+
 struct qes_file {
     QES_ZTYPE fp;
     char *path;
     off_t filepos;
-    rwmode_t mode;
+    enum qes_read_mode mode;
     char *buffer;
     char *bufiter;
     char *bufend;
@@ -80,7 +87,7 @@ qes_file_ok(const struct qes_file *qf)
      * we're Write-only, is all of them */
     return  qf != NULL && \
             qf->fp != NULL && \
-            (qf->mode == RW_WRITE || \
+            (qf->mode == QES_READ_MODE_WRITE || \
                 (qf->bufiter != NULL && \
                  qf->buffer != NULL)
             );
@@ -121,8 +128,8 @@ qes_file_readable(struct qes_file *file)
 {
     /* Here we check that reads won't fail. We refil if we need to. */
     /* Can we possibly read from this file? */
-    if (!qes_file_ok(file) || file->mode == RW_UNKNOWN || \
-            file->mode == RW_WRITE || file->eof) {
+    if (!qes_file_ok(file) || file->mode == QES_READ_MODE_UNKNOWN || \
+            file->mode == QES_READ_MODE_WRITE || file->eof) {
         return 0;
     }
     /* We can read from buffer */
@@ -144,8 +151,8 @@ qes_file_writable(struct qes_file *file)
 {
     /* Here we check that reads won't fail. We refil if we need to. */
     /* Can we possibly read from this file? */
-    if (!qes_file_ok(file) || file->mode == RW_UNKNOWN || \
-            file->mode == RW_READ) {
+    if (!qes_file_ok(file) || file->mode == QES_READ_MODE_UNKNOWN || \
+            file->mode == QES_READ_MODE_READ) {
         return 0;
     }
     /* TODO: be more rigorous here */

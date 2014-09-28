@@ -35,7 +35,7 @@ qes_file_open_ (const char *path, const char *mode, qes_errhandler_func onerr,
         return(NULL);
     }
     qf->mode = qes_file_guess_mode(mode);
-    if (qf->mode == RW_UNKNOWN) {
+    if (qf->mode == QES_READ_MODE_UNKNOWN) {
         QES_ZCLOSE(qf->fp);
         qes_free(qf);
         return NULL;
@@ -43,7 +43,7 @@ qes_file_open_ (const char *path, const char *mode, qes_errhandler_func onerr,
     /* Use a larger than default IO buffer, speeds things up.
      * Using 2x our buffer len for no particular reason. */
     QES_ZBUFFER(qf->fp, (QES_FILEBUFFER_LEN) << 1);
-    if (qf->mode == RW_READ || qf-> mode == RW_READWRITE) {
+    if (qf->mode == QES_READ_MODE_READ) {
 #ifdef HAVE_POSIX_MEMALIGN
         posix_memalign((void *)&(qf->buffer), getpagesize(),
                 (QES_FILEBUFFER_LEN * sizeof(*qf->buffer)));
@@ -83,11 +83,11 @@ int
 qes_file_guess_mode (const char *mode)
 {
     if (mode[0] == 'r') {
-        return RW_READ;
+        return QES_READ_MODE_READ;
     } else if(mode[0] == 'w' || mode[0] == 'a') {
-        return RW_WRITE;
+        return QES_READ_MODE_WRITE;
     }
-    return RW_UNKNOWN;
+    return QES_READ_MODE_UNKNOWN;
 }
 
 void

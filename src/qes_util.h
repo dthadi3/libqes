@@ -172,17 +172,6 @@ qes_roundup64 (uint64_t u64)
 }
 
 
-
-
-/* IO helpers */
-
-typedef enum __rwmode {
-    RW_UNKNOWN,
-    RW_READ,
-    RW_WRITE,
-    RW_READWRITE,
-} rwmode_t;
-
 /*  INLINE FUNCTIONS */
 
 /*
