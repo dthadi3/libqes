@@ -22,7 +22,7 @@
 
 #include <limits.h>
 
-void
+static void
 test_qes_hamming (void *p)
 {
     (void) (p);
@@ -50,7 +50,7 @@ end:
 }
 
 
-void
+static void
 test_qes_hamming_max (void *p)
 {
 

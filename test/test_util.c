@@ -20,7 +20,7 @@
 
 
 /* Actual tests */
-void
+static void
 test_qes_calloc(void *ptr)
 {
     void *res = NULL;
@@ -42,7 +42,7 @@ end:
     if (res != NULL) free(res);
 }
 
-void
+static void
 test_qes_malloc(void *ptr)
 {
     void *res = NULL;
@@ -59,7 +59,7 @@ end:
     if (res != NULL) free(res);
 }
 
-void
+static void
 test_qes_realloc(void *ptr)
 {
     char *res = NULL;
@@ -82,7 +82,7 @@ end:
     if (dat != NULL) free(dat);
 }
 
-void
+static void
 test_qes_free(void *ptr)
 {
     char *dat = strdup("test");
@@ -99,7 +99,7 @@ end:
     if (dat != NULL) free(dat);
 }
 
-void
+static void
 test_qes_roundup32 (void *ptr)
 {
     int32_t val = 3;
@@ -122,7 +122,7 @@ end:
     ;
 }
 
-void
+static void
 test_qes_roundup64 (void *ptr)
 {
     int64_t val = 3;

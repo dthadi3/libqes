@@ -19,7 +19,7 @@
 
 #include <qes_seq.h>
 
-void
+static void
 test_qes_seq_create (void *ptr)
 {
     struct qes_seq *seq = NULL;
@@ -47,7 +47,7 @@ end:
     qes_seq_destroy(seq);
 }
 
-void
+static void
 test_qes_seq_create_no_qual (void *ptr)
 {
     struct qes_seq *seq = NULL;
@@ -75,7 +75,7 @@ end:
     qes_seq_destroy(seq);
 }
 
-void
+static void
 test_qes_seq_create_no_qual_or_comment (void *ptr)
 {
     struct qes_seq *seq = NULL;
@@ -103,7 +103,7 @@ end:
     qes_seq_destroy(seq);
 }
 
-void
+static void
 test_qes_seq_ok (void *ptr)
 {
     struct qes_seq *seq = NULL;
@@ -145,7 +145,7 @@ end:
     qes_seq_destroy(seq);
 }
 
-void
+static void
 test_qes_seq_ok_no_comment (void *ptr)
 {
     struct qes_seq *seq = NULL;
@@ -188,7 +188,7 @@ end:
     qes_seq_destroy(seq);
 }
 
-void
+static void
 test_qes_seq_ok_no_qual (void *ptr)
 {
     struct qes_seq *seq = NULL;
@@ -230,7 +230,7 @@ end:
     qes_seq_destroy(seq);
 }
 
-void
+static void
 test_qes_seq_ok_no_comment_or_qual (void *ptr)
 {
     struct qes_seq *seq = NULL;
@@ -274,7 +274,7 @@ end:
 }
 
 
-void
+static void
 test_qes_seq_destroy (void *ptr)
 {
     struct qes_seq *seq = NULL;
@@ -291,7 +291,7 @@ end:
     qes_seq_destroy(seq);
 }
 
-void
+static void
 test_qes_seq_copy(void *ptr)
 {
     struct qes_seq *seq = NULL;
@@ -322,7 +322,7 @@ end:
     qes_seq_destroy(copy);
 }
 
-void
+static void
 test_qes_seq_fill_funcs(void *ptr)
 {
 #define CHECK_FILLING(submember, str, len)          \

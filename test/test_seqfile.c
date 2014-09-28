@@ -23,7 +23,7 @@
 #include "kseq.h"
 KSEQ_INIT(gzFile, gzread)
 
-void
+static void
 test_qes_seqfile_create(void *ptr)
 {
     struct qes_seqfile *sf = NULL;
@@ -85,7 +85,7 @@ end:
     }
 }
 
-void
+static void
 test_qes_seqfile_guess_format (void *ptr)
 {
     struct qes_seqfile *sf = NULL;
@@ -125,7 +125,7 @@ end:
     if (fname != NULL) free(fname);
 }
 
-void
+static void
 test_qes_seqfile_destroy (void *ptr)
 {
     struct qes_seqfile *sf = NULL;
@@ -152,7 +152,7 @@ end:
 Name:           test_qes_seqfile_read
 Description:    Tests the qes_seqfile_read function from qes_seqfile.c
  *===========================================================================*/
-void
+static void
 test_qes_seqfile_read (void *ptr)
 {
     struct qes_seq *seq = qes_seq_create();
@@ -238,7 +238,7 @@ end:
 #undef CHECK_SEQFILE_READ
 }
 
-void
+static void
 test_qes_seqfile_read_vs_kseq (void *ptr)
 {
     struct qes_seq *seq = qes_seq_create();
@@ -310,7 +310,7 @@ Name:           test_qes_seqfile_write
 Description:    Tests the qes_seqfile_write function from qes_seqfile.c
  *===========================================================================*/
 
-void
+static void
 test_qes_seqfile_write (void *ptr)
 {
     struct qes_seq *seq = qes_seq_create();

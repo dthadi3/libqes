@@ -19,7 +19,7 @@
 
 #include <qes_sequtil.h>
 
-void
+static void
 test_qes_sequtil_translate_codon (void *ptr)
 {
     size_t iii;

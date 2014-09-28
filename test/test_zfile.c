@@ -19,7 +19,7 @@
 
 #include <qes_file.h>
 
-void
+static void
 test_qes_file_open (void *ptr)
 {
     struct qes_file *file = NULL;
@@ -68,7 +68,7 @@ end:
     if (fname != NULL) free(fname);
 }
 
-void
+static void
 test_qes_file_close (void *ptr)
 {
     struct qes_file *file = NULL;
@@ -92,7 +92,7 @@ end:
 }
 
 
-void
+static void
 test_qes_file_rewind (void *ptr)
 {
     struct qes_file *file = NULL;
@@ -124,7 +124,7 @@ end:
     free(fname);
 }
 
-void
+static void
 test_qes_file_readline (void *ptr)
 {
     struct qes_file *file = NULL;
@@ -165,7 +165,7 @@ end:
     free(fname);
 }
 
-void
+static void
 test_qes_file_getuntil (void *ptr)
 {
     struct qes_file *file = NULL;
@@ -235,7 +235,7 @@ end:
     if (fname != NULL) free(fname);
 }
 
-void
+static void
 test_qes_file_peek (void *ptr)
 {
     int res = 0;
@@ -265,7 +265,7 @@ end:
     if (fname != NULL) free(fname);
 }
 
-void
+static void
 test_qes_file_guess_mode (void *ptr)
 {
     const char *modes[] = {
@@ -290,7 +290,7 @@ end:
     ;
 }
 
-void
+static void
 test_qes_file_readline_realloc (void *ptr)
 {
     char *buf = NULL;
@@ -388,7 +388,8 @@ end:
     free(fname);
 }
 
-void test_qes_file_ok (void *ptr)
+static void
+test_qes_file_ok (void *ptr)
 {
     struct qes_file *file;
     char *writeable = NULL;
