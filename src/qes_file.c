@@ -22,9 +22,14 @@ struct qes_file *
 qes_file_open_ (const char *path, const char *mode, qes_errhandler_func onerr,
         const char *file, int line)
 {
-    /* create file struct */
     struct qes_file *qf = NULL;
-    if (path == NULL || mode == NULL) return NULL;
+
+    /* Error out with NULL */
+    if (path == NULL || mode == NULL || onerr == NULL || file == NULL) {
+        return NULL;
+    }
+
+    /* create file struct */
     qf = qes_calloc(1, sizeof(*qf));
     /* Open file, handling any errors */
     qf->fp = QES_ZOPEN(path, mode);
@@ -45,8 +50,8 @@ qes_file_open_ (const char *path, const char *mode, qes_errhandler_func onerr,
     QES_ZBUFFER(qf->fp, (QES_FILEBUFFER_LEN) << 1);
     if (qf->mode == QES_READ_MODE_READ) {
 #ifdef HAVE_POSIX_MEMALIGN
-        posix_memalign((void *)&(qf->buffer), getpagesize(),
-                (QES_FILEBUFFER_LEN * sizeof(*qf->buffer)));
+        qf->buffer = aligned_alloc(getpagesize(),
+                                   (QES_FILEBUFFER_LEN * sizeof(*qf->buffer)));
         if (qf->buffer == NULL) {
             QES_ZCLOSE(qf->fp);
             qes_free(qf);
@@ -59,7 +64,7 @@ qes_file_open_ (const char *path, const char *mode, qes_errhandler_func onerr,
         if (qf->buffer == NULL) {
             QES_ZCLOSE(qf->fp);
             qes_free(qf);
-            (*onerr)("Coudn't allocate aligned memory", file, line);
+            (*onerr)("Coudn't allocate buffer memory", file, line);
             return NULL;
         }
 #endif
