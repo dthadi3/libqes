@@ -8,7 +8,6 @@ SET(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake-modules")
 ## Setup CMAKE Environment ##
 #############################
 
-INCLUDE(CheckSymbolExists)
 # Shortcut to enable dev compile options
 IF (DEV)
 	SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS}  -fsanitize=address -fsanitize=leak -fsanitize=undefined")
@@ -47,6 +46,7 @@ INCLUDE(CPack)
 ## Find Packages and Headers ##
 ###############################
 
+INCLUDE(CheckSymbolExists)
 CHECK_SYMBOL_EXISTS(getline stdio.h HAVE_GETLINE)
 CHECK_SYMBOL_EXISTS(strndup string.h HAVE_STRNDUP)
 FIND_PACKAGE(ZLIB 1.2.5 REQUIRED)
