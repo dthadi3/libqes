@@ -35,9 +35,6 @@ test_qes_calloc(void *ptr)
     tt_int_op(memcmp(res, zeros, 1), ==, 0);
     free(res);
     res = NULL;
-    /* This should fail */
-    res = qes_calloc(SIZE_MAX, 1);
-    tt_ptr_op(res, ==, NULL);
 end:
     if (res != NULL) free(res);
 }
@@ -52,9 +49,6 @@ test_qes_malloc(void *ptr)
     tt_ptr_op(res, !=, NULL);
     free(res);
     res = NULL;
-    /* This should fail */
-    res = qes_malloc(SIZE_MAX);
-    tt_ptr_op(res, ==, NULL);
 end:
     if (res != NULL) free(res);
 }
@@ -74,9 +68,6 @@ test_qes_realloc(void *ptr)
     tt_int_op(memcmp(res, str, 5), ==, 0);
     free(res);
     res = NULL;
-    /* This should fail */
-    res = qes_realloc(dat, SIZE_MAX);
-    tt_ptr_op(res, ==, NULL);
 end:
     if (res != NULL) free(res);
     if (dat != NULL) free(dat);
