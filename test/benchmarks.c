@@ -29,7 +29,9 @@
 
 void bench_qes_file_readline_realloc_file(int silent);
 void bench_qes_file_readline_file(int silent);
+#ifdef HAVE_GELINE
 void bench_gnu_getline_file(int silent);
+#endif
 void bench_qes_seqfile_parse_fq(int silent);
 void bench_kseq_parse_fq(int silent);
 void bench_qes_seqfile_write(int silent);
@@ -61,7 +63,8 @@ bench_qes_file_readline_realloc_file(int silent)
         flen += len;
     }
     if (!silent)
-        printf("[qes_file_readline_realloc]\tFile of %zu chars\n", flen);
+        printf("[qes_file_readline_realloc]\tFile of %lu chars\n",
+               (long unsigned)flen);
     qes_file_close(file);
     free(buf);
 }
@@ -79,10 +82,12 @@ bench_qes_file_readline_file(int silent)
         flen += len;
     }
     if (!silent)
-        printf("[qes_file_readline]\t\tFile of %zu chars\n", flen);
+        printf("[qes_file_readline]\t\tFile of %lu chars\n",
+               (long unsigned)flen);
     qes_file_close(file);
 }
 
+#ifdef HAVE_GELINE
 void
 bench_gnu_getline_file(int silent)
 {
@@ -97,10 +102,12 @@ bench_gnu_getline_file(int silent)
         flen += len;
     }
     if (!silent)
-        printf("[getline]\t\tFile of %zu chars\n", flen);
+        printf("[getline]\t\tFile of %lu chars\n",
+               (long unsigned)flen);
     fclose(file);
     free(buf);
 }
+#endif
 
 
 #ifndef LIBQES_NO_OPENMP
@@ -118,7 +125,8 @@ bench_qes_seqfile_par_iter_fq_macro(int silent)
     QES_SEQFILE_ITER_PARALLEL_SINGLE_END(seq)
 
     if (!silent) {
-        printf("[qes_seqfile_iter_fq_macro] Total seq len %zu\n", total_len);
+        printf("[qes_seqfile_iter_fq_macro] Total seq len %lu\n",
+               (long unsigned)total_len);
     }
     qes_seqfile_destroy(sf);
 }
@@ -142,7 +150,8 @@ bench_qes_seqfile_parse_fq(int silent)
         n_recs++;
     }
     if (!silent) {
-        printf("[qes_seqfile_fq] Total seq len %zu\n", seq_len);
+        printf("[qes_seqfile_fq] Total seq len %lu\n",
+               (long unsigned)seq_len);
     }
     qes_seqfile_destroy(sf);
     qes_seq_destroy(seq);
@@ -162,7 +171,8 @@ bench_kseq_parse_fq(int silent)
         n_recs++;
     }
     if (!silent) {
-        printf("[kseq_fq] Total seq len %zu\n", seq_len);
+        printf("[kseq_fq] Total seq len %lu\n",
+               (long unsigned) seq_len);
     }
     kseq_destroy(seq);
     gzclose(fp);
@@ -189,7 +199,8 @@ bench_qes_seqfile_write(int silent)
         res += qes_seqfile_write(sf, seq);
     }
     if (!silent) {
-        printf("[qes_seqfile_write] Total file len %zu to %s\n", res, fname);
+        printf("[qes_seqfile_write] Total file len %lu to %s\n",
+               (long unsigned)res, fname);
     }
     qes_seqfile_destroy(sf);
     qes_seq_destroy(seq);
@@ -200,7 +211,9 @@ bench_qes_seqfile_write(int silent)
 static const bench_t benchmarks[] = {
     { "qes_file_readline", &bench_qes_file_readline_file},
     { "qes_file_readline_realloc", &bench_qes_file_readline_realloc_file},
+#ifdef HAVE_GELINE
     { "gnu_getline", &bench_gnu_getline_file},
+#endif
     { "qes_seqfile_parse_fq", &bench_qes_seqfile_parse_fq},
 #ifndef LIBQES_NO_OPENMP
     { "qes_seqfile_par_iter_fq_macro", &bench_qes_seqfile_par_iter_fq_macro},

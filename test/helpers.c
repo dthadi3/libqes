@@ -53,7 +53,9 @@ find_data_file(const char * filepath)
     buf[len] = '\0';
     /* Check we can access the file. If so, strdup & return */
     if (access(buf, F_OK) == 0) {
-        return strndup(buf, buflen);
+        char *ret = malloc(buflen + 1);
+        assert(ret);
+        return strncpy(ret, buf, buflen);
     }
     /* If we get to here, something's gone wrong. */
     return NULL;
@@ -75,6 +77,7 @@ get_writable_file(void)
     size_t buflen = 1<<12;
     size_t len = 0;
     char buf[buflen];
+    char *ret = NULL;
 
     /* Bail out if we can't get the data_prefix. */
     if (data_prefix == NULL) {
@@ -88,7 +91,9 @@ get_writable_file(void)
     /* Null terminate AFTER making sure len < buflen */
     buf[len] = '\0';
     /* Check we can access the file. If so, strdup & return */
-    return strndup(buf, buflen);
+    ret = malloc(buflen + 1);
+    assert(ret);
+    return strncpy(ret, buf, buflen);
 }
 
 

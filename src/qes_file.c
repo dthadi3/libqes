@@ -80,7 +80,8 @@ qes_file_open_ (const char *path, const char *mode, qes_errhandler_func onerr,
     /* init struct fields */
     qf->eof = 0;
     qf->filepos = 0;
-    qf->path = strndup(path, QES_MAX_FN_LEN);
+    qf->path = qes_malloc(QES_MAX_FN_LEN * sizeof(*qf->path));
+    strncpy(qf->path, path, QES_MAX_FN_LEN-1);
     return(qf);
 }
 

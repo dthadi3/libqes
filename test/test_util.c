@@ -28,7 +28,7 @@ test_qes_calloc(void *ptr)
     unsigned char *zeros[1<<10];
 
     (void) ptr;
-    bzero(zeros, bufsize);
+    memset(zeros, 0, bufsize);
     /* This should work, and the buffer should be zero throughout */
     res = qes_calloc(1, 1);
     tt_ptr_op(res, !=, NULL);
@@ -138,11 +138,11 @@ test_qes_roundup64 (void *ptr)
     val = 262143llu;
     tt_int_op(qes_roundup64(val), ==, 262144);
     /* Unsigned */
-    tt_int_op(qes_roundup64(uval), ==, 1llu<<63);
+    tt_assert(qes_roundup64(uval) == 1llu<<63);
     uval = 1llu<<62;
-    tt_int_op(qes_roundup64(uval), ==, 1llu<<63);
+    tt_assert(qes_roundup64(uval) == 1llu<<63);
     uval = 63llu;
-    tt_int_op(qes_roundup64(uval) - 2, ==, 62llu);
+    tt_assert(qes_roundup64(uval) - 2 == 62llu);
 end:
     ;
 }

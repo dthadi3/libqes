@@ -8,6 +8,7 @@ SET(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake-modules")
 ## Setup CMAKE Environment ##
 #############################
 
+INCLUDE(CheckSymbolExists)
 # Shortcut to enable dev compile options
 IF (DEV)
 	SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS}  -fsanitize=address -fsanitize=leak -fsanitize=undefined")
@@ -46,6 +47,7 @@ INCLUDE(CPack)
 ## Find Packages and Headers ##
 ###############################
 
+CHECK_SYMBOL_EXISTS(getline stdio.h HAVE_GETLINE)
 FIND_PACKAGE(ZLIB 1.2.5 REQUIRED)
 SET(LIBQES_DEPENDS_LIBS
     ${LIBQES_DEPENDS_LIBS} ${ZLIB_LIBRARIES})
@@ -72,7 +74,7 @@ ELSE()
 ENDIF()
 
 # Set CFLAGS
-SET(WEXTRA_FLAGS "${WEXTRA_FLAGS} -fstack-protector-all -Wstack-protector -Wfloat-equal")
+SET(WEXTRA_FLAGS "${WEXTRA_FLAGS} -Wstack-protector -Wfloat-equal")
 SET(WEXTRA_FLAGS "${WEXTRA_FLAGS} -Wundef -Wpointer-arith -Wstrict-prototypes")
 SET(WEXTRA_FLAGS "${WEXTRA_FLAGS} -Wmissing-prototypes -Wwrite-strings -Wredundant-decls")
 SET(WEXTRA_FLAGS "${WEXTRA_FLAGS} -Wchar-subscripts -Wcomment -Wformat=2 -Wwrite-strings")
@@ -84,8 +86,8 @@ SET(WEXTRA_FLAGS "${WEXTRA_FLAGS} -Wstrict-overflow=1 -Wextra -Warray-bounds -Wa
 
 SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=gnu99")
 SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${WEXTRA_FLAGS}")
-SET(CMAKE_C_FLAGS_DEBUG "-ggdb -march=native")
-SET(CMAKE_C_FLAGS_RELEASE "-O3 -march=native")
+SET(CMAKE_C_FLAGS_DEBUG "-ggdb -fstack-protector-all -march=native")
+SET(CMAKE_C_FLAGS_RELEASE "-O4 -march=native")
 # Coverage target set in CodeCoverage.cmake
 
 # Set include dirs
