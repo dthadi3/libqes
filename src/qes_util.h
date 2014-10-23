@@ -30,6 +30,7 @@
 #include <string.h>
 #include <strings.h>
 #include "qes_config.h"
+#include "qes_compat.h"
 
 /*
  * Cross-platform bollocks. Thanks windows.

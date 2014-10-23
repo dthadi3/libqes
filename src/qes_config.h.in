@@ -19,6 +19,7 @@
 /* Pull LIBQES_VERSION in from CMAKE */
 #define LIBQES_VERSION "${LIBQES_VERSION}";
 #cmakedefine HAVE_GETLINE
+#cmakedefine HAVE_STRNDUP
 #cmakedefine ZLIB_FOUND
 #cmakedefine NO_OPENMP
 
