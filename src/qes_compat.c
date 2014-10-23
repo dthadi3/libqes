@@ -19,11 +19,12 @@
 
 #ifndef HAVE_STRNDUP
 char *
-strndup(const char *s, size_t *n)
+strndup(const char *s, size_t n)
 {
     char *dest = malloc(n+1);
     if (dest == NULL) return NULL;
     strncpy(dest, s, n);
     dest[n] = '\0';
+    return dest;
 }
 #endif
