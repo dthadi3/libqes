@@ -173,7 +173,7 @@ qes_file_peek(struct qes_file *file)
 static inline void
 qes_file_print_str (struct qes_file *stream, const struct qes_str *str)
 {
-    QES_ZWRITE(stream->fp, str->s, str->l);
+    QES_ZWRITE(stream->fp, str->str, str->len);
 }
 
 static inline int
@@ -473,7 +473,7 @@ Name:           qes_file_readline_str
 Paramters:      struct qes_file *file: File to read.
                 struct qes_str *str: struct qes_str object to read into.
 Description:    Convenience wrapper around qes_file_readline_realloc, which reads a
-                line into a struct qes_str object, passing str->s to and str->m to
+                line into a struct qes_str object, passing str->str to and str->capacity to
                 qes_file_readline_realloc.
 Returns:        ssize_t set to either the length of the line copied to the
                 struct qes_str, or one of -1 (EOF) or -2 (error).
@@ -481,19 +481,18 @@ Returns:        ssize_t set to either the length of the line copied to the
 static inline ssize_t
 qes_file_readline_str (struct qes_file *file, struct qes_str *str)
 {
-    ssize_t ln = 0;
+    ssize_t len = 0;
 
     if (file == NULL || !qes_str_ok(str)) {
         return -2; /* ERROR, not EOF */
     }
-    ln = qes_file_readline_realloc(file, &(str->s), &(str->m));
-    if (ln < 0) {
+    len = qes_file_readline_realloc(file, &(str->str), &(str->capacity));
+    if (len < 0) {
         qes_str_nullify(str);
-        return ln;
-    } else {
-        str->l = ln;
-        return ln;
+        return len;
     }
+    str->len = len;
+    return len;
 }
 
 #endif /* QES_FILE_H */

@@ -120,7 +120,7 @@ bench_qes_seqfile_par_iter_fq_macro(int silent)
     QES_SEQFILE_ITER_PARALLEL_SINGLE_BEGIN(sf, seq, seq_len, shared(total_len))
         #pragma omp critical
         {
-        total_len += seq->seq.l;
+        total_len += seq->seq.len;
         }
     QES_SEQFILE_ITER_PARALLEL_SINGLE_END(seq)
 

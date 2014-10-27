@@ -25,8 +25,8 @@ read_fastq_seqfile(struct qes_seqfile *seqfile, struct qes_seq *seq)
 #define CHECK_AND_TRIM(subrec) if (len < 1) { \
             goto error;     \
         } else {        \
-            subrec.s[--len] = '\0'; \
-            subrec.l = len; \
+            subrec.str[--len] = '\0'; \
+            subrec.len = len; \
         }
     ssize_t len = 0;
     int next = '\0';
@@ -47,7 +47,7 @@ read_fastq_seqfile(struct qes_seqfile *seqfile, struct qes_seq *seq)
         errcode = -3;
         goto error;
     }
-    qes_seq_fill_header(seq, seqfile->scratch.s, seqfile->scratch.l);
+    qes_seq_fill_header(seq, seqfile->scratch.str, seqfile->scratch.len);
     /* Fill the actual sequence directly */
     len = qes_file_readline_str(seqfile->qf, &seq->seq);
     errcode = -4;
@@ -68,14 +68,14 @@ read_fastq_seqfile(struct qes_seqfile *seqfile, struct qes_seq *seq)
     len = qes_file_readline_str(seqfile->qf, &seq->qual);
     errcode = -6;
     CHECK_AND_TRIM(seq->qual)
-    if ((size_t)len != seq->seq.l) {
+    if ((size_t)len != seq->seq.len) {
         /* Error out on different len qual/seq entries */
         errcode = -7;
         goto error;
     }
     /* return seq/qual len */
     seqfile->n_records++;
-    return seq->seq.l;
+    return seq->seq.len;
 error:
     qes_str_nullify(&seq->name);
     qes_str_nullify(&seq->comment);
@@ -92,8 +92,8 @@ read_fasta_seqfile(struct qes_seqfile *seqfile, struct qes_seq *seq)
 #define CHECK_AND_TRIM(subrec) if (len < 1) { \
             goto error;     \
         } else {        \
-            subrec.s[--len] = '\0'; \
-            subrec.l = len; \
+            subrec.str[--len] = '\0'; \
+            subrec.len = len; \
         }
     ssize_t len = 0;
     int next = '\0';
@@ -111,33 +111,33 @@ read_fasta_seqfile(struct qes_seqfile *seqfile, struct qes_seq *seq)
     if (len < 1) {
         goto error;
     }
-    qes_seq_fill_header(seq, seqfile->scratch.s, seqfile->scratch.l);
-    /* we need to nullify seq, as we rely on seq.l being 0 as we enter this
+    qes_seq_fill_header(seq, seqfile->scratch.str, seqfile->scratch.len);
+    /* we need to nullify seq, as we rely on seq.len being 0 as we enter this
      *  while loop */
     qes_str_nullify(&seq->seq);
     /* While the next char is not a '>', i.e. until next header line */
     while ((next = qes_file_peek(seqfile->qf)) != EOF && next != FASTA_DELIM) {
-        len = qes_file_readline(seqfile->qf, seq->seq.s + seq->seq.l,
-                seq->seq.m - seq->seq.l - 1);
+        len = qes_file_readline(seqfile->qf, seq->seq.str + seq->seq.len,
+                seq->seq.capacity - seq->seq.len - 1);
         if (len < 0) {
             goto error;
         }
-        seq->seq.l += len - 1;
-        seq->seq.s[seq->seq.l] = '\0';
-        if (seq->seq.m -  1 <= seq->seq.l) {
-            seq->seq.m = qes_roundupz(seq->seq.m);
-            seq->seq.s = qes_realloc(seq->seq.s,
-                    sizeof(*seq->seq.s) * seq->seq.m);
-            if (seq->seq.s == NULL) {
+        seq->seq.len += len - 1;
+        seq->seq.str[seq->seq.len] = '\0';
+        if (seq->seq.capacity -  1 <= seq->seq.len) {
+            seq->seq.capacity = qes_roundupz(seq->seq.capacity);
+            seq->seq.str = qes_realloc(seq->seq.str,
+                    sizeof(*seq->seq.str) * seq->seq.capacity);
+            if (seq->seq.str == NULL) {
                 goto error;
             }
         }
     }
-    seq->seq.s[seq->seq.l] = '\0';
+    seq->seq.str[seq->seq.len] = '\0';
     /* return seq len */
     seqfile->n_records++;
     qes_str_nullify(&seq->qual);
-    return seq->seq.l;
+    return seq->seq.len;
 error:
     qes_str_nullify(&seq->name);
     qes_str_nullify(&seq->comment);
@@ -242,10 +242,10 @@ qes_seqfile_format_seq(const struct qes_seq *seq, enum qes_seqfile_format fmt,
                 return 0;
             }
             len = snprintf(buffer, maxlen, "%c%s %s\n%s\n%c\n%s\n",
-                    FASTQ_DELIM, seq->name.s, seq->comment.s,
-                    seq->seq.s,
+                    FASTQ_DELIM, seq->name.str, seq->comment.str,
+                    seq->seq.str,
                     FASTQ_QUAL_DELIM,
-                    seq->qual.s);
+                    seq->qual.str);
             return len;
             break;
         case FASTA_FMT:
@@ -254,8 +254,8 @@ qes_seqfile_format_seq(const struct qes_seq *seq, enum qes_seqfile_format fmt,
                 return 0;
             }
             len = snprintf(buffer, maxlen, "%c%s %s\n%s\n",
-                    FASTA_DELIM, seq->name.s, seq->comment.s,
-                    seq->seq.s);
+                    FASTA_DELIM, seq->name.str, seq->comment.str,
+                    seq->seq.str);
             return len;
             break;
         case UNKNOWN_FMT:
@@ -286,29 +286,29 @@ qes_seqfile_write (struct qes_seqfile *seqfile, struct qes_seq *seq)
     switch (seqfile->format) {
         case FASTA_FMT:
             sf_putc_check(FASTA_DELIM);
-            sf_puts_check(seq->name.s);
+            sf_puts_check(seq->name.str);
             if (qes_seq_has_comment(seq)) {
                 sf_putc_check(' ');
-                sf_puts_check(seq->comment.s);
+                sf_puts_check(seq->comment.str);
             }
             sf_putc_check('\n');
-            sf_puts_check(seq->seq.s);
+            sf_puts_check(seq->seq.str);
             sf_putc_check('\n');
             break;
         case FASTQ_FMT:
             sf_putc_check(FASTQ_DELIM);
-            sf_puts_check(seq->name.s);
+            sf_puts_check(seq->name.str);
             if (qes_seq_has_comment(seq)) {
                 sf_putc_check(' ');
-                sf_puts_check(seq->comment.s);
+                sf_puts_check(seq->comment.str);
             }
             sf_putc_check('\n');
-            sf_puts_check(seq->seq.s);
+            sf_puts_check(seq->seq.str);
             sf_putc_check('\n');
             if (qes_seq_has_qual(seq)) {
                 sf_putc_check('+');
                 sf_putc_check('\n');
-                sf_puts_check(seq->qual.s);
+                sf_puts_check(seq->qual.str);
                 sf_putc_check('\n');
 
             }

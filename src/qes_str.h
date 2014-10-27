@@ -22,23 +22,23 @@
 #include <qes_util.h>
 
 struct qes_str {
-    char *s;
-    size_t l;
-    size_t m;
+    char *str;
+    size_t len;
+    size_t capacity;
 };
 
 
 /*===  FUNCTION  ============================================================*
 Name:           qes_str_ok
 Parameters:     const struct qes_str *str: `struct qes_str` ref to check.
-Description:    Checks if a string is OK to use, i.e. checks that `str->s` is
+Description:    Checks if a string is OK to use, i.e. checks that `str->str` is
                 a valid `char` array.
 Returns:        An `int` that evaluates to true or false.
  *===========================================================================*/
 static inline int
 qes_str_ok (const struct qes_str *str)
 {
-    return str != NULL && str->s != NULL && str->m > 0;
+    return str != NULL && str->str != NULL && str->capacity > 0;
 }
 
 /*===  FUNCTION  ============================================================*
@@ -53,9 +53,9 @@ static inline void
 qes_str_init (struct qes_str *str, size_t capacity)
 {
     if (str == NULL) return;
-    str->l = 0;
-    str->s = qes_calloc(capacity, sizeof(*str->s));
-    str->m = capacity;
+    str->len = 0;
+    str->str = qes_calloc(capacity, sizeof(*str->str));
+    str->capacity = capacity;
 }
 
 /*===  FUNCTION  ============================================================*
@@ -82,16 +82,16 @@ qes_str_fill_charptr (struct qes_str *str, const char *cp, size_t len)
     if (len == 0) {
         len = strlen(cp);
     }
-    if (str->m < len + 1) {
-        while (str->m < len + 1) {
-            str->m = qes_roundupz(str->m);
+    if (str->capacity < len + 1) {
+        while (str->capacity < len + 1) {
+            str->capacity = qes_roundupz(str->capacity);
         }
-        str->s = qes_realloc(str->s, str->m * sizeof(*str->s));
+        str->str = qes_realloc(str->str, str->capacity * sizeof(*str->str));
     }
     /* FIXME: check for null after realloc */
-    memcpy(str->s, cp, len);
-    str->s[len] = '\0';
-    str->l = len;
+    memcpy(str->str, cp, len);
+    str->str[len] = '\0';
+    str->len = len;
     return 1;
 }
 
@@ -105,8 +105,8 @@ static inline int
 qes_str_nullify (struct qes_str *str)
 {
     if (!qes_str_ok(str)) return 1;
-    str->s[0] = '\0';
-    str->l = 0;
+    str->str[0] = '\0';
+    str->len = 0;
     return 0;
 }
 
@@ -114,18 +114,17 @@ static inline int
 qes_str_copy (struct qes_str *dest, const struct qes_str *src)
 {
     if (!qes_str_ok(src) || dest == NULL) return 1;
-    if (!qes_str_ok(dest)) qes_str_init(dest, src->m);
-    memcpy(dest->s, src->s, src->m);
+    if (!qes_str_ok(dest)) qes_str_init(dest, src->capacity);
+    memcpy(dest->str, src->str, src->capacity);
     return 0;
 }
-
 
 extern void qes_str_print (const struct qes_str *str, FILE *stream);
 
 /*===  FUNCTION  ============================================================*
 Name:           qes_str_destroy
 Paramters:      struct qes_str *: `struct qes_str` to destroy.
-Description:    Frees `str->s` and the struct qes_str struct itself.
+Description:    Frees `str->str` and the struct qes_str struct itself.
 Returns:        void
  *===========================================================================*/
 extern void qes_str_destroy (struct qes_str *str);
@@ -133,11 +132,10 @@ extern void qes_str_destroy (struct qes_str *str);
 /*===  FUNCTION  ============================================================*
 Name:           qes_str_destroy_cp
 Paramters:      struct qes_str *: String to destrop
-Description:    Frees `str->s` without freeing the struct qes_str struct itself. For use
-                on `struct qes_str`s allocated on the stack.
+Description:    Frees `str->str` without freeing the struct qes_str struct
+                itself. For use on `struct qes_str`s allocated on the stack.
 Returns:        void
  *===========================================================================*/
 extern void qes_str_destroy_cp (struct qes_str *str);
-
 
 #endif /* QES_STR_H */

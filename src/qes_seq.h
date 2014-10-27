@@ -99,13 +99,13 @@ qes_seq_ok_no_comment_or_qual (const struct qes_seq *seq)
 static inline int
 qes_seq_has_comment (const struct qes_seq *seq)
 {
-    return qes_seq_ok(seq) && seq->comment.l > 0;
+    return qes_seq_ok(seq) && seq->comment.len > 0;
 }
 
 static inline int
 qes_seq_has_qual (const struct qes_seq *seq)
 {
-    return qes_seq_ok(seq) && seq->qual.l > 0;
+    return qes_seq_ok(seq) && seq->qual.len > 0;
 }
 
 static inline int
@@ -115,10 +115,10 @@ qes_seq_n_bytes (const struct qes_seq *seq)
         return -1;
     }
     /* Arragned per line in a fastq */
-    return 1 + seq->name.l + \
-           (qes_seq_has_comment(seq) ? 1 + seq->comment.l : 0) + 1 + \
-           seq->seq.l + 1 +\
-           qes_seq_has_qual(seq) ? 2 + seq->qual.l + 1 : 0;
+    return 1 + seq->name.len + \
+           (qes_seq_has_comment(seq) ? 1 + seq->comment.len : 0) + 1 + \
+           seq->seq.len + 1 +\
+           qes_seq_has_qual(seq) ? 2 + seq->qual.len + 1 : 0;
 }
 
 /*===  FUNCTION  ============================================================*

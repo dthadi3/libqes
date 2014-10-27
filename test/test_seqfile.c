@@ -161,37 +161,37 @@ test_qes_seqfile_read (void *ptr)
     char *fname = NULL;
     /* Check a seq is empty */
 #define CHECK_SEQ_EMPTY                                                     \
-    tt_str_op(seq->name.s, ==, "");                                         \
-    tt_str_op(seq->comment.s, ==, "");                                      \
-    tt_str_op(seq->seq.s, ==, "");                                          \
-    tt_str_op(seq->qual.s, ==, "")
+    tt_str_op(seq->name.str, ==, "");                                       \
+    tt_str_op(seq->comment.str, ==, "");                                    \
+    tt_str_op(seq->seq.str, ==, "");                                        \
+    tt_str_op(seq->qual.str, ==, "")
     /* Check seq against the first known read */
 #define CHECK_SEQ_FIRST                                                     \
-    tt_str_op(seq->name.s, ==, first_fastq_read[0]);                        \
-    tt_str_op(seq->comment.s, ==, first_fastq_read[1]);                     \
-    tt_str_op(seq->seq.s, ==, first_fastq_read[2]);                         \
-    tt_str_op(seq->qual.s, ==, first_fastq_read[3])
+    tt_str_op(seq->name.str, ==, first_fastq_read[0]);                      \
+    tt_str_op(seq->comment.str, ==, first_fastq_read[1]);                   \
+    tt_str_op(seq->seq.str, ==, first_fastq_read[2]);                       \
+    tt_str_op(seq->qual.str, ==, first_fastq_read[3])
     /* Open, read, check & close a seqfile */
 #define CHECK_SEQFILE_READ(fn, expt_res, check_seq)                         \
     fname = find_data_file(fn);                                             \
     tt_assert(fname != NULL);                                               \
-    sf = qes_seqfile_create(fname, "r");                                        \
-    res = qes_seqfile_read(sf, seq);                                            \
+    sf = qes_seqfile_create(fname, "r");                                    \
+    res = qes_seqfile_read(sf, seq);                                        \
     tt_int_op(res, ==, expt_res);                                           \
     check_seq;                                                              \
-    qes_seqfile_destroy(sf);                                                    \
+    qes_seqfile_destroy(sf);                                                \
     free(fname);                                                            \
     fname = NULL
     /* Open, read, check & close a seqfile, forcing its filetype to FASTQ */
 #define CHECK_SEQFILE_READ_FORCE(fn, expt_res, check_seq)                   \
     fname = find_data_file(fn);                                             \
     tt_assert(fname != NULL);                                               \
-    sf = qes_seqfile_create(fname, "r");                                        \
-    qes_seqfile_set_format(sf, FASTQ_FMT);                                      \
-    res = qes_seqfile_read(sf, seq);                                            \
+    sf = qes_seqfile_create(fname, "r");                                    \
+    qes_seqfile_set_format(sf, FASTQ_FMT);                                  \
+    res = qes_seqfile_read(sf, seq);                                        \
     tt_int_op(res, ==, expt_res);                                           \
     check_seq;                                                              \
-    qes_seqfile_destroy(sf);                                                    \
+    qes_seqfile_destroy(sf);                                                \
     free(fname);                                                            \
     fname = NULL
 
@@ -199,19 +199,19 @@ test_qes_seqfile_read (void *ptr)
     /* Test file opening for reading */
     CHECK_SEQFILE_READ("test.fastq", first_fastq_len, CHECK_SEQ_FIRST);
     CHECK_SEQFILE_READ("test.fasta", 33,
-        tt_str_op(seq->name.s, ==, "HWI-ST960:105:D10GVACXX:2:1101:1122:2186");
-        tt_str_op(seq->comment.s, ==, "1:N:0: bcd:RPI8 seq:CACACTTGAATC");
-        tt_str_op(seq->seq.s, ==, "CACACTTGAATCCAGTTTAAAGTTAACTCATTG");
-        tt_int_op(seq->qual.l, ==, 0);
-        tt_str_op(seq->qual.s, ==, "")
+        tt_str_op(seq->name.str, ==, "HWI-ST960:105:D10GVACXX:2:1101:1122:2186");
+        tt_str_op(seq->comment.str, ==, "1:N:0: bcd:RPI8 seq:CACACTTGAATC");
+        tt_str_op(seq->seq.str, ==, "CACACTTGAATCCAGTTTAAAGTTAACTCATTG");
+        tt_int_op(seq->qual.len, ==, 0);
+        tt_str_op(seq->qual.str, ==, "")
         );
     CHECK_SEQFILE_READ("nocomment.fasta", 33,
-        tt_str_op(seq->name.s, ==, "HWI-ST960:105:D10GVACXX:2:1101:1122:2186");
-        tt_int_op(seq->comment.l, ==, 0);
-        tt_str_op(seq->comment.s, ==, "");
-        tt_str_op(seq->seq.s, ==, "CACACTTGAATCCAGTTTAAAGTTAACTCATTG");
-        tt_int_op(seq->qual.l, ==, 0);
-        tt_str_op(seq->qual.s, ==, "")
+        tt_str_op(seq->name.str, ==, "HWI-ST960:105:D10GVACXX:2:1101:1122:2186");
+        tt_int_op(seq->comment.len, ==, 0);
+        tt_str_op(seq->comment.str, ==, "");
+        tt_str_op(seq->seq.str, ==, "CACACTTGAATCCAGTTTAAAGTTAACTCATTG");
+        tt_int_op(seq->qual.len, ==, 0);
+        tt_str_op(seq->qual.str, ==, "")
         );
     /* Test with bad fastqs, ensure all code paths are taken */
     CHECK_SEQFILE_READ("loremipsum.txt", -2, CHECK_SEQ_EMPTY);
@@ -259,10 +259,10 @@ test_qes_seqfile_read_vs_kseq (void *ptr)
             /* EOF or error */
             break;
         }
-        tt_str_op(seq->name.s, ==, kseq->name.s);
-        tt_str_op(seq->comment.s, ==, kseq->comment.s);
-        tt_str_op(seq->seq.s, ==, kseq->seq.s);
-        tt_str_op(seq->qual.s, ==, kseq->qual.s);
+        tt_str_op(seq->name.str, ==, kseq->name.s);
+        tt_str_op(seq->comment.str, ==, kseq->comment.s);
+        tt_str_op(seq->seq.str, ==, kseq->seq.s);
+        tt_str_op(seq->qual.str, ==, kseq->qual.s);
     }
     my_res = qes_seqfile_read(sf, seq);
     kseq_res = kseq_read(kseq);
@@ -290,9 +290,9 @@ test_qes_seqfile_read_vs_kseq (void *ptr)
             /* EOF or error */
             break;
         }
-        tt_str_op(seq->name.s, ==, kseq->name.s);
-        tt_str_op(seq->comment.s, ==, kseq->comment.s);
-        tt_str_op(seq->seq.s, ==, kseq->seq.s);
+        tt_str_op(seq->name.str, ==, kseq->name.s);
+        tt_str_op(seq->comment.str, ==, kseq->comment.s);
+        tt_str_op(seq->seq.str, ==, kseq->seq.s);
     }
 end:
     qes_seqfile_destroy(sf);

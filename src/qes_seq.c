@@ -38,9 +38,9 @@ qes_seq_create_no_qual (void)
     qes_str_init(&seq->name, __INIT_LINE_LEN);
     qes_str_init(&seq->comment, __INIT_LINE_LEN);
     qes_str_init(&seq->seq, __INIT_LINE_LEN);
-    seq->qual.m = 0;
-    seq->qual.l = 0;
-    seq->qual.s = NULL;
+    seq->qual.capacity = 0;
+    seq->qual.len = 0;
+    seq->qual.str = NULL;
     return seq;
 }
 
@@ -50,12 +50,12 @@ qes_seq_create_no_qual_or_comment (void)
     struct qes_seq *seq = qes_malloc(sizeof(*seq));
     qes_str_init(&seq->name, __INIT_LINE_LEN);
     qes_str_init(&seq->seq, __INIT_LINE_LEN);
-    seq->qual.m = 0;
-    seq->qual.l = 0;
-    seq->qual.s = NULL;
-    seq->comment.m = 0;
-    seq->comment.l = 0;
-    seq->comment.s = NULL;
+    seq->qual.capacity = 0;
+    seq->qual.len = 0;
+    seq->qual.str = NULL;
+    seq->comment.capacity = 0;
+    seq->comment.len = 0;
+    seq->comment.str = NULL;
     return seq;
 }
 
