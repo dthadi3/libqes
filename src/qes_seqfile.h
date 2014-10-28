@@ -103,7 +103,7 @@ void qes_seqfile_destroy_(struct qes_seqfile *seqfile);
             seqfile = NULL;                                                 \
         } while(0)
 
-#ifndef LIBQES_NO_OPENMP
+#ifndef NO_OPENMP
 #define QES_SEQFILE_ITER_PARALLEL_SINGLE_BEGIN(fle, sq, ln, opts)           \
     _Pragma(STRINGIFY(omp parallel shared(fle) opts default(none)))         \
     {                                                                       \
@@ -169,7 +169,7 @@ void qes_seqfile_destroy_(struct qes_seqfile *seqfile);
         qes_seq_destroy(sq2);                                               \
     }
 
-#endif /* LIBQES_NO_OPENMP */
+#endif /* NO_OPENMP */
 
 #define QES_SEQFILE_ITER_SINGLE_BEGIN(fle, sq, ln)                          \
     {                                                                       \

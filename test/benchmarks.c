@@ -35,7 +35,7 @@ void bench_gnu_getline_file(int silent);
 void bench_qes_seqfile_parse_fq(int silent);
 void bench_kseq_parse_fq(int silent);
 void bench_qes_seqfile_write(int silent);
-#ifndef LIBQES_NO_OPENMP
+#ifndef NO_OPENMP
 void bench_qes_seqfile_par_iter_fq_macro(int silent);
 #endif
 
@@ -110,7 +110,7 @@ bench_gnu_getline_file(int silent)
 #endif
 
 
-#ifndef LIBQES_NO_OPENMP
+#ifndef NO_OPENMP
 void
 bench_qes_seqfile_par_iter_fq_macro(int silent)
 {
@@ -215,7 +215,7 @@ static const bench_t benchmarks[] = {
     { "gnu_getline", &bench_gnu_getline_file},
 #endif
     { "qes_seqfile_parse_fq", &bench_qes_seqfile_parse_fq},
-#ifndef LIBQES_NO_OPENMP
+#ifndef NO_OPENMP
     { "qes_seqfile_par_iter_fq_macro", &bench_qes_seqfile_par_iter_fq_macro},
 #endif
     { "kseq_parse_fq", &bench_kseq_parse_fq},
