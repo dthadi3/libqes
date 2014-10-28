@@ -17,7 +17,7 @@
 #include <stdlib.h>
 #include "qes_compat.h"
 
-#ifndef HAVE_STRNDUP
+#ifndef STRNDUP_FOUND
 char *
 strndup(const char *s, size_t n)
 {

@@ -17,6 +17,6 @@
 
 #include "qes_config.h"
 
-#ifndef HAVE_STRNDUP
+#ifndef STRNDUP_FOUND
 char *strndup(const char *s, size_t n);
 #endif

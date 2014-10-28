@@ -29,13 +29,13 @@
 
 void bench_qes_file_readline_realloc_file(int silent);
 void bench_qes_file_readline_file(int silent);
-#ifdef HAVE_GELINE
+#ifdef GELINE_FOUND
 void bench_gnu_getline_file(int silent);
 #endif
 void bench_qes_seqfile_parse_fq(int silent);
 void bench_kseq_parse_fq(int silent);
 void bench_qes_seqfile_write(int silent);
-#ifndef NO_OPENMP
+#ifdef OPENMP_FOUND
 void bench_qes_seqfile_par_iter_fq_macro(int silent);
 #endif
 
@@ -87,7 +87,7 @@ bench_qes_file_readline_file(int silent)
     qes_file_close(file);
 }
 
-#ifdef HAVE_GELINE
+#ifdef GELINE_FOUND
 void
 bench_gnu_getline_file(int silent)
 {
@@ -110,7 +110,7 @@ bench_gnu_getline_file(int silent)
 #endif
 
 
-#ifndef NO_OPENMP
+#ifdef OPENMP_FOUND
 void
 bench_qes_seqfile_par_iter_fq_macro(int silent)
 {
@@ -211,11 +211,11 @@ bench_qes_seqfile_write(int silent)
 static const bench_t benchmarks[] = {
     { "qes_file_readline", &bench_qes_file_readline_file},
     { "qes_file_readline_realloc", &bench_qes_file_readline_realloc_file},
-#ifdef HAVE_GELINE
+#ifdef GELINE_FOUND
     { "gnu_getline", &bench_gnu_getline_file},
 #endif
     { "qes_seqfile_parse_fq", &bench_qes_seqfile_parse_fq},
-#ifndef NO_OPENMP
+#ifdef OPENMP_FOUND
     { "qes_seqfile_par_iter_fq_macro", &bench_qes_seqfile_par_iter_fq_macro},
 #endif
     { "kseq_parse_fq", &bench_kseq_parse_fq},

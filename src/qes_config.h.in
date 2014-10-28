@@ -18,10 +18,12 @@
 
 /* Pull LIBQES_VERSION in from CMAKE */
 #define LIBQES_VERSION "${LIBQES_VERSION}";
-#cmakedefine HAVE_GETLINE
-#cmakedefine HAVE_STRNDUP
+#cmakedefine GETLINE_FOUND
+#cmakedefine STRNDUP_FOUND
+#cmakedefine ALIGNED_ALLOC_FOUND
+#cmakedefine GETPAGESIZE_FOUND
 #cmakedefine ZLIB_FOUND
-#cmakedefine NO_OPENMP
+#cmakedefine OPENMP_FOUND
 
 /* Definitions to make changing fp type easy */
 #ifdef ZLIB_FOUND

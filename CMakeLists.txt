@@ -47,13 +47,27 @@ INCLUDE(CPack)
 ###############################
 
 INCLUDE(CheckSymbolExists)
-CHECK_SYMBOL_EXISTS(getline stdio.h HAVE_GETLINE)
-CHECK_SYMBOL_EXISTS(strndup string.h HAVE_STRNDUP)
+CHECK_SYMBOL_EXISTS(getline stdio.h GETLINE_FOUND)
+CHECK_SYMBOL_EXISTS(strndup string.h STRNDUP_FOUND)
+CHECK_SYMBOL_EXISTS(aligned_alloc stdlib.h ALIGNED_ALLOC_FOUND)
+CHECK_SYMBOL_EXISTS(getpagesize unistd.h GETPAGESIZE_FOUND)
+
 FIND_PACKAGE(ZLIB 1.2.5 REQUIRED)
+FIND_PACKAGE(OpenMP)
+
+# Ignore that we found openmp if we've been asked to disable it
+IF (${NO_OPENMP})
+	SET(OPENMP_FOUND FALSE)
+	SET(OpenMP_C_FLAGS "")
+ENDIF()
+
+# Set dependency flags appropriately
 SET(LIBQES_DEPENDS_LIBS
     ${LIBQES_DEPENDS_LIBS} ${ZLIB_LIBRARIES})
 SET(LIBQES_DEPENDS_INCLUDE_DIRS
     ${LIBQES_DEPENDS_INCLUDE_DIRS} ${ZLIB_INCLUDE_DIRS})
+SET(LIBQES_DEPENDS_CFLAGS
+	${LIBQES_DEPENDS_CFLAGS} ${ZLIB_CFLAGS} ${OpenMP_C_FLAGS})
 
 ##########################
 ## Set Compiler Options ##
@@ -67,11 +81,6 @@ IF (CMAKE_COMPILER_IS_GNUCC)
 	IF (${GCC_VERSION} VERSION_GREATER 4.9 OR ${GCC_VERSION} VERSION_EQUAL 4.9)
 		SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fdiagnostics-color=always")
 	ENDIF()
-	IF (NOT NO_OPENMP)
-		SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fopenmp")
-	ENDIF()
-ELSE()
-	SET(NO_OPENMP 1)
 ENDIF()
 
 # Set CFLAGS
@@ -85,8 +94,7 @@ SET(WEXTRA_FLAGS "${WEXTRA_FLAGS} -Wmissing-field-initializers -Wdeclaration-aft
 SET(WEXTRA_FLAGS "${WEXTRA_FLAGS} -Wold-style-definition -Waddress -Wmissing-noreturn ")
 SET(WEXTRA_FLAGS "${WEXTRA_FLAGS} -Wstrict-overflow=1 -Wextra -Warray-bounds -Wall")
 
-SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=gnu99")
-SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${WEXTRA_FLAGS}")
+SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${LIBQES_DEPENDS_CFLAGS} -std=gnu99 ${WEXTRA_FLAGS}")
 SET(CMAKE_C_FLAGS_DEBUG "-ggdb -fstack-protector-all -march=native")
 SET(CMAKE_C_FLAGS_RELEASE "-O4 -march=native")
 # Coverage target set in CodeCoverage.cmake
