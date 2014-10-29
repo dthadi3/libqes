@@ -21,6 +21,9 @@
 
 #include <qes_util.h>
 #include <qes_str.h>
+#ifdef MEMALIGN_FOUND
+#include <malloc.h>
+#endif
 
 enum qes_read_mode {
     QES_READ_MODE_UNKNOWN,
