@@ -96,7 +96,11 @@ SET(WEXTRA_FLAGS "${WEXTRA_FLAGS} -Wold-style-definition -Waddress -Wmissing-nor
 SET(WEXTRA_FLAGS "${WEXTRA_FLAGS} -Wstrict-overflow=1 -Wextra -Warray-bounds -Wall")
 
 SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${LIBQES_DEPENDS_CFLAGS} -std=gnu99 ${WEXTRA_FLAGS}")
-SET(CMAKE_C_FLAGS_DEBUG "-ggdb -fstack-protector-all -march=native")
+IF(UNIX)
+	SET(CMAKE_C_FLAGS_DEBUG "-ggdb -fstack-protector-all -march=native")
+ELSE()
+	SET(CMAKE_C_FLAGS_DEBUG "-g -march=native")
+ENDIF()
 SET(CMAKE_C_FLAGS_RELEASE "-O4 -march=native")
 # Coverage target set in CodeCoverage.cmake
 
