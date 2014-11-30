@@ -271,6 +271,7 @@ test_qes_seqfile_read_vs_kseq (void *ptr)
     qes_seqfile_destroy(sf);
     qes_seq_destroy(seq);
     kseq_destroy(kseq);
+    kseq = NULL;
     gzclose(fp);
     free(fname);
     /* Try again, with fasta */
@@ -280,8 +281,6 @@ test_qes_seqfile_read_vs_kseq (void *ptr)
     sf = qes_seqfile_create(fname, "r");
     fp = gzopen(fname, "r");
     kseq = kseq_init(fp);
-    kseq_res = 0;
-    my_res = 0;
     while (1) {
         my_res = qes_seqfile_read(sf, seq);
         kseq_res = kseq_read(kseq);
@@ -297,11 +296,9 @@ test_qes_seqfile_read_vs_kseq (void *ptr)
 end:
     qes_seqfile_destroy(sf);
     qes_seq_destroy(seq);
-    kseq_destroy(kseq);
+    if (kseq != NULL) kseq_destroy(kseq);
     gzclose(fp);
-    if (fname != NULL) {
-        free(fname);
-    }
+    if (fname != NULL) free(fname);
 }
 
 

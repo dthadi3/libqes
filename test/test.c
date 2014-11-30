@@ -18,7 +18,6 @@
 
 #include "tests.h"
 
-
 struct testgroup_t libqes_tests[] = {
     {"qes/util/", qes_util_tests},
     {"qes/match/", qes_match_tests},
@@ -53,14 +52,16 @@ main (int argc, const char *argv[])
     }
     if (data_prefix == NULL) {
         data_prefix = strdup(".");
+        assert(data_prefix != NULL);
     }
     if (access(data_prefix, W_OK | X_OK | R_OK) != 0) {
-        fprintf(stderr, "Could not access data prefix dir '%s'\n", data_prefix);
-        fprintf(stderr, "Please set the LIBQES_TEST_DATA_DIR environmental variable appropriately\n");
+        fprintf(stderr, "ERROR: Could not access data prefix dir '%s'\n",
+                data_prefix);
+        fprintf(stderr, "Usage: test_libqes <DATA_DIR> [<test>]\n");
         free(data_prefix);
         exit(EXIT_FAILURE);
     }
-    res = tinytest_main(argc-1, argv+1, libqes_tests);
+    res = tinytest_main(our_argc, our_argv, libqes_tests);
     free(data_prefix);
     return res;
 }

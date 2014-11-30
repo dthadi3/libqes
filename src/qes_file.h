@@ -47,8 +47,8 @@ struct qes_file {
 };
 
 /* qes_file_open:
-    Create a `struct qes_file` and open `path` with mode `mode` and errorhandler
-    `onerr`
+    Create a `struct qes_file` and open `path` with mode `mode` and
+    errorhandler `onerr`
  */
 struct qes_file *qes_file_open_ (const char *path, const char *mode,
                                  qes_errhandler_func onerr, const char *file,
@@ -233,8 +233,9 @@ Returns:        ssize_t set to either the length of the line copied to
                 `*bufref`, or one of -1 (EOF) or -2 (error).
 *============================================================================*/
 static inline ssize_t
-qes_file_getuntil_realloc_ (struct qes_file *file, int delim, char **bufref, size_t *sizeref,
-        qes_errhandler_func onerr, const char *src, const int line)
+qes_file_getuntil_realloc_(struct qes_file *file, int delim, char **bufref,
+                           size_t *sizeref, qes_errhandler_func onerr,
+                           const char *src, const int line)
 {
     size_t len = 0;
     size_t tocpy = 0;
@@ -259,10 +260,9 @@ qes_file_getuntil_realloc_ (struct qes_file *file, int delim, char **bufref, siz
         buf[0] = '\0';
     }
     /* Set nextbuf AFTER we may/may not have alloced buf above */
-    nextbuf = buf;
     /* In case we error out below, we always set bufref = buf here, as
        then we don't lose the memory alloced above */
-    *bufref = buf;
+    *bufref = nextbuf = buf;
     /* Read until delim is in file->buffer, filling buffer */
     while ((end = strchr(file->bufiter, delim)) == NULL) {
         /* copy the remainder of the buffer */
@@ -277,6 +277,7 @@ qes_file_getuntil_realloc_ (struct qes_file *file, int delim, char **bufref, siz
                  * function */
                 return -2;
             }
+            *bufref = buf;
         }
         /* set to the correct position in the NEW buf, maybe after realloc */
         nextbuf = buf + len - tocpy;
@@ -319,6 +320,7 @@ qes_file_getuntil_realloc_ (struct qes_file *file, int delim, char **bufref, siz
              * function */
             return -2;
         }
+        *bufref = buf;
     }
     nextbuf = buf + len - tocpy;
     memcpy(nextbuf, file->bufiter, tocpy);
@@ -370,7 +372,8 @@ qes_file_readline_realloc_ (struct qes_file *file, char **buf, size_t *size,
     return qes_file_getuntil_realloc_(file, '\n', buf, size, onerr, src, line);
 }
 #define qes_file_readline_realloc(fp, buf, sz) \
-    qes_file_readline_realloc_(fp, buf, sz, QES_DEFAULT_ERR_FN, __FILE__, __LINE__)
+    qes_file_readline_realloc_(fp, buf, sz, QES_DEFAULT_ERR_FN, __FILE__,   \
+                               __LINE__)
 #define qes_file_readline_realloc_errnil(fp, buf, sz) \
     qes_file_readline_realloc_(fp, buf, sz, errnil, __FILE__, __LINE__)
 #define qes_file_readline_realloc_errprint(fp, buf, sz) \
@@ -390,7 +393,8 @@ Description:    Reads ``file`` into ``dest`` until ``delim`` is found or
 Returns:        ssize_t: EOF, -2 (error) or size of data read.
  *===========================================================================*/
 static inline ssize_t
-qes_file_getuntil (struct qes_file *file, const int delim, char *dest, size_t maxlen)
+qes_file_getuntil (struct qes_file *file, const int delim, char *dest,
+                   size_t maxlen)
 {
     size_t len = 0;
     char *nextbuf = dest;
@@ -475,9 +479,9 @@ qes_file_readline (struct qes_file *file, char *dest, size_t maxlen)
 Name:           qes_file_readline_str
 Paramters:      struct qes_file *file: File to read.
                 struct qes_str *str: struct qes_str object to read into.
-Description:    Convenience wrapper around qes_file_readline_realloc, which reads a
-                line into a struct qes_str object, passing str->str to and str->capacity to
-                qes_file_readline_realloc.
+Description:    Convenience wrapper around qes_file_readline_realloc, which
+                reads a line into a struct qes_str object, passing str->str to
+                and str->capacity to qes_file_readline_realloc.
 Returns:        ssize_t set to either the length of the line copied to the
                 struct qes_str, or one of -1 (EOF) or -2 (error).
 * ===========================================================================*/
