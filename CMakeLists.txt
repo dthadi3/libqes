@@ -1,5 +1,5 @@
 CMAKE_MINIMUM_REQUIRED(VERSION 2.8)
-PROJECT(libqes C CXX)
+PROJECT(libqes C)
 
 # Append cmake-modules to module path
 SET(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH}
