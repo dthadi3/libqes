@@ -20,7 +20,6 @@
 #define LIBQES_VERSION "${LIBQES_VERSION}";
 #cmakedefine GETLINE_FOUND
 #cmakedefine STRNDUP_FOUND
-#cmakedefine ALIGNED_ALLOC_FOUND
 #cmakedefine GETPAGESIZE_FOUND
 #cmakedefine ZLIB_FOUND
 #cmakedefine GZBUFFER_FOUND
