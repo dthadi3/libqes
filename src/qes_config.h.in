@@ -5,9 +5,7 @@
  *
  *    Description:  Define various things from CMake.
  *
- *        Version:  1.0
  *        Created:  15/08/14 12:09:59
- *       Revision:  none
  *        License:  GPLv3+
  *       Compiler:  gcc, clang
  *
@@ -16,7 +14,9 @@
  * ============================================================================
  */
 
-/* Pull LIBQES_VERSION in from CMAKE */
+#ifndef QES_CONFIG_H
+#define QES_CONFIG_H
+
 #define LIBQES_VERSION "${LIBQES_VERSION}";
 #cmakedefine GETLINE_FOUND
 #cmakedefine STRNDUP_FOUND
@@ -25,6 +25,7 @@
 #cmakedefine ZLIB_FOUND
 #cmakedefine GZBUFFER_FOUND
 #cmakedefine OPENMP_FOUND
+#cmakedefine MALLOC_H_FOUND
 
 /* Definitions to make changing fp type easy */
 #ifdef ZLIB_FOUND
@@ -73,3 +74,4 @@
 #   define QES_ZREWIND frewind
 #endif
 
+#endif /* QES_CONFIG_H */

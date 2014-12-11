@@ -3,25 +3,28 @@ PROJECT(libqes C)
 
 # Append cmake-modules to module path
 SET(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH}
-	"${CMAKE_CURRENT_SOURCE_DIR}/cmake-modules")
-# git versioning
-INCLUDE(GitSemVer)
-GetGitSemVer(LIBQES_VERSION)
+    "${CMAKE_CURRENT_SOURCE_DIR}/cmake-modules")
+
+# git describe as versioning
+EXECUTE_PROCESS(COMMAND git describe
+                WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+                OUTPUT_VARIABLE LIBQES_VERSION
+                OUTPUT_STRIP_TRAILING_WHITESPACE)
 
 #############################
 ## Setup CMAKE Environment ##
 #############################
 
 # Shortcut to enable dev compile options
+OPTION(DEV "Enable developer warnings")
 IF (DEV)
-	SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS}  -fsanitize=address -fsanitize=leak -fsanitize=undefined")
-	SET(CMAKE_BUILD_TYPE Coverage)
+    SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS}  -fsanitize=address -fsanitize=leak -fsanitize=undefined")
+    SET(CMAKE_BUILD_TYPE Coverage)
 ENDIF()
 
 IF (NOT CMAKE_BUILD_TYPE)
-	SET(CMAKE_BUILD_TYPE Release)
+    SET(CMAKE_BUILD_TYPE Release)
 ENDIF()
-
 
 MESSAGE(STATUS "${CMAKE_BUILD_TYPE} build of libqes version: ${LIBQES_VERSION}")
 
@@ -33,7 +36,7 @@ SET(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 # Include coverage module IFF out build type is Coverage to avoid bailing out
 # with unmet dependencies on Release builds, i.e. other peoples' computers
 IF (CMAKE_BUILD_TYPE STREQUAL "Coverage")
-	INCLUDE(CodeCoverage)
+    INCLUDE(CodeCoverage)
 ENDIF()
 
 # Testing
@@ -47,12 +50,20 @@ INCLUDE(CPack)
 ## Find Packages and Headers ##
 ###############################
 
+# Header/symbols
 INCLUDE(CheckSymbolExists)
 INCLUDE(CheckFunctionExists)
 INCLUDE(CheckLibraryExists)
+INCLUDE(CheckIncludeFiles)
+
 CHECK_SYMBOL_EXISTS(getline stdio.h GETLINE_FOUND)
 CHECK_SYMBOL_EXISTS(strndup string.h STRNDUP_FOUND)
-CHECK_SYMBOL_EXISTS(memalign malloc.h MEMALIGN_FOUND)
+CHECK_INCLUDE_FILES(malloc.h MALLOC_H_FOUND)
+IF(MALLOC_H_FOUND)
+    CHECK_SYMBOL_EXISTS(memalign malloc.h MEMALIGN_FOUND)
+ELSE()
+    SET(MEMALIGN_FOUND False)
+ENDIF()
 CHECK_SYMBOL_EXISTS(getpagesize unistd.h GETPAGESIZE_FOUND)
 
 FIND_PACKAGE(ZLIB 1.2.1 REQUIRED)
@@ -61,17 +72,21 @@ FIND_PACKAGE(OpenMP)
 
 # Ignore that we found openmp if we've been asked to disable it
 IF (${NO_OPENMP})
-	SET(OPENMP_FOUND FALSE)
-	SET(OpenMP_C_FLAGS "")
+    SET(OPENMP_FOUND FALSE)
+    SET(OpenMP_C_FLAGS "")
 ENDIF()
 
 # Set dependency flags appropriately
 SET(LIBQES_DEPENDS_LIBS
-	${LIBQES_DEPENDS_LIBS} ${ZLIB_LIBRARIES})
+    ${LIBQES_DEPENDS_LIBS}
+    ${ZLIB_LIBRARIES})
 SET(LIBQES_DEPENDS_INCLUDE_DIRS
-	${LIBQES_DEPENDS_INCLUDE_DIRS} ${ZLIB_INCLUDE_DIRS})
+    ${LIBQES_DEPENDS_INCLUDE_DIRS}
+    ${ZLIB_INCLUDE_DIRS})
 SET(LIBQES_DEPENDS_CFLAGS
-	${LIBQES_DEPENDS_CFLAGS} ${ZLIB_CFLAGS} ${OpenMP_C_FLAGS})
+    ${LIBQES_DEPENDS_CFLAGS}
+    ${ZLIB_CFLAGS}
+    ${OpenMP_C_FLAGS})
 
 ##########################
 ## Set Compiler Options ##
@@ -79,12 +94,11 @@ SET(LIBQES_DEPENDS_CFLAGS
 
 # Set GCC-specific options
 IF (CMAKE_COMPILER_IS_GNUCC)
-	SET(WEXTRA_FLAGS "${WEXTRA_FLAGS} -Woverride-init -Wnormalized=id -Wlogical-op")
-	EXECUTE_PROCESS(COMMAND ${CMAKE_C_COMPILER} -dumpversion
-			OUTPUT_VARIABLE GCC_VERSION)
-	IF (${GCC_VERSION} VERSION_GREATER 4.9 OR ${GCC_VERSION} VERSION_EQUAL 4.9)
-		SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fdiagnostics-color=always")
-	ENDIF()
+    SET(WEXTRA_FLAGS "${WEXTRA_FLAGS} -Woverride-init -Wnormalized=id -Wlogical-op")
+    EXECUTE_PROCESS(COMMAND ${CMAKE_C_COMPILER} -dumpversion OUTPUT_VARIABLE GCC_VERSION)
+    IF (${GCC_VERSION} VERSION_GREATER 4.9 OR ${GCC_VERSION} VERSION_EQUAL 4.9)
+        SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fdiagnostics-color=always")
+    ENDIF()
 ENDIF()
 
 # Set CFLAGS
@@ -100,21 +114,21 @@ SET(WEXTRA_FLAGS "${WEXTRA_FLAGS} -Wstrict-overflow=1 -Wextra -Warray-bounds -Wa
 
 SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${LIBQES_DEPENDS_CFLAGS} -std=gnu99 ${WEXTRA_FLAGS}")
 IF(UNIX)
-	SET(CMAKE_C_FLAGS_DEBUG "-ggdb -fstack-protector-all -march=native")
+    SET(CMAKE_C_FLAGS_DEBUG "-ggdb -fstack-protector-all -march=native")
 ELSE()
-	SET(CMAKE_C_FLAGS_DEBUG "-g -march=native")
+    SET(CMAKE_C_FLAGS_DEBUG "-g -march=native")
 ENDIF()
 SET(CMAKE_C_FLAGS_RELEASE "-O4 -march=native")
 # Coverage target set in CodeCoverage.cmake
 
 # Set include dirs
 INCLUDE_DIRECTORIES(
-	${CMAKE_BINARY_DIR}
-	${CMAKE_CURRENT_SOURCE_DIR}/src
-	${CMAKE_CURRENT_SOURCE_DIR}/test
-	${CMAKE_CURRENT_SOURCE_DIR}/test/tinytest
-	${LIBQES_DEPENDS_INCLUDE_DIRS}
-	)
+    ${CMAKE_BINARY_DIR}
+    ${CMAKE_CURRENT_SOURCE_DIR}/src
+    ${CMAKE_CURRENT_SOURCE_DIR}/test
+    ${CMAKE_CURRENT_SOURCE_DIR}/test/tinytest
+    ${LIBQES_DEPENDS_INCLUDE_DIRS}
+    )
 
 # Set link dirs
 LINK_DIRECTORIES(${CMAKE_BINARY_DIR}/lib)
