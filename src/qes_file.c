@@ -47,7 +47,9 @@ qes_file_open_ (const char *path, const char *mode, qes_errhandler_func onerr,
     }
     /* Use a larger than default IO buffer, speeds things up.
      * Using 2x our buffer len for no particular reason. */
+#ifdef GZBUFFER_FOUND
     QES_ZBUFFER(qf->fp, (QES_FILEBUFFER_LEN) << 1);
+#endif
     if (qf->mode == QES_READ_MODE_READ) {
 #if defined(MEMALIGN_FOUND) && defined(GETPAGESIZE_FOUND)
         qf->buffer = aligned_alloc(getpagesize(),

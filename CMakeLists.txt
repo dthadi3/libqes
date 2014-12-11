@@ -48,12 +48,15 @@ INCLUDE(CPack)
 ###############################
 
 INCLUDE(CheckSymbolExists)
+INCLUDE(CheckFunctionExists)
+INCLUDE(CheckLibraryExists)
 CHECK_SYMBOL_EXISTS(getline stdio.h GETLINE_FOUND)
 CHECK_SYMBOL_EXISTS(strndup string.h STRNDUP_FOUND)
 CHECK_SYMBOL_EXISTS(memalign malloc.h MEMALIGN_FOUND)
 CHECK_SYMBOL_EXISTS(getpagesize unistd.h GETPAGESIZE_FOUND)
 
-FIND_PACKAGE(ZLIB 1.2.5 REQUIRED)
+FIND_PACKAGE(ZLIB 1.2.1 REQUIRED)
+CHECK_LIBRARY_EXISTS(${ZLIB_LIBRARIES} gzbuffer "" GZBUFFER_FOUND)
 FIND_PACKAGE(OpenMP)
 
 # Ignore that we found openmp if we've been asked to disable it

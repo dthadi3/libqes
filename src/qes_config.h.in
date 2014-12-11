@@ -23,6 +23,7 @@
 #cmakedefine ALIGNED_ALLOC_FOUND
 #cmakedefine GETPAGESIZE_FOUND
 #cmakedefine ZLIB_FOUND
+#cmakedefine GZBUFFER_FOUND
 #cmakedefine OPENMP_FOUND
 
 /* Definitions to make changing fp type easy */
@@ -43,7 +44,9 @@
 #   define QES_ZFUNGETC gzungetc
 #   define QES_ZERR gzerror
 #   define QES_ZEOF gzeof
+#ifdef GZBUFFER_FOUND
 #   define QES_ZBUFFER gzbuffer
+#endif
 #   define QES_ZSEEK gzseek
 #   define QES_ZTELL gztell
 #   define QES_ZREWIND gzrewind
