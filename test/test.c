@@ -24,6 +24,7 @@ struct testgroup_t libqes_tests[] = {
     {"qes/file/", qes_file_tests},
     {"qes/seqfile/", qes_seqfile_tests},
     {"qes/seq/", qes_seq_tests},
+    {"qes/log/", qes_log_tests},
     {"qes/sequtil/", qes_sequtil_tests},
     {"testdata/", data_tests},
     END_OF_GROUPS

@@ -50,7 +50,7 @@
 extern struct testcase_t qes_util_tests[];
 /* test_match tests */
 extern struct testcase_t qes_match_tests[];
-/* test_qes_fil tests */
+/* test_qes_file tests */
 extern struct testcase_t qes_file_tests[];
 /* test_seqfile tests */
 extern struct testcase_t qes_seqfile_tests[];
@@ -58,5 +58,7 @@ extern struct testcase_t qes_seqfile_tests[];
 extern struct testcase_t qes_seq_tests[];
 /* test_sequtil tests */
 extern struct testcase_t qes_sequtil_tests[];
+/* test_log tests */
+extern struct testcase_t qes_log_tests[];
 
 #endif /* TESTS_H */
