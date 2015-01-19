@@ -13,7 +13,6 @@
 #define QES_LOG_H
 
 #include <stdlib.h>
-#define _GNU_SOURCE
 #include <stdio.h>
 #include <qes_util.h>
 
@@ -90,16 +89,16 @@ int qes_log_format(struct qes_logger *logger, enum qes_log_level level,
                    const char *format, ...);
 #ifndef NDEBUG
 #define qes_log_format_debug(log, fmt, ...) \
-        qes_log_format(log, QES_LOG_DEBUG, fmt, _VA_ARGS_)
+        qes_log_format(log, QES_LOG_DEBUG, fmt, __VA_ARGS__)
 #else
 #define qes_log_format_debug(log, fmt, ...)
 #endif
 #define qes_log_format_info(log, fmt, ...) \
-        qes_log_format(log, QES_LOG_INFO, fmt, _VA_ARGS_)
+        qes_log_format(log, QES_LOG_INFO, fmt, __VA_ARGS__)
 #define qes_log_format_error(log, fmt, ...) \
-        qes_log_format(log, QES_LOG_ERROR, fmt, _VA_ARGS_)
+        qes_log_format(log, QES_LOG_ERROR, fmt, __VA_ARGS__)
 #define qes_log_format_fatal(log, fmt, ...) \
-        qes_log_format(log, QES_LOG_FATAL, fmt, _VA_ARGS_)
+        qes_log_format(log, QES_LOG_FATAL, fmt, __VA_ARGS__)
 
 
 #endif /* QES_LOG_H */

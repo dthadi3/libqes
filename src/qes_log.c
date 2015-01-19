@@ -11,6 +11,7 @@
 
 #include "qes_log.h"
 
+
 struct qes_logger *
 qes_logger_create(void)
 {
@@ -32,8 +33,8 @@ qes_logger_init(struct qes_logger  *logger,
 }
 
 int
-qes_logger_add_destination_struct(struct qes_logger *logger,
-                                  struct qes_log_destination *destination)
+qes_logger_add_destination_struct(struct qes_logger            *logger,
+                                  struct qes_log_destination   *destination)
 {
     struct qes_log_destination *new = NULL;
     size_t new_sz = logger->n_destinations + 1;
@@ -50,8 +51,9 @@ qes_logger_add_destination_struct(struct qes_logger *logger,
 }
 
 int
-qes_logger_add_destination(struct qes_logger *logger, FILE *stream,
-                           enum qes_log_level level)
+qes_logger_add_destination(struct qes_logger   *logger,
+                           FILE                *stream,
+                           enum qes_log_level   level)
 {
     struct qes_log_destination *new = NULL;
     size_t new_sz = logger->n_destinations + 1;
@@ -72,12 +74,12 @@ qes_logger_add_destination(struct qes_logger *logger, FILE *stream,
 }
 
 void
-_qes_logger_destroy(struct qes_logger *logger)
+_qes_logger_destroy(struct qes_logger  *logger)
 {
     if (logger != NULL) {
         qes_free(logger->name);
-        /* Memory leak, but the API needs to change */
         qes_free(logger->destinations);
+        qes_free(logger);
     }
 }
 
@@ -98,10 +100,10 @@ qes_log_entry_init(struct qes_log_entry *entry, enum qes_log_level level,
     return 0;
 }
 
-
 struct qes_log_entry *
-qes_log_entry_format_va(enum qes_log_level level, const char *format,
-                        va_list args)
+qes_log_entry_format_va(enum qes_log_level  level,
+                        const char         *format,
+                        va_list             args)
 {
     int res = 0;
     char *message = NULL;
@@ -126,7 +128,9 @@ qes_log_entry_format_va(enum qes_log_level level, const char *format,
 }
 
 struct qes_log_entry *
-qes_log_entry_format(enum qes_log_level level, const char *format, ...)
+qes_log_entry_format(enum qes_log_level     level,
+                     const char            *format,
+                     ...)
 {
     va_list args;
     struct qes_log_entry *entry;
@@ -140,7 +144,7 @@ qes_log_entry_format(enum qes_log_level level, const char *format, ...)
 }
 
 void
-_qes_log_entry_destroy(struct qes_log_entry *entry)
+_qes_log_entry_destroy(struct qes_log_entry    *entry)
 {
     if (entry != NULL) {
         qes_free(entry->message);
@@ -149,7 +153,8 @@ _qes_log_entry_destroy(struct qes_log_entry *entry)
 }
 
 static int
-_qes_logger_write_entry(struct qes_logger *logger, struct qes_log_entry *entry)
+_qes_logger_write_entry(struct qes_logger      *logger,
+                        struct qes_log_entry   *entry)
 {
     size_t iii;
     int res;
@@ -166,14 +171,16 @@ _qes_logger_write_entry(struct qes_logger *logger, struct qes_log_entry *entry)
         if (dest->level > entry->level) continue;
 
         res = fprintf(dest->stream, "%s", entry->message);
+        fflush(dest->stream);
         if (res < 0) return 1;
     }
     return 0;
 }
 
 int
-qes_log_message(struct qes_logger *logger, enum qes_log_level level,
-                const char *message)
+qes_log_message(struct qes_logger      *logger,
+                enum qes_log_level      level,
+                const char             *message)
 {
     struct qes_log_entry *entry;
 
@@ -182,8 +189,10 @@ qes_log_message(struct qes_logger *logger, enum qes_log_level level,
 }
 
 int
-qes_log_format(struct qes_logger *logger, enum qes_log_level level,
-               const char *format, ...)
+qes_log_format(struct qes_logger       *logger,
+               enum qes_log_level       level,
+               const char              *format,
+               ...)
 {
     struct qes_log_entry *entry;
     va_list args;

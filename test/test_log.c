@@ -15,7 +15,7 @@
 
 
 static void
-test_qes_logger(void *ptr)
+test_qes_logger_setup(void *ptr)
 {
     int res = 0;
     struct qes_logger *logger = NULL;
@@ -39,11 +39,53 @@ test_qes_logger(void *ptr)
     tt_int_op(logger->n_destinations, ==, 1);
     qes_logger_destroy(logger);
     tt_ptr_op(logger, ==, NULL);
+
 end:
-    if (logger != NULL) free(logger);
+    if (logger != NULL) {
+        if (logger->destinations != NULL) free(logger->destinations);
+        if (logger->name != NULL) free(logger->name);
+        free(logger);
+    }
+}
+
+static void
+test_qes_logger_logging(void *ptr)
+{
+    int res = 0;
+    struct qes_logger *logger = NULL;
+    char *log_fname = NULL;
+    char *truth_fname = NULL;
+    FILE *log_file = NULL;
+
+    (void) ptr;
+    /* Set up a logger, with an acutal file as output */
+    logger = qes_logger_create();
+    tt_ptr_op(logger, !=, NULL);
+    truth_fname = find_data_file("log_test.txt");
+    tt_ptr_op(truth_fname, !=, NULL);
+    log_fname = get_writable_file();
+    tt_ptr_op(log_fname, !=, NULL);
+    log_file = fopen(log_fname, "w");
+    tt_ptr_op(log_file, !=, NULL);
+    res = qes_logger_add_destination(logger, log_file, QES_LOG_INFO);
+    tt_int_op(res, ==, 0);
+
+    qes_log_message_debug(logger, "Hello World\n"); /* wont' print */
+    qes_log_message_info(logger, "Hello World\n"); /* should print */
+
+    qes_log_format_debug(logger, "%s\n", "Hello World");
+    qes_log_format_info(logger, "%s\n", "Hello World");
+
+    tt_int_op(filecmp(log_fname, truth_fname), ==, 0);
+end:
+    if (log_file != NULL) fclose(log_file);
+    if (truth_fname != NULL) free(truth_fname);
+    if (log_fname != NULL) free(log_fname);
+    qes_logger_destroy(logger);
 }
 
 struct testcase_t qes_log_tests[] = {
-    { "qes_logger", test_qes_logger, 0, NULL, NULL},
+    { "qes_logger_setup", test_qes_logger_setup, 0, NULL, NULL},
+    { "qes_logger_logging", test_qes_logger_logging, 0, NULL, NULL},
     END_OF_TESTCASES
 };
