@@ -4,13 +4,7 @@
  *       Filename:  tests.h
  *
  *    Description:  Tests for libqes
- *
- *        Version:  1.0
- *        Created:  04/05/14 15:48:16
- *       Revision:  none
  *        License:  GPLv3+
- *       Compiler:  gcc, clang
- *
  *         Author:  Kevin Murray, spam@kdmurray.id.au
  *
  * ============================================================================
@@ -60,5 +54,7 @@ extern struct testcase_t qes_seq_tests[];
 extern struct testcase_t qes_sequtil_tests[];
 /* test_log tests */
 extern struct testcase_t qes_log_tests[];
+/* test_helpers tests */
+extern struct testcase_t helper_tests[];
 
 #endif /* TESTS_H */

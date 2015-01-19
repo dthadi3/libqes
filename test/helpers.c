@@ -4,13 +4,7 @@
  *       Filename:  helpers.c
  *
  *    Description:  Helpers for tests
- *
- *        Version:  1.0
- *        Created:  29/05/14 16:22:23
- *       Revision:  none
  *        License:  GPLv3+
- *       Compiler:  gcc, clang
- *
  *         Author:  Kevin Murray, spam@kdmurray.id.au
  *
  * ============================================================================
@@ -144,4 +138,53 @@ crc32_file(const char *filepath)
     crcbuf[len] = '\0';
     fclose(fp);
     return strdup(crcbuf);
+}
+
+int
+filecmp(const char *file1, const char *file2)
+{
+    /* returns: -1 on error, 0 if identical, 1 if not */
+    FILE *fp1 = NULL;
+    FILE *fp2 = NULL;
+    unsigned char *buff1 = NULL;
+    unsigned char *buff2 = NULL;
+    const size_t buff_size = 65535;
+    int retval = 1;
+
+    if (file1 == NULL || file2 == NULL) return -1;
+    fp1 = fopen(file1, "r");
+    fp2 = fopen(file2, "r");
+    buff1 = malloc(buff_size);
+    buff2 = malloc(buff_size);
+    if (fp1 == NULL || fp2 == NULL || buff1 == NULL || buff2 == NULL) {
+        retval = -1;
+        goto exit;
+    }
+
+    while (!feof(fp1) && !feof(fp2)) {
+        size_t bytes_read = 0;
+        size_t res1 = 0;
+        size_t res2 = 0;
+        res1 = fread(buff1, 1, buff_size, fp1);
+        res2 = fread(buff2, 1, buff_size, fp2);
+        if (ferror(fp1) != 0 || ferror(fp2) != 0) {
+            retval = -1;
+            goto exit;
+        }
+        if (res1 != res2) {
+            retval = 1;
+            goto exit;
+        }
+        if (res1 == 0 && res2 == 0) {
+            break;
+        }
+        bytes_read += res1;
+        if (memcmp(buff1, buff2, res1) == 0) retval = 0;
+    }
+exit:
+    if (buff1 != NULL) free(buff1);
+    if (fp1 != NULL) fclose(fp1);
+    if (buff2 != NULL) free(buff2);
+    if (fp2 != NULL) fclose(fp2);
+    return retval;
 }

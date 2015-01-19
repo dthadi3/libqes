@@ -4,13 +4,7 @@
  *       Filename:  test.c
  *
  *    Description:  Tests for libqes
- *
- *        Version:  1.0
- *        Created:  11/08/13 21:34:38
- *       Revision:  none
  *        License:  GPLv3+
- *       Compiler:  gcc, clang
- *
  *         Author:  Kevin Murray, spam@kdmurray.id.au
  *
  * ============================================================================
@@ -27,6 +21,7 @@ struct testgroup_t libqes_tests[] = {
     {"qes/log/", qes_log_tests},
     {"qes/sequtil/", qes_sequtil_tests},
     {"testdata/", data_tests},
+    {"testhelpers/", helper_tests},
     END_OF_GROUPS
 };
 
