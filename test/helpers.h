@@ -29,8 +29,8 @@
 
 #include <qes_libgnu.h>
 
-extern char *data_prefix;
 
+extern char *data_prefix;
 char *find_data_file(const char * filepath);
 char *get_writable_file(void);
 void clean_writable_file(char *filepath);

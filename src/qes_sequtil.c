@@ -4,19 +4,14 @@
  *       Filename:  qes_sequtil.c
  *
  *    Description:  Sequence utility functions
- *
- *        Version:  1.0
- *        Created:  05/01/14 18:51:21
- *       Revision:  none
  *        License:  GPLv3+
- *       Compiler:  gcc, clang
- *
  *         Author:  Kevin Murray, spam@kdmurray.id.au
- 
+ *
  * ============================================================================
  */
 
 #include "qes_sequtil.h"
+
 
 /*
  * ===  FUNCTION  =============================================================

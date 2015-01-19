@@ -4,13 +4,7 @@
  *       Filename:  qes_str.h
  *
  *    Description:  String handling functions
- *
- *        Version:  1.0
- *        Created:  22/03/14 13:00:00
- *       Revision:  none
  *        License:  GPLv3+
- *       Compiler:  gcc, clang
- *
  *         Author:  Kevin Murray, spam@kdmurray.id.au
  *
  * ============================================================================

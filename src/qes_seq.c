@@ -4,19 +4,14 @@
  *       Filename:  qes_seq.c
  *
  *    Description:  Sequence structures
- *
- *        Version:  1.0
- *        Created:  11/08/13 21:34:38
- *       Revision:  none
  *        License:  GPLv3+
- *       Compiler:  gcc, clang
- *
  *         Author:  Kevin Murray, spam@kdmurray.id.au
  *
  * ============================================================================
  */
 
 #include "qes_seq.h"
+
 
 struct qes_seq *
 qes_seq_create (void)

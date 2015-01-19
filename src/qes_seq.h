@@ -4,13 +4,7 @@
  *       Filename:  qes_seq.h
  *
  *    Description:  Sequence structures
- *
- *        Version:  1.0
- *        Created:  31/07/13 12:51:02
- *       Revision:  none
  *        License:  GPLv3+
- *       Compiler:  gcc, clang
- *
  *         Author:  Kevin Murray, spam@kdmurray.id.au
  *
  * ============================================================================
@@ -21,6 +15,7 @@
 
 #include <qes_util.h>
 #include <qes_str.h>
+
 
 /*---------------------------------------------------------------------------
   | qes_seq module -- data structures to hold NGS sequences                 |

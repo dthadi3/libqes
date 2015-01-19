@@ -2,6 +2,7 @@
  * ============================================================================
  *
  *       Filename:  test_log.c
+ *
  *    Description:  Test logging
  *        License:  GPLv3+
  *         Author:  Kevin Murray, spam@kdmurray.id.au

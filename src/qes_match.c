@@ -5,19 +5,14 @@
  *
  *    Description:  Sequence matching and finding functions used in
  *                  bioinformatic tasks
- *
- *        Version:  1.0
- *        Created:  11/08/13 21:34:38
- *       Revision:  none
  *        License:  GPLv3+
- *       Compiler:  gcc, clang
- *
  *         Author:  Kevin Murray, spam@kdmurray.id.au
  *
  * ============================================================================
  */
 
 #include "qes_match.h"
+
 
 inline int_fast32_t
 qes_match_hamming (const char *seq1, const char *seq2, size_t len)

@@ -12,6 +12,7 @@
 
 #include "tests.h"
 
+
 static void
 test_crc32_file(void *data)
 {

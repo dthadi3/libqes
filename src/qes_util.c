@@ -4,19 +4,14 @@
  *       Filename:  qes_util.c
  *
  *    Description:  Wrappers around std library functions
- *
- *        Version:  1.0
- *        Created:  04/05/14 14:10:50
- *       Revision:  none
  *        License:  GPLv3+
- *       Compiler:  gcc, clang
- *
  *         Author:  Kevin Murray, spam@kdmurray.id.au
  *
  * ============================================================================
  */
 
 #include "qes_util.h"
+
 
 /* Pull LIBQES_VERSION in from qes_config.h */
 const char *libqes_version = LIBQES_VERSION;

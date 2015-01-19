@@ -4,13 +4,7 @@
  *       Filename:  testdata.h
  *
  *    Description:  Data for tests
- *
- *        Version:  1.0
- *        Created:  17/03/14 16:26:59
- *       Revision:  none
  *        License:  GPLv3+
- *       Compiler:  gcc, clang
- *
  *         Author:  Kevin Murray, spam@kdmurray.id.au
  *
  * ============================================================================
@@ -29,7 +23,6 @@
 #ifndef _WIN32
 #include <unistd.h>
 #endif
-
 #include <sys/stat.h>
 #include <sys/types.h>
 

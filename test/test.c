@@ -12,6 +12,7 @@
 
 #include "tests.h"
 
+
 struct testgroup_t libqes_tests[] = {
     {"qes/util/", qes_util_tests},
     {"qes/match/", qes_match_tests},

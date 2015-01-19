@@ -4,23 +4,16 @@
  *       Filename:  test_match.c
  *
  *    Description:  Test qes_match functions
- *
- *        Version:  1.0
- *        Created:  04/05/14 15:52:13
- *       Revision:  none
  *        License:  GPLv3+
- *       Compiler:  gcc
- *
  *         Author:  Kevin Murray, spam@kdmurray.id.au
  *
  * ============================================================================
  */
 
 #include "tests.h"
-
 #include <qes_match.h>
-
 #include <limits.h>
+
 
 static void
 test_qes_hamming (void *p)

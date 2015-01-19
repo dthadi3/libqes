@@ -2,6 +2,7 @@
  * ============================================================================
  *
  *       Filename:  qes_log.c
+ *
  *    Description:  Logging module of libngs2
  *        License:  GPLv3+
  *         Author:  Kevin Murray, spam@kdmurray.id.au

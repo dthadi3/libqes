@@ -12,11 +12,12 @@
 
 #include "helpers.h"
 
+
 /* This is how we name out output files, n_writables is the num of writable
    files we've made. */
 static int n_writables = 0;
 /* This holds the prefix. It is set (via extern) in test.c's main func. */
-char * data_prefix = NULL;
+char *data_prefix = NULL;
 
 
 /*===  FUNCTION  ============================================================*

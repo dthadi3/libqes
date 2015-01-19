@@ -4,13 +4,7 @@
  *       Filename:  benchmarks.c
  *
  *    Description:  Some benchmarks
- *
- *        Version:  1.0
- *        Created:  16/05/14 12:27:04
- *       Revision:  none
  *        License:  GPLv3+
- *       Compiler:  gcc, clang
- *
  *         Author:  Kevin Murray, spam@kdmurray.id.au
  *
  * ============================================================================
@@ -19,7 +13,7 @@
 #include <assert.h>
 #include <stdlib.h>
 #include <time.h>
-
+#include <stdlib.h>
 #include <qes_file.h>
 #include <qes_seqfile.h>
 #ifdef ZLIB_FOUND
@@ -30,8 +24,8 @@
 #endif
 
 #include "helpers.h"
-
 #include "kseq.h"
+
 
 void bench_qes_file_readline_realloc_file(int silent);
 void bench_qes_file_readline_file(int silent);

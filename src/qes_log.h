@@ -2,6 +2,7 @@
  * ============================================================================
  *
  *       Filename:  qes_log.h
+ *
  *    Description:  Logging module of libngs2
  *        License:  GPLv3+
  *         Author:  Kevin Murray, spam@kdmurray.id.au
@@ -15,6 +16,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <qes_util.h>
+
 
 enum qes_log_level {
     /* The idea is that the user can add values inbetween these, if they need

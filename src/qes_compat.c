@@ -4,18 +4,15 @@
  *       Filename:  qes_compat.c
  *
  *    Description:  Compatibility helpers for cross-platformness
- *
- *        Created:  24/10/14 08:59:24
- *       Revision:  none
  *        License:  GPLv3+
- *       Compiler:  gcc, clang
- *
  *         Author:  Kevin Murray, spam@kdmurray.id.au
  *
  * ============================================================================
  */
-#include <stdlib.h>
+
 #include "qes_compat.h"
+#include <stdlib.h>
+
 
 #ifndef STRNDUP_FOUND
 char *
