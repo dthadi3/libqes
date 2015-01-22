@@ -56,8 +56,6 @@ typedef struct qes_log_entry QesLogEntry;
 struct qes_logger *qes_logger_create(void);
 int qes_logger_init(struct qes_logger *logger, const char *name,
                     enum qes_log_level level);
-int qes_logger_add_destination_struct(struct qes_logger *logger,
-                                      struct qes_log_destination *destination);
 int qes_logger_add_destination(struct qes_logger *logger, FILE *stream,
                                enum qes_log_level level);
 void _qes_logger_destroy(struct qes_logger *logger);
@@ -67,10 +65,14 @@ void _qes_logger_destroy(struct qes_logger *logger);
 struct qes_log_entry *qes_log_entry_create(void);
 int qes_log_entry_init(struct qes_log_entry *entry, enum qes_log_level level,
                        const char *message);
-struct qes_log_entry *qes_log_entry_format(enum qes_log_level level,
-                                           const char *format, ...);
-struct qes_log_entry *qes_log_entry_format_va(enum qes_log_level level,
-                                           const char *format, va_list args);
+void qes_log_entry_clear(struct qes_log_entry *entry);
+int qes_log_entry_format(struct qes_log_entry *entry, enum qes_log_level level,
+                         const char *format, ...);
+int qes_log_entry_format_va(struct qes_log_entry *entry,
+                            enum qes_log_level level, const char *format,
+                            va_list args);
+int qes_logger_write_entry(struct qes_logger *logger,
+                           struct qes_log_entry *entry);
 void _qes_log_entry_destroy(struct qes_log_entry *log_entry);
 #define qes_log_entry_destroy(l) ({ _qes_log_entry_destroy(l); l = NULL; })
 
