@@ -159,6 +159,7 @@ test_qes_log_entry(void *ptr)
 
     qes_log_entry_destroy(entry);
     tt_ptr_op(entry, ==, NULL);
+
 end:
     qes_log_entry_destroy(entry);
 }

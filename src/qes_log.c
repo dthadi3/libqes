@@ -104,6 +104,7 @@ qes_log_entry_format_va(struct qes_log_entry   *entry,
     }
     /* Make the entry struct */
     res = qes_log_entry_init(entry, level, message);
+    free(message);
     return res;
 }
 
@@ -174,7 +175,9 @@ qes_log_message(struct qes_logger      *logger,
 
     res = qes_log_entry_format(&entry, level, "%s", message);
     if (res != 0) return res;
-    return qes_logger_write_entry(logger, &entry);
+    res = qes_logger_write_entry(logger, &entry);
+    qes_log_entry_clear(&entry);
+    return res;
 }
 
 int
@@ -191,5 +194,7 @@ qes_log_format(struct qes_logger       *logger,
     res = qes_log_entry_format_va(&entry, level, format, args);
     va_end(args);
     if (res != 0) return res;
-    return qes_logger_write_entry(logger, &entry);
+    res = qes_logger_write_entry(logger, &entry);
+    qes_log_entry_clear(&entry);
+    return res;
 }
