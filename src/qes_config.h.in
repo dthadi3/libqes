@@ -23,6 +23,8 @@
 #cmakedefine ZLIB_FOUND
 #cmakedefine GZBUFFER_FOUND
 #cmakedefine OPENMP_FOUND
+#cmakedefine ASPRINTF_FOUND
+#cmakedefine VASPRINTF_FOUND
 
 /* Definitions to make changing fp type easy */
 #ifdef ZLIB_FOUND
