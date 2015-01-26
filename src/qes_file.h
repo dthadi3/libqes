@@ -100,6 +100,7 @@ static inline int
 __qes_file_fill_buffer (struct qes_file *file)
 {
     ssize_t res = 0;
+
     if (!qes_file_ok(file)) {
         return 0;
     }
@@ -107,7 +108,7 @@ __qes_file_fill_buffer (struct qes_file *file)
         file->eof = 1;
         return EOF;
     }
-    res = QES_ZREAD(file->fp, file->buffer, (QES_FILEBUFFER_LEN) - 1);
+    res = QES_ZREAD(file->fp, file->buffer, QES_FILEBUFFER_LEN - 1);
     if (res < 0) {
         /* Errored */
         return 0;
@@ -244,6 +245,7 @@ qes_file_getuntil_realloc_(struct qes_file *file, int delim, char **bufref,
     char *end = NULL;
     size_t size = 0;
     int ret = 0;
+
     if (bufref == NULL || !qes_file_ok(file) || sizeref == NULL) {
         return -2;
     }
@@ -259,12 +261,13 @@ qes_file_getuntil_realloc_(struct qes_file *file, int delim, char **bufref,
         size = __INIT_LINE_LEN;
         buf[0] = '\0';
     }
-    /* Set nextbuf AFTER we may/may not have alloced buf above */
-    /* In case we error out below, we always set bufref = buf here, as
-       then we don't lose the memory alloced above */
+    /* Set nextbuf AFTER we may/may not have alloced buf above
+     * In case we error out below, we always set bufref = buf here, as
+     * then we don't lose the memory alloced above */
     *bufref = nextbuf = buf;
     /* Read until delim is in file->buffer, filling buffer */
-    while ((end = strchr(file->bufiter, delim)) == NULL) {
+    while ((end = memchr(file->bufiter, delim, file->bufend - file->bufiter))
+            == NULL) {
         /* copy the remainder of the buffer */
         tocpy = file->bufend - file->bufiter;
         len += tocpy;
@@ -410,11 +413,12 @@ qes_file_getuntil (struct qes_file *file, const int delim, char *dest,
     if (file->eof) {
         return EOF;
     }
-    while ((end = strchr(file->bufiter, delim)) == NULL) {
+    while ((end = memchr(file->bufiter, delim, file->bufend - file->bufiter))
+            == NULL) {
         tocpy = file->bufend - file->bufiter;
         if (len + tocpy >= maxlen) {
-            /* maxlen - 1 because we always leave space for \0 */
-            tocpy -= len - maxlen - 1;
+            /* + 1 because we always leave space for \0 */
+            tocpy += maxlen - (len + tocpy + 1);
         }
         len += tocpy;
         memcpy(nextbuf, file->bufiter, tocpy);
@@ -429,7 +433,7 @@ qes_file_getuntil (struct qes_file *file, const int delim, char *dest,
         }
     }
     if (end != NULL) {
-        tocpy = end + 1 - file->bufiter; /* +1 includes the delimiter */
+        tocpy = (end - file->bufiter) + 1; /* +1 includes the delimiter */
     } else if (file->bufiter < file->bufend) {
         tocpy = file->bufend - file->bufiter;
     } else {
@@ -437,13 +441,12 @@ qes_file_getuntil (struct qes_file *file, const int delim, char *dest,
         file->eof = 1;
         goto done;
     }
-    len += tocpy;
     if (len + tocpy >= maxlen) {
         /* maxlen - 1 because we always leave space for \0 */
-        tocpy -= len - maxlen - 1;
+        tocpy += maxlen - (len + tocpy + 1);
     }
-    nextbuf = dest + len - tocpy;
     memcpy(nextbuf, file->bufiter, tocpy);
+    nextbuf = dest + len - tocpy;
     file->bufiter += tocpy;
     goto done;
 done:
