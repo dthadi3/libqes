@@ -446,7 +446,7 @@ qes_file_getuntil (struct qes_file *file, const int delim, char *dest,
         tocpy += maxlen - (len + tocpy + 1);
     }
     memcpy(nextbuf, file->bufiter, tocpy);
-    nextbuf = dest + len - tocpy;
+    len += tocpy;
     file->bufiter += tocpy;
     goto done;
 done:
