@@ -35,7 +35,7 @@
 #   define QES_ZCLOSE gzclose
 #   define QES_ZREAD gzread
 #   define QES_ZWRITE gzwrite
-#   define QES_ZFLUSH gzflush
+#   define QES_ZFLUSH(fp) gzflush(fp, Z_SYNC_FLUSH)
 #   define QES_ZFPRINTF gzprintf
 #   define QES_ZFPUTS gzputs
 #   define QES_ZFPUTC gzputc
@@ -56,13 +56,13 @@
 #   define QES_ZCLOSE fclose
 #   define QES_ZDOPEN fdopen
 #   define QES_ZCLOSE fclose
-#   define QES_ZREAD fread
-#   define QES_ZWRITE fwrite
+#   define QES_ZREAD(fp, buf, ln) fread(buf, 1, ln, fp)
+#   define QES_ZWRITE(fp, buf, ln) fwrite(buf, 1, ln, fp)
 #   define QES_ZFLUSH fflush
 #   define QES_ZFPRINTF fprintf
-#   define QES_ZFPUTS fputs
-#   define QES_ZFPUTC fputc
-#   define QES_ZFGETS fgets
+#   define QES_ZFPUTS(fp, s) fputs(s, fp)
+#   define QES_ZFPUTC(fp, c) fputc(c, fp)
+#   define QES_ZFGETS(fp, s, l) fgets(s, l, fp)
 #   define QES_ZFGETC fgetc
 #   define QES_ZFUNGETC fungetc
 #   define QES_ZERR ferror
