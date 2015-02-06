@@ -136,9 +136,17 @@ qes_file_error (struct qes_file *file)
         /* Never return NULL, or we'll SIGSEGV printf */
         return "BAD FILE";
     }
+#ifdef ZLIB_FOUND
     errstr = gzerror(file->fp, &error);
     if (error == Z_ERRNO) {
         return strerror(errno);
     }
+#else
+    error = ferror(file->fp);
+    if (error != 0) {
+        errstr = strerror(errno);
+        clearerr(file->fp);
+    }
+#endif
     return errstr;
 }
