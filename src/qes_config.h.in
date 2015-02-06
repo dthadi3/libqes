@@ -67,10 +67,10 @@
 #   define QES_ZFUNGETC fungetc
 #   define QES_ZERR ferror
 #   define QES_ZEOF feof
-#   define QES_ZBUFFER fbuffer
+#   define QES_ZBUFFER(fp, sz) setvbuf(fp, NULL, _IOFBF, sz)
 #   define QES_ZSEEK fseek
 #   define QES_ZTELL ftell
-#   define QES_ZREWIND frewind
+#   define QES_ZREWIND rewind
 #endif
 
 #endif /* QES_CONFIG_H */
