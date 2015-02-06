@@ -5,8 +5,14 @@ A C library for various bioinformatics-y tasks. Proper docs will come in time.
 For now, we have reasonable test coverage under `./test/` that demonstrate the
 API.
 
-[![Build Status](https://travis-ci.org/kdmurray91/libqes.png)](https://travis-ci.org/kdmurray91/libqes)
-[![Coverage Status](https://img.shields.io/coveralls/kdmurray91/libqes.svg)](https://coveralls.io/r/kdmurray91/libqes?branch=dev)
+###Tests:
+
+| Jenkins GNU/Linux | [![Build Status](http://biojenkins.anu.edu.au/job/libqes/badge/icon)](http://biojenkins.anu.edu.au/job/libqes/) |
+| ----------------- | --- |
+| Jenkins MinGW     | [![Build Status](http://biojenkins.anu.edu.au/job/libqes-mingw/badge/icon)](http://biojenkins.anu.edu.au/job/libqes-mingw/) |
+| TravisCI          | [![Build Status](https://travis-ci.org/kdmurray91/libqes.svg?branch=dev)](https://travis-ci.org/kdmurray91/libqes) |
+| Test Coverage     | [![Coverage Status](https://img.shields.io/coveralls/kdmurray91/libqes.svg)](https://coveralls.io/r/kdmurray91/libqes?branch=master) |
+
 
 License
 =======
