@@ -37,9 +37,10 @@ qes_logger_init(struct qes_logger  *logger,
 }
 
 int
-qes_logger_add_destination(struct qes_logger   *logger,
-                           FILE                *stream,
-                           enum qes_log_level   level)
+qes_logger_add_destination_formatted(struct qes_logger   *logger,
+                                     FILE                *stream,
+                                     enum qes_log_level   level,
+                               char *(*formatter)(struct qes_log_entry *entry))
 {
     struct qes_log_destination *new = NULL;
     size_t new_sz = logger->n_destinations + 1;
@@ -56,6 +57,7 @@ qes_logger_add_destination(struct qes_logger   *logger,
     new = &new[new_sz - 1];
     new->stream = stream;
     new->level = level;
+    new->formatter = formatter;
     return 0;
 }
 
@@ -153,13 +155,17 @@ qes_logger_write_entry(struct qes_logger      *logger,
     if (logger->level > entry->level) return 0;
 
     for (iii = 0; iii < logger->n_destinations; iii++) {
+        char *formatted = NULL;
         struct qes_log_destination *dest = &logger->destinations[iii];
 
         /* Message is to unimportant for this destination */
         if (dest->level > entry->level) continue;
 
-        res = fprintf(dest->stream, "%s", entry->message);
+        formatted = dest->formatter(entry);
+        if (formatted == NULL) return 1;
+        res = fprintf(dest->stream, "%s", formatted);
         fflush(dest->stream);
+        qes_free(formatted);
         if (res < 0) return 1;
     }
     return 0;
@@ -197,4 +203,49 @@ qes_log_format(struct qes_logger       *logger,
     res = qes_logger_write_entry(logger, &entry);
     qes_log_entry_clear(&entry);
     return res;
+}
+
+char *
+qes_log_formatter_plain(struct qes_log_entry *entry)
+{
+    /* In the plain-text case, we just pass the message as is. */
+    if (entry == NULL) return NULL;
+    if (entry->message == NULL) return NULL;
+    return strdup(entry->message);
+}
+
+char *
+qes_log_formatter_pretty(struct qes_log_entry *entry)
+{
+    char *buf = NULL;
+    const char *colour = ANSIRST;
+    const char *reset = ANSIRST;
+    char marker = ' ';
+    int res = 0;
+
+    if (entry == NULL || entry->message == NULL) return NULL;
+
+    if (entry->level <= QES_LOG_DEBUG) {
+        marker = '.';
+        colour = ANSIBEG ATDIM FGCYN BGBLK ANSIEND;
+        reset = "";
+    } else if (entry->level <= QES_LOG_INFO) {
+        marker = '*';
+        colour = ANSIBEG ATNRM FGGRN BGBLK ANSIEND;
+    } else if (entry->level <= QES_LOG_WARNING) {
+        marker = '!';
+        colour = ANSIBEG ATULN FGYEL BGBLK ANSIEND;
+    } else if (entry->level <= QES_LOG_ERROR) {
+        marker = 'E';
+        colour = ANSIBEG ATBLD FGMAG BGBLK ANSIEND;
+    } else {
+        marker = 'F';
+        colour = ANSIBEG ATBLD ATBNK FGRED BGBLK ANSIEND;
+    }
+    res = asprintf(&buf, "%s[%c] %s%s", colour, marker, entry->message, reset);
+    if (res > 0) {
+        return buf;
+    } else {
+        return NULL;
+    }
 }
