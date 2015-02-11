@@ -15,6 +15,8 @@ EXECUTE_PROCESS(COMMAND git describe
 ## Setup CMAKE Environment ##
 #############################
 
+OPTION(NO_OPENMP "Disable OpenMP" False)
+OPTION(NO_ZLIB "Disable zlib" False)
 # Shortcut to enable dev compile options
 OPTION(DEV "Enable developer warnings")
 IF (DEV)
@@ -66,14 +68,23 @@ ELSE()
 ENDIF()
 CHECK_SYMBOL_EXISTS(getpagesize unistd.h GETPAGESIZE_FOUND)
 
-FIND_PACKAGE(ZLIB 1.2.1 REQUIRED)
-CHECK_LIBRARY_EXISTS(${ZLIB_LIBRARIES} gzbuffer "" GZBUFFER_FOUND)
-FIND_PACKAGE(OpenMP)
+IF (NOT ${NO_ZLIB})
+    FIND_PACKAGE(ZLIB 1.2.1 REQUIRED)
+    CHECK_LIBRARY_EXISTS(${ZLIB_LIBRARIES} gzbuffer "" GZBUFFER_FOUND)
+ELSE()
+    SET(ZLIB_FOUND FALSE)
+    SET(ZLIB_C_FLAGS "")
+    SET(ZLIB_LIBRARIES "")
+    SET(ZLIB_INCLUDE_DIRS "")
+    MESSAGE(STATUS "Building without zlib")
+ENDIF()
 
-# Ignore that we found openmp if we've been asked to disable it
-IF (${NO_OPENMP})
+IF (NOT ${NO_OPENMP})
+    FIND_PACKAGE(OpenMP)
+ELSE()
     SET(OPENMP_FOUND FALSE)
     SET(OpenMP_C_FLAGS "")
+    MESSAGE(STATUS "Building without OpenMP")
 ENDIF()
 
 # Set dependency flags appropriately
