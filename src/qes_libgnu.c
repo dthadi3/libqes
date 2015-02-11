@@ -8,7 +8,8 @@
  *
  * ============================================================================
  */
-#include <stdlib.h>
+
+#include "qes_libgnu.h"
 
 #ifndef ZLIB_FOUND
 # include "crc.c"
