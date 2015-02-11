@@ -10,4 +10,6 @@
  */
 #include <stdlib.h>
 
-#include "crc.c"
+#ifndef ZLIB_FOUND
+# include "crc.c"
+#endif
