@@ -1,4 +1,4 @@
-file(GLOB LIBQES_SOURCES *.c)
+file(GLOB LIBQES_SOURCES qes_*.c)
 
 # Targets
 ADD_LIBRARY(qes_static STATIC ${LIBQES_SOURCES})
