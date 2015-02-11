@@ -22,6 +22,3 @@ License
 All source code is licensed under the GNU Public License version 3, or a later
 version at your preference.  For license text, see `./gpl-3.0.txt` or
 [the GNU website here](http://www.gnu.org/licenses/gpl-3.0.html).
-If you're an open source developer and this causes license incompatibility,
-please talk to me and I'll re-license the  relevant portions (or the whole
-library).
