@@ -21,7 +21,17 @@
 #include <qes_seqfile.h>
 
 #include "kseq.h"
-KSEQ_INIT(gzFile, gzread)
+
+
+#ifdef ZLIB_FOUND
+#  include <zlib.h>
+   KSEQ_INIT(gzFile, gzread)
+#else
+#  include <sys/stat.h>
+#  include <fcntl.h>
+   KSEQ_INIT(int, read)
+#endif
+
 
 static void
 test_qes_seqfile_create(void *ptr)
@@ -85,6 +95,7 @@ end:
     }
 }
 
+
 static void
 test_qes_seqfile_guess_format (void *ptr)
 {
@@ -112,6 +123,8 @@ test_qes_seqfile_guess_format (void *ptr)
     tt_int_op(sf->format, ==, FASTA_FMT);
     qes_seqfile_destroy(sf);
     free(fname);
+    fname = NULL;
+#ifdef ZLIB_FOUND
     /* test with a gziped FASTQ file */
     fname = find_data_file("test.fastq.gz");
     tt_assert(fname != NULL);
@@ -120,10 +133,12 @@ test_qes_seqfile_guess_format (void *ptr)
     tt_int_op(res, ==, FASTQ_FMT);
     tt_int_op(sf->format, ==, FASTQ_FMT);
     qes_seqfile_destroy(sf);
+#endif
 end:
     qes_seqfile_destroy(sf);
     if (fname != NULL) free(fname);
 }
+
 
 static void
 test_qes_seqfile_destroy (void *ptr)
@@ -145,7 +160,6 @@ end:
     qes_seqfile_destroy(sf);
     if (fname != NULL) free(fname);
 }
-
 
 
 /*===  FUNCTION  ============================================================*
@@ -238,13 +252,19 @@ end:
 #undef CHECK_SEQFILE_READ
 }
 
+
 static void
 test_qes_seqfile_read_vs_kseq (void *ptr)
 {
     struct qes_seq *seq = qes_seq_create();
+#ifdef ZLIB_FOUND
     char *fname = find_data_file("test.fastq.gz");
-    struct qes_seqfile *sf = qes_seqfile_create(fname, "r");
     gzFile fp = gzopen(fname, "r");
+#else
+    char *fname = find_data_file("test.fastq");
+    int fp = open(fname, O_RDONLY);
+#endif
+    struct qes_seqfile *sf = qes_seqfile_create(fname, "r");
     kseq_t *kseq = kseq_init(fp);
     ssize_t kseq_res = 0;
     ssize_t my_res = 0;
@@ -272,14 +292,22 @@ test_qes_seqfile_read_vs_kseq (void *ptr)
     qes_seq_destroy(seq);
     kseq_destroy(kseq);
     kseq = NULL;
+#ifdef ZLIB_FOUND
     gzclose(fp);
+#else
+    close(fp);
+#endif
     free(fname);
     /* Try again, with fasta */
     seq = qes_seq_create();
     fname = find_data_file("test.fasta");
     tt_assert(fname != NULL);
     sf = qes_seqfile_create(fname, "r");
+#ifdef ZLIB_FOUND
     fp = gzopen(fname, "r");
+#else
+    fp = open(fname, O_RDONLY);
+#endif
     kseq = kseq_init(fp);
     while (1) {
         my_res = qes_seqfile_read(sf, seq);
@@ -297,8 +325,12 @@ end:
     qes_seqfile_destroy(sf);
     qes_seq_destroy(seq);
     if (kseq != NULL) kseq_destroy(kseq);
-    gzclose(fp);
     if (fname != NULL) free(fname);
+#ifdef ZLIB_FOUND
+    gzclose(fp);
+#else
+    close(fp);
+#endif
 }
 
 
@@ -306,7 +338,6 @@ end:
 Name:           test_qes_seqfile_write
 Description:    Tests the qes_seqfile_write function from qes_seqfile.c
  *===========================================================================*/
-
 static void
 test_qes_seqfile_write (void *ptr)
 {
@@ -365,6 +396,7 @@ end:
     if (fname != NULL) free(fname);
     if (crc != NULL) free(crc);
 }
+
 
 struct testcase_t qes_seqfile_tests[] = {
     { "qes_seqfile_create", test_qes_seqfile_create, 0, NULL, NULL},

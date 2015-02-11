@@ -268,13 +268,13 @@ qes_seqfile_format_seq(const struct qes_seq *seq, enum qes_seqfile_format fmt,
 ssize_t
 qes_seqfile_write (struct qes_seqfile *seqfile, struct qes_seq *seq)
 {
-#define sf_putc_check(c) ret = QES_ZFPUTC(seqfile->qf->fp, c);                  \
+#define sf_putc_check(c) ret = QES_ZFPUTC(seqfile->qf->fp, c);              \
     if (ret != c) {return -2;}                                              \
-    else res_len += 1;                                                      \
+    else {res_len += 1;}                                                    \
     ret = 0
-#define sf_puts_check(s) ret = QES_ZFPUTS(seqfile->qf->fp, s);                  \
+#define sf_puts_check(s) ret = QES_ZFPUTS(seqfile->qf->fp, s.str);          \
     if (ret < 0) {return -2;}                                               \
-    else res_len += ret;                                                    \
+    else {res_len += s.len;}                                                \
     ret = 0
 
     int ret = 0;
@@ -286,29 +286,29 @@ qes_seqfile_write (struct qes_seqfile *seqfile, struct qes_seq *seq)
     switch (seqfile->format) {
         case FASTA_FMT:
             sf_putc_check(FASTA_DELIM);
-            sf_puts_check(seq->name.str);
+            sf_puts_check(seq->name);
             if (qes_seq_has_comment(seq)) {
                 sf_putc_check(' ');
-                sf_puts_check(seq->comment.str);
+                sf_puts_check(seq->comment);
             }
             sf_putc_check('\n');
-            sf_puts_check(seq->seq.str);
+            sf_puts_check(seq->seq);
             sf_putc_check('\n');
             break;
         case FASTQ_FMT:
             sf_putc_check(FASTQ_DELIM);
-            sf_puts_check(seq->name.str);
+            sf_puts_check(seq->name);
             if (qes_seq_has_comment(seq)) {
                 sf_putc_check(' ');
-                sf_puts_check(seq->comment.str);
+                sf_puts_check(seq->comment);
             }
             sf_putc_check('\n');
-            sf_puts_check(seq->seq.str);
+            sf_puts_check(seq->seq);
             sf_putc_check('\n');
             if (qes_seq_has_qual(seq)) {
                 sf_putc_check('+');
                 sf_putc_check('\n');
-                sf_puts_check(seq->qual.str);
+                sf_puts_check(seq->qual);
                 sf_putc_check('\n');
 
             }
