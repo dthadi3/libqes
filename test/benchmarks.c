@@ -15,13 +15,19 @@
  *
  * ============================================================================
  */
+
+#include <assert.h>
 #include <stdlib.h>
+#include <time.h>
 
 #include <qes_file.h>
 #include <qes_seqfile.h>
-#include <time.h>
-#include <zlib.h>
-#include <assert.h>
+#ifdef ZLIB_FOUND
+#  include <zlib.h>
+#else
+#  include <sys/stat.h>
+#  include <fcntl.h>
+#endif
 
 #include "helpers.h"
 
@@ -40,7 +46,11 @@ void bench_qes_seqfile_par_iter_fq_macro(int silent);
 #endif
 
 
+#ifdef ZLIB_FOUND
 KSEQ_INIT(gzFile, gzread)
+#else
+KSEQ_INIT(int, read)
+#endif
 
 static char *infile;
 
@@ -160,7 +170,11 @@ bench_qes_seqfile_parse_fq(int silent)
 void
 bench_kseq_parse_fq(int silent)
 {
+#ifdef ZLIB_FOUND
     gzFile fp = gzopen(infile, "r");
+#else
+    int fp = open(infile, O_RDONLY);
+#endif
     kseq_t *seq = kseq_init(fp);
     ssize_t res = 0;
     size_t n_recs = 0;
@@ -175,7 +189,11 @@ bench_kseq_parse_fq(int silent)
                (long unsigned) seq_len);
     }
     kseq_destroy(seq);
+#ifdef ZLIB_FOUND
     gzclose(fp);
+#else
+    close(fp);
+#endif
 }
 
 void

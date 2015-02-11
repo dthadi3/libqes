@@ -27,15 +27,13 @@
 #include <strings.h>
 #include <errno.h>
 #include <stdint.h>
+#include <inttypes.h>
 #include <time.h>
 #ifndef _WIN32
-#include <unistd.h>
+# include <unistd.h>
 #endif
 
-#include <sys/stat.h>
-#include <sys/types.h>
-
-#include <zlib.h>
+#include <qes_libgnu.h>
 
 extern char *data_prefix;
 
