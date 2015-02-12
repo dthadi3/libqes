@@ -43,6 +43,29 @@ __qes_file_fill_buffer (struct qes_file *file)
     return 1;
 }
 
+static int
+__qes_file_write_buffer (struct qes_file *file)
+{
+    size_t len_to_write = 0;
+    ssize_t res = 0;
+
+    if (!qes_file_ok(file)) {
+        return 0;
+    }
+    /* While we're writing, bufiter is the next EMPTY place, and should always
+     * be '\0'. Therefore, it's the first thing we DON'T want to write.
+     * Therefore, there's no +1 or -1 below. */
+    len_to_write = file->bufiter - file->buffer;
+    res = QES_ZWRITE(file->fp, file->buffer, len_to_write);
+    if (res < 0) {
+        /* Errored */
+        return 0;
+    }
+    file->bufiter = file->buffer;
+    file->bufiter[0] = '\0'; /* Don't worry about memset */
+    return 1;
+}
+
 struct qes_file *
 qes_file_open_ (const char *path, const char *mode, qes_errhandler_func onerr,
                 const char *file, int line)
