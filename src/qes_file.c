@@ -122,9 +122,6 @@ void
 qes_file_close_ (struct qes_file *file)
 {
     if (file != NULL) {
-        if (file->mode == QES_FILE_MODE_WRITE) {
-            __qes_file_write_buffer(file);
-        }
         if (file->fp != NULL) {
             QES_ZCLOSE(file->fp);
         }
