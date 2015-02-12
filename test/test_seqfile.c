@@ -47,7 +47,7 @@ test_qes_seqfile_create(void *ptr)
     sf = qes_seqfile_create(fname, "r");
     tt_ptr_op(sf, !=, NULL);
     tt_ptr_op(sf->qf, !=, NULL);
-    tt_int_op(sf->qf->mode, ==, QES_READ_MODE_READ);
+    tt_int_op(sf->qf->mode, ==, QES_FILE_MODE_READ);
     tt_int_op(sf->n_records, ==, 0);
     tt_int_op(sf->format, ==, FASTQ_FMT);
     qes_seqfile_destroy(sf);
@@ -58,7 +58,7 @@ test_qes_seqfile_create(void *ptr)
     sf = qes_seqfile_create(fname, "r");
     tt_ptr_op(sf, !=, NULL);
     tt_ptr_op(sf->qf, !=, NULL);
-    tt_int_op(sf->qf->mode, ==, QES_READ_MODE_READ);
+    tt_int_op(sf->qf->mode, ==, QES_FILE_MODE_READ);
     tt_int_op(sf->n_records, ==, 0);
     tt_int_op(sf->format, ==, FASTA_FMT);
     qes_seqfile_destroy(sf);
@@ -70,7 +70,7 @@ test_qes_seqfile_create(void *ptr)
     QES_ZWRITE(sf->qf->fp, "ABCD", 4);
     tt_ptr_op(sf, !=, NULL);
     tt_ptr_op(sf->qf, !=, NULL);
-    tt_int_op(sf->qf->mode, ==, QES_READ_MODE_WRITE);
+    tt_int_op(sf->qf->mode, ==, QES_FILE_MODE_WRITE);
     tt_int_op(sf->n_records, ==, 0);
     tt_int_op(access(fname, F_OK), ==, 0);
     qes_seqfile_destroy(sf);
@@ -82,7 +82,7 @@ test_qes_seqfile_create(void *ptr)
     sf = qes_seqfile_create(fname, "w9");
     tt_ptr_op(sf, !=, NULL);
     tt_ptr_op(sf->qf, !=, NULL);
-    tt_int_op(sf->qf->mode, ==, QES_READ_MODE_WRITE);
+    tt_int_op(sf->qf->mode, ==, QES_FILE_MODE_WRITE);
     tt_int_op(sf->n_records, ==, 0);
     tt_int_op(access(fname, F_OK), ==, 0);
     qes_seqfile_destroy(sf);

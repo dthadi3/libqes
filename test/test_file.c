@@ -32,7 +32,7 @@ test_qes_file_open (void *ptr)
     tt_assert(fname != NULL);
     file = qes_file_open(fname, "r");
     tt_ptr_op(file, !=, NULL);
-    tt_int_op(file->mode, ==, QES_READ_MODE_READ);
+    tt_int_op(file->mode, ==, QES_FILE_MODE_READ);
     qes_file_close(file);
     free(fname);
     /* test zipped file opening for reading */
@@ -40,7 +40,7 @@ test_qes_file_open (void *ptr)
     tt_assert(fname != NULL);
     file = qes_file_open(fname, "r");
     tt_ptr_op(file, !=, NULL);
-    tt_int_op(file->mode, ==, QES_READ_MODE_READ);
+    tt_int_op(file->mode, ==, QES_FILE_MODE_READ);
     qes_file_close(file);
     free(fname);
     /* read with non-existant file */
@@ -55,7 +55,7 @@ test_qes_file_open (void *ptr)
     tt_assert(fname != NULL);
     file = qes_file_open(fname, "w");
     tt_ptr_op(file, !=, NULL);
-    tt_int_op(file->mode, ==, QES_READ_MODE_WRITE);
+    tt_int_op(file->mode, ==, QES_FILE_MODE_WRITE);
     clean_writable_file(fname);
     fname = NULL;
     /* With non-existant file path */
@@ -275,13 +275,13 @@ test_qes_file_guess_mode (void *ptr)
         "+", "+b", "+b8", "+T", "+bT",
     };
     const int mode_results[] = {
-        QES_READ_MODE_READ, QES_READ_MODE_READ, QES_READ_MODE_READ,
-        QES_READ_MODE_READ, QES_READ_MODE_READ, QES_READ_MODE_WRITE,
-        QES_READ_MODE_WRITE, QES_READ_MODE_WRITE, QES_READ_MODE_WRITE,
-        QES_READ_MODE_WRITE, QES_READ_MODE_WRITE, QES_READ_MODE_WRITE,
-        QES_READ_MODE_WRITE, QES_READ_MODE_WRITE, QES_READ_MODE_WRITE,
-        QES_READ_MODE_UNKNOWN, QES_READ_MODE_UNKNOWN, QES_READ_MODE_UNKNOWN,
-        QES_READ_MODE_UNKNOWN, QES_READ_MODE_UNKNOWN,
+        QES_FILE_MODE_READ, QES_FILE_MODE_READ, QES_FILE_MODE_READ,
+        QES_FILE_MODE_READ, QES_FILE_MODE_READ, QES_FILE_MODE_WRITE,
+        QES_FILE_MODE_WRITE, QES_FILE_MODE_WRITE, QES_FILE_MODE_WRITE,
+        QES_FILE_MODE_WRITE, QES_FILE_MODE_WRITE, QES_FILE_MODE_WRITE,
+        QES_FILE_MODE_WRITE, QES_FILE_MODE_WRITE, QES_FILE_MODE_WRITE,
+        QES_FILE_MODE_UNKNOWN, QES_FILE_MODE_UNKNOWN, QES_FILE_MODE_UNKNOWN,
+        QES_FILE_MODE_UNKNOWN, QES_FILE_MODE_UNKNOWN,
     };
     const size_t num_modes = 20;
     size_t iii;
