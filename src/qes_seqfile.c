@@ -4,19 +4,14 @@
  *       Filename:  qes_seqfile.c
  *
  *    Description:  qes_seqfile -- read sequences in FASTA or FASTQ format.
- *
- *        Version:  1.0
- *        Created:  14/05/14 15:56:38
- *       Revision:  none
  *        License:  GPLv3+
- *       Compiler:  gcc, clang
- *
  *         Author:  Kevin Murray, spam@kdmurray.id.au
  *
  * ============================================================================
  */
 
 #include "qes_seqfile.h"
+
 
 static inline ssize_t
 read_fastq_seqfile(struct qes_seqfile *seqfile, struct qes_seq *seq)

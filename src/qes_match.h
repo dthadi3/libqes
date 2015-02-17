@@ -5,13 +5,7 @@
  *
  *    Description:  Sequence matching and finding functions used in
  *                  bioinformatic tasks
- *
- *        Version:  1.0
- *        Created:  13/11/13 17:38:11
- *       Revision:  none
  *        License:  GPLv3+
- *       Compiler:  gcc, clang
- *
  *         Author:  Kevin Murray, spam@kdmurray.id.au
  *
  * ============================================================================

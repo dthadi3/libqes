@@ -4,20 +4,15 @@
  *       Filename:  test_file.c
  *
  *    Description:  Test qes_file
- *
- *        Version:  1.0
- *        Created:  22/03/14 12:16:56
- *       Revision:  none
  *        License:  GPLv3+
- *       Compiler:  gcc
- *
  *         Author:  Kevin Murray, spam@kdmurray.id.au
  *
  * ============================================================================
  */
-#include "tests.h"
 
+#include "tests.h"
 #include <qes_file.h>
+
 
 static void
 test_qes_file_open (void *ptr)

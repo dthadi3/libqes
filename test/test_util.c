@@ -4,17 +4,12 @@
  *       Filename:  test_util.c
  *
  *    Description:  Test qes_util.c
- *
- *        Version:  1.0
- *        Created:  05/03/14 21:44:03
- *       Revision:  none
  *        License:  GPLv3+
- *       Compiler:  gcc / clang
- *
  *         Author:  Kevin Murray, spam@kdmurray.id.au
  *
  * ============================================================================
  */
+
 #include "tests.h"
 #include <qes_util.h>
 

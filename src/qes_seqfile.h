@@ -4,23 +4,19 @@
  *       Filename:  qes_seqfile.h
  *
  *    Description:  qes_seqfile -- read sequences in FASTA or FASTQ format.
- *
- *        Version:  1.0
- *        Created:  14/05/14 15:57:20
- *       Revision:  none
  *        License:  GPLv3+
- *       Compiler:  gcc, clang
- *
  *         Author:  Kevin Murray, spam@kdmurray.id.au
  *
  * ============================================================================
  */
+
 #ifndef QES_SEQFILE_H
 #define QES_SEQFILE_H
 
 #include <qes_util.h>
 #include <qes_seq.h>
 #include <qes_file.h>
+
 
 /*--------------------------------------------------------------------------
   |       Seqfile -- seamless reading & writing of FASTA & FASTQ           |

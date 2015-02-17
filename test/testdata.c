@@ -4,19 +4,14 @@
  *       Filename:  testdata.c
  *
  *    Description:  Data for tests
- *
- *        Version:  1.0
- *        Created:  31/05/14 20:03:59
- *       Revision:  none
  *        License:  GPLv3+
- *       Compiler:  gcc, clang
- *
  *         Author:  Kevin Murray, spam@kdmurray.id.au
  *
  * ============================================================================
  */
 
 #include "testdata.h"
+
 
 const size_t n_loremipsum_lines = 11;
 const size_t loremipsum_fsize = 80+76+80+75+80+79+77+75+69+1+20;

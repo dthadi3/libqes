@@ -4,22 +4,14 @@
  *       Filename:  test_seqfile.c
  *
  *    Description:  Tests for the qes_seqfile module
- *
- *        Version:  1.0
- *        Created:  16/05/14 12:33:47
- *       Revision:  none
  *        License:  GPLv3+
- *       Compiler:  gcc, clang
- *
  *         Author:  Kevin Murray, spam@kdmurray.id.au
  *
  * ============================================================================
  */
 
 #include "tests.h"
-
 #include <qes_seqfile.h>
-
 #include "kseq.h"
 
 
@@ -31,6 +23,7 @@
 #  include <fcntl.h>
    KSEQ_INIT(int, read)
 #endif
+
 
 
 static void

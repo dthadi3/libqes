@@ -4,13 +4,7 @@
  *       Filename:  test.c
  *
  *    Description:  Tests for libqes
- *
- *        Version:  1.0
- *        Created:  11/08/13 21:34:38
- *       Revision:  none
  *        License:  GPLv3+
- *       Compiler:  gcc, clang
- *
  *         Author:  Kevin Murray, spam@kdmurray.id.au
  *
  * ============================================================================
@@ -18,14 +12,17 @@
 
 #include "tests.h"
 
+
 struct testgroup_t libqes_tests[] = {
     {"qes/util/", qes_util_tests},
     {"qes/match/", qes_match_tests},
     {"qes/file/", qes_file_tests},
     {"qes/seqfile/", qes_seqfile_tests},
     {"qes/seq/", qes_seq_tests},
+    {"qes/log/", qes_log_tests},
     {"qes/sequtil/", qes_sequtil_tests},
     {"testdata/", data_tests},
+    {"testhelpers/", helper_tests},
     END_OF_GROUPS
 };
 

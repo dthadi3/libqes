@@ -4,13 +4,7 @@
  *       Filename:  qes_file.h
  *
  *    Description:  Compressed file IO
- *
- *        Version:  1.0
- *        Created:  09/05/14 12:25:07
- *       Revision:  none
  *        License:  GPLv3+
- *       Compiler:  gcc, clang
- *
  *         Author:  Kevin Murray, spam@kdmurray.id.au
  *
  * ============================================================================

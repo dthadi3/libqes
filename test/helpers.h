@@ -4,13 +4,7 @@
  *       Filename:  helpers.h
  *
  *    Description:  Helpers for tests
- *
- *        Version:  1.0
- *        Created:  29/05/14 16:22:23
- *       Revision:  none
  *        License:  GPLv3+
- *       Compiler:  gcc, clang
- *
  *         Author:  Kevin Murray, spam@kdmurray.id.au
  *
  * ============================================================================
@@ -35,11 +29,12 @@
 
 #include <qes_libgnu.h>
 
-extern char *data_prefix;
 
+extern char *data_prefix;
 char *find_data_file(const char * filepath);
 char *get_writable_file(void);
 void clean_writable_file(char *filepath);
 char *crc32_file(const char *filepath);
+int filecmp(const char *file1, const char *file2);
 
 #endif /* HELPERS_H */

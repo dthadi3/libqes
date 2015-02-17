@@ -4,13 +4,7 @@
  *       Filename:  qes_util.h
  *
  *    Description:  Wrappers around std library functions
- *
- *        Version:  1.0
- *        Created:  04/05/14 14:10:50
- *       Revision:  none
  *        License:  GPLv3+
- *       Compiler:  gcc, clang
- *
  *         Author:  Kevin Murray, spam@kdmurray.id.au
  *
  * ============================================================================
@@ -18,6 +12,7 @@
 
 #ifndef QES_UTIL_H
 #define QES_UTIL_H
+
 
 /* #####   HEADER FILE INCLUDES   ########################################## */
 #include <ctype.h>
@@ -32,6 +27,7 @@
 #include "qes_config.h"
 #include "qes_compat.h"
 #include "qes_libgnu.h"
+
 
 /*
  * Cross-platform bollocks. Thanks windows.

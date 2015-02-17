@@ -4,20 +4,15 @@
  *       Filename:  test_sequtil.c
  *
  *    Description:  Tests for the sequtil module
- *
- *        Version:  1.0
- *        Created:  01/06/14 11:44:56
- *       Revision:  none
  *        License:  GPLv3+
- *       Compiler:  gcc, clang
- *
  *         Author:  Kevin Murray, spam@kdmurray.id.au
  *
  * ============================================================================
  */
-#include "tests.h"
 
+#include "tests.h"
 #include <qes_sequtil.h>
+
 
 static void
 test_qes_sequtil_translate_codon (void *ptr)

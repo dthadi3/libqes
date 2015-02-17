@@ -4,20 +4,15 @@
  *       Filename:  test_seq.c
  *
  *    Description:  Test qes_seq.c
- *
- *        Version:  1.0
- *        Created:  04/05/14 15:58:53
- *       Revision:  none
  *        License:  GPLv3+
- *       Compiler:  gcc
- *
  *         Author:  Kevin Murray, spam@kdmurray.id.au
  *
  * ============================================================================
  */
-#include "tests.h"
 
+#include "tests.h"
 #include <qes_seq.h>
+
 
 static void
 test_qes_seq_create (void *ptr)
