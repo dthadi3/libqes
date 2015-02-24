@@ -20,6 +20,14 @@ ENDIF()
 ## Setup CMAKE Environment ##
 #############################
 
+# Set this before you include libqes as a CMake subproject, so that we know not
+# to add cmake to the install rule
+IF (LIBQES_AS_SUBMODULE)
+    SET(LIBQES_DONT_INSTALL True)
+ELSE()
+    SET(LIBQES_DONT_INSTALL False)
+ENDIF()
+
 OPTION(NO_OPENMP "Disable OpenMP" False)
 OPTION(NO_ZLIB "Disable zlib" False)
 # Shortcut to enable dev compile options
