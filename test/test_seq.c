@@ -226,6 +226,67 @@ end:
 }
 
 static void
+test_qes_seq_print(void *ptr)
+{
+    struct qes_seq *seq = NULL;
+    FILE *fp = NULL;
+    char *outfile = NULL;
+    char *truthfile = NULL;
+    int res = 1;
+
+    (void) ptr;
+    /* Create output file */
+    outfile = get_writable_file();
+    fp = fopen(outfile, "w");
+    tt_ptr_op(fp, !=, NULL);
+    /* create sequence, fill it */
+    seq = qes_seq_create();
+    res = qes_seq_fill(seq, "TEST", "Comment 1", "AGCT", "IIII");
+    tt_int_op(res, ==, 0);
+    /* Print the seq to the output file */
+    res = qes_seq_print(seq, fp);
+    tt_int_op(res, ==, 0);
+    /* Check printing */
+    truthfile = find_data_file("truth/qes_seq_print.fq");
+    tt_ptr_op(truthfile, !=, NULL);
+    tt_int_op(filecmp(outfile, truthfile), ==, 0);
+    /* Clean up */
+    free(truthfile);
+    truthfile = NULL;
+    fclose(fp);
+    fp = NULL;
+    qes_seq_destroy(seq);
+
+    /* recreate, just without quality */
+    seq = qes_seq_create();
+    fp = fopen(outfile, "w");
+    tt_ptr_op(fp, !=, NULL);
+    res = qes_seq_fill(seq, "TEST", "Comment 1", "AGCT", "");
+    tt_int_op(res, ==, 0);
+    /* Print the seq to the output file */
+    res = qes_seq_print(seq, fp);
+    tt_int_op(res, ==, 0);
+    /* Check printing */
+    truthfile = find_data_file("truth/qes_seq_print.fa");
+    tt_ptr_op(truthfile, !=, NULL);
+    tt_int_op(filecmp(outfile, truthfile), ==, 0);
+    free(truthfile);
+    truthfile = NULL;
+    fclose(fp);
+    fp = NULL;
+
+    /* error cases  */
+    tt_int_op(qes_seq_print(NULL, stdout), ==, 1);
+    tt_int_op(qes_seq_print(seq, NULL), ==, 1);
+
+end:
+    qes_seq_destroy(seq);
+    if (fp != NULL) fclose(fp);
+    if (outfile != NULL) free(outfile);
+    if (truthfile != NULL) free(truthfile);
+}
+
+static void
 test_qes_seq_ok_no_comment_or_qual (void *ptr)
 {
     struct qes_seq *seq = NULL;
@@ -418,5 +479,6 @@ struct testcase_t qes_seq_tests[] = {
     { "qes_seq_destroy", test_qes_seq_destroy, 0, NULL, NULL},
     { "qes_seq_fill", test_qes_seq_fill_funcs, 0, NULL, NULL},
     { "qes_seq_copy", test_qes_seq_copy, 0, NULL, NULL},
+    { "qes_seq_print", test_qes_seq_print, 0, NULL, NULL},
     END_OF_TESTCASES
 };
