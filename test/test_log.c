@@ -97,7 +97,7 @@ test_qes_logger_logging(void *ptr)
     /* Set up a logger, with an acutal file as output */
     logger = qes_logger_create();
     tt_ptr_op(logger, !=, NULL);
-    truth_fname = find_data_file("log_test.txt");
+    truth_fname = find_data_file("truth/log_test.txt");
     tt_ptr_op(truth_fname, !=, NULL);
     log_fname = get_writable_file();
     tt_ptr_op(log_fname, !=, NULL);
