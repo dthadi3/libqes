@@ -131,10 +131,15 @@ qes_seq_fill(struct qes_seq *seqobj, const char *name, const char *comment,
             || qual == NULL) {
         return 1;
     }
+    qes_str_nullify(&seqobj->name);
+    qes_str_nullify(&seqobj->comment);
+    qes_str_nullify(&seqobj->seq);
+    qes_str_nullify(&seqobj->qual);
     if (qes_seq_fill_name(seqobj, name, strlen(name)) != 0) return 1;
     if (qes_seq_fill_comment(seqobj, comment, strlen(comment)) != 0) return 1;
     if (qes_seq_fill_seq(seqobj, seq, strlen(seq)) != 0) return 1;
-    if (qes_seq_fill_qual(seqobj, qual, strlen(qual)) != 0) return 1;
+    if (strlen(qual) > 0 &&
+        qes_seq_fill_qual(seqobj, qual, strlen(qual)) != 0) return 1;
     return 0;
 }
 
@@ -145,7 +150,7 @@ Description:    Deallocate and set to NULL a struct qes_seq on the heap.
 Returns:        void.
  *===========================================================================*/
 void
-qes_seq_destroy_ (struct qes_seq *seq)
+qes_seq_destroy_(struct qes_seq *seq)
 {
     if (seq != NULL) {
         qes_str_destroy_cp(&seq->name);
@@ -154,4 +159,32 @@ qes_seq_destroy_ (struct qes_seq *seq)
         qes_str_destroy_cp(&seq->qual);
         qes_free(seq);
     }
+}
+
+int
+qes_seq_print(const struct qes_seq *seq, FILE *stream)
+{
+    if (!qes_seq_ok(seq)) return 1;
+    if (stream == NULL) return 1;
+
+    if (seq->qual.len > 0) {
+        fputc('@', stream);
+    } else {
+        fputc('>', stream);
+    }
+    fputs(seq->name.str, stream);
+    if (seq->comment.str) {
+        fputc(' ', stream);
+        fputs(seq->comment.str, stream);
+    }
+    fputc('\n', stream);
+    fputs(seq->seq.str, stream);
+    fputc('\n', stream);
+    if (seq->qual.len > 0) {
+        fputs("+\n", stream);
+        fputs(seq->qual.str, stream);
+        fputc('\n', stream);
+    }
+    fflush(stream);
+    return 0;
 }
