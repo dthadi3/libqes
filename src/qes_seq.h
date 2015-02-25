@@ -147,7 +147,6 @@ extern int qes_seq_fill_qual(struct qes_seq *seqobj, const char *qual,
 extern int qes_seq_fill(struct qes_seq *seqobj, const char *name,
                         const char *comment, const char *seq, const char *qual);
 
-#if 0
 /*===  FUNCTION  ============================================================*
 Name:           qes_seq_print
 Paramters:      const struct qes_seq *: seq to print
@@ -156,9 +155,8 @@ Paramters:      const struct qes_seq *: seq to print
 Description:    Print ``seq`` in formatted per ``format`` to ``stream``.
 Returns:        int: 1 on success, 0 on failure.
  *===========================================================================*/
-extern int qes_seq_print (const struct qes_seq *seq,
-                          enum qes_seqfile_format fmt, FILE *stream);
-#endif
+int qes_seq_print              (const struct qes_seq   *seq,
+                                FILE                   *stream);
 
 /*===  FUNCTION  ============================================================*
 Name:           qes_seq_destroy
