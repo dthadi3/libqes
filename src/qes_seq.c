@@ -13,6 +13,15 @@
 #include "qes_seq.h"
 
 
+void
+qes_seq_init (struct qes_seq *seq)
+{
+    qes_str_init(&seq->name, __INIT_LINE_LEN);
+    qes_str_init(&seq->comment, __INIT_LINE_LEN);
+    qes_str_init(&seq->seq, __INIT_LINE_LEN);
+    qes_str_init(&seq->qual, __INIT_LINE_LEN);
+}
+
 struct qes_seq *
 qes_seq_create (void)
 {

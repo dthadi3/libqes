@@ -43,6 +43,7 @@ struct qes_seq *qes_seq_create (void);
 struct qes_seq *qes_seq_create_no_qual (void);
 struct qes_seq *qes_seq_create_no_qual_or_comment (void);
 
+void qes_seq_init               (struct qes_seq        *seq);
 
 /*===  FUNCTION  ============================================================*
 Name:           qes_seq_ok
