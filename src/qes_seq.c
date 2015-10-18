@@ -154,7 +154,7 @@ qes_seq_fill(struct qes_seq *seqobj, const char *name, const char *comment,
 
 /*===  FUNCTION  ============================================================*
 Name:           qes_seq_destroy
-Paramters:      struct qes_seq *: seq to destroy.
+Parameters:     struct qes_seq *: seq to destroy.
 Description:    Deallocate and set to NULL a struct qes_seq on the heap.
 Returns:        void.
  *===========================================================================*/

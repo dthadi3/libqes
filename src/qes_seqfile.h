@@ -44,7 +44,7 @@ struct qes_seqfile {
 
 /*===  FUNCTION  ============================================================*
 Name:           qes_seqfile_create
-Paramters:      const char *path: Path to open.
+Parameters:     const char *path: Path to open.
                 const char *mode: Mode to pass to the fopen equivalent used.
 Description:    Allocates structures, initialises values and opens the internal
                 file handle.
@@ -55,8 +55,8 @@ struct qes_seqfile *qes_seqfile_create (const char *path, const char *mode);
 
 /*===  FUNCTION  ============================================================*
 Name:           qes_seqfile_ok
-Paramters:      const struct qes_seqfile *file: File reference to check.
-Description:    Check a file referenece ``file``, ensuring that it may be
+Parameters:     const struct qes_seqfile *file: File reference to check.
+Description:    Check a file reference ``file``, ensuring that it may be
                 dereferenced and used. This checks if a buffer has been
                 allocated and buffer pointers set appropriately IFF the file is
                 opened for reading. No guarantees are given about being able to
@@ -73,7 +73,7 @@ qes_seqfile_ok(const struct qes_seqfile *file)
 
 /*===  FUNCTION  ============================================================*
 Name:           qes_seqfile_guess_format
-Paramters:      struct qes_seqfile *file: File whose format we guess.
+Parameters:     struct qes_seqfile *file: File whose format we guess.
 Description:    Guess, using qes_file_peek, the format of ``file``. This only inspects
                 the first character, so it will be confused if the first
                 character of the file is incorrect. Only use this at the start

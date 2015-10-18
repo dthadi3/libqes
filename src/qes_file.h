@@ -57,7 +57,7 @@ struct qes_file *qes_file_open_(const char             *path,
 
 /*===  FUNCTION  ============================================================*
 Name:           qes_file_close
-Paramters:      struct qes_file *file: file to close.
+Parameters:     struct qes_file *file: file to close.
 Description:    Closes the file pointer in ``file``, frees dynamically
                 allocated members of ``file`` and sets ``file`` to NULL.
 Returns:        void
@@ -87,7 +87,7 @@ int qes_file_getc              (struct qes_file        *file);
 
 /*===  FUNCTION  ============================================================*
 Name:           qes_file_readline
-Paramters:      struct qes_file *file: File to read
+Parameters:     struct qes_file *file: File to read
                 char *dest: Destination buffer
                 size_t maxlen: size of destination buffer
 Description:    Reads at most ``maxlen - 1`` bytes of the next '\n' delimited
@@ -102,7 +102,7 @@ ssize_t qes_file_readline      (struct qes_file        *file,
 
 /*===  FUNCTION  ============================================================*
 Name:           qes_file_readline_str
-Paramters:      struct qes_file *file: File to read.
+Parameters:     struct qes_file *file: File to read.
                 struct qes_str *str: struct qes_str object to read into.
 Description:    Convenience wrapper around qes_file_readline_realloc, which
                 reads a line into a struct qes_str object, passing str->str to
@@ -115,7 +115,7 @@ ssize_t qes_file_readline_str  (struct qes_file        *file,
 
 /*===  FUNCTION  ============================================================*
 Name:           qes_file_getuntil
-Paramters:      struct qes_file *file: File to read
+Parameters:     struct qes_file *file: File to read
                 const int delim: Delimiter char.
 Description:    Reads ``file`` into ``dest`` until ``delim`` is found or
                 ``maxlen - `` bytes have been read. ``delim`` is copied into
@@ -130,7 +130,7 @@ ssize_t qes_file_getuntil      (struct qes_file        *file,
 
 /*===  FUNCTION  ============================================================*
 Name:           qes_file_getuntil_realloc
-Paramters:      qes_file *file: File to read.
+Parameters:     qes_file *file: File to read.
                 int delim: Delimiter char.
                 char **bufref: reference to a `char *` containing the buffer.
                     Must not refer to a ``char[]`` that cannot be resized with

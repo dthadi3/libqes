@@ -49,7 +49,7 @@
 #define BGWHT  "47"
 
 enum qes_log_level {
-    /* The idea is that the user can add values inbetween these, if they need
+    /* The idea is that the user can add values between these, if they need
      * to. a la Python's logging module. */
     QES_LOG_DEBUG = 0,
     QES_LOG_INFO = 10,

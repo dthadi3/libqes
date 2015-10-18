@@ -37,10 +37,11 @@ qes_str_ok (const struct qes_str *str)
 
 /*===  FUNCTION  ============================================================*
 Name:           qes_str_init
-Parameters:     struct qes_str *str: String to initialise (normally on the stack).
+Parameters:     struct qes_str *str: String to initialise (normally on the
+                                     stack).
                 size_t len: Initial capacity of `struct qes_str`.
-Description:    Initialise a `struct qes_str` (typically on the stack) with room for
-                `len` characters.
+Description:    Initialise a `struct qes_str` (typically on the stack) with
+                room for `len` characters.
 Returns:        void
  *===========================================================================*/
 static inline void
@@ -55,7 +56,8 @@ qes_str_init (struct qes_str *str, size_t capacity)
 /*===  FUNCTION  ============================================================*
 Name:           qes_str_create
 Parameters:     size_t len: Initial capacity of `struct qes_str`.
-Description:    Create a `struct qes_str` on the heap with room for `len` characters.
+Description:    Create a `struct qes_str` on the heap with room for `len`
+                characters.
 Returns:        `struct qes_str *` Pointer to a memory address.
  *===========================================================================*/
 static inline struct qes_str *
@@ -91,7 +93,7 @@ qes_str_fill_charptr (struct qes_str *str, const char *cp, size_t len)
 
 /*===  FUNCTION  ============================================================*
 Name:           qes_str_nullify
-Paramters:      struct qes_str *str: `struct qes_str` to nullify.
+Parameters:     struct qes_str *str: `struct qes_str` to nullify.
 Description:    Invalidates a `struct qes_str` without freeing the `char []`.
 Returns:        int: 0 on success, otherwise 1.
  *===========================================================================*/
@@ -117,7 +119,7 @@ extern void qes_str_print (const struct qes_str *str, FILE *stream);
 
 /*===  FUNCTION  ============================================================*
 Name:           qes_str_destroy
-Paramters:      struct qes_str *: `struct qes_str` to destroy.
+Parameters:     struct qes_str *: `struct qes_str` to destroy.
 Description:    Frees `str->str` and the struct qes_str struct itself.
 Returns:        void
  *===========================================================================*/
@@ -125,7 +127,7 @@ extern void qes_str_destroy (struct qes_str *str);
 
 /*===  FUNCTION  ============================================================*
 Name:           qes_str_destroy_cp
-Paramters:      struct qes_str *: String to destrop
+Parameters:     struct qes_str *: String to destrop
 Description:    Frees `str->str` without freeing the struct qes_str struct
                 itself. For use on `struct qes_str`s allocated on the stack.
 Returns:        void

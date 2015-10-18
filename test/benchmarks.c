@@ -263,7 +263,7 @@ main (int argc, char *argv[])
     } else {
         infile = strdup(argv[1]);
         rnds = atoi(argv[2]);
-        printf("Begining benchmarks.\n");
+        printf("Beginning benchmarks.\n");
         printf("---------------------------------------------------------------------\n");
     }
     for (iii = 3; iii < (unsigned int) argc; iii++) {

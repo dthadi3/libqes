@@ -398,7 +398,7 @@ qes_file_readline_realloc_ (struct qes_file *file, char **buf, size_t *size,
 
 /*===  FUNCTION  ============================================================*
 Name:           qes_file_getuntil
-Paramters:      struct qes_file *file: File to read
+Parameters:     struct qes_file *file: File to read
                 const int delim: Delimiter char.
 Description:    Reads ``file`` into ``dest`` until ``delim`` is found or
                 ``maxlen - `` bytes have been read. ``delim`` is copied into

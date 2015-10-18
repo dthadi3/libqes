@@ -33,7 +33,7 @@ qes_match_hamming (const char *seq1, const char *seq2, size_t len)
             len = len2;
         }
     }
-    /* Count mismatches. See comment on analagous loop in qes_match_hamming_max
+    /* Count mismatches. See comment on analogous loop in qes_match_hamming_max
      * for an explanation. */
     while(iii < len) {
         if (seq2[iii] != seq1[iii]) {
@@ -56,7 +56,7 @@ qes_match_hamming_max(const char *seq1, const char *seq2, size_t len,
     if (seq1 == NULL || seq2 == NULL || max < 0) {
         return -1;
     }
-    /* If we've been given a lenght of 0, we make it up ourselves */
+    /* If we've been given a length of 0, we make it up ourselves */
     if (len == 0) {
         size_t len2 = strlen(seq2);
         len = strlen(seq1);

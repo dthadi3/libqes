@@ -54,7 +54,7 @@ test_qes_file_open (void *ptr)
     clean_writable_file(fname);
     fname = NULL;
     /* With non-existant file path */
-    badfile = qes_file_open("non/existant.file", "w");
+    badfile = qes_file_open("non/existent.file", "w");
     tt_ptr_op(badfile, ==, NULL);
 
 end:

@@ -15,7 +15,7 @@
 #include "qes_config.h"
 
 /* This file and qes_libgnu.c are designed to allow us to keep the sources of
- * the gnulib functions intact and in their original seperate form. */
+ * the gnulib functions intact and in their original separate form. */
 
 #ifndef ZLIB_FOUND
 # include "crc.h"

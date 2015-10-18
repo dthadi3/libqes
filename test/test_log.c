@@ -94,7 +94,7 @@ test_qes_logger_logging(void *ptr)
     FILE *log_file = NULL;
 
     (void) ptr;
-    /* Set up a logger, with an acutal file as output */
+    /* Set up a logger, with an actual file as output */
     logger = qes_logger_create();
     tt_ptr_op(logger, !=, NULL);
     truth_fname = find_data_file("truth/log_test.txt");

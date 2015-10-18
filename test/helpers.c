@@ -22,7 +22,7 @@ char *data_prefix = NULL;
 
 /*===  FUNCTION  ============================================================*
 Name:           find_data_file
-Paramters:      filepath: the file, under ./data, to find
+Parameters:      filepath: the file, under ./data, to find
 Description:    Finds the full path to ``filepath``
 Returns:        A ``char *`` on the heap that contains a valid path to the
                 file ``filepath``, or NULL on error;
@@ -59,7 +59,7 @@ find_data_file(const char * filepath)
 
 /*===  FUNCTION  ============================================================*
 Name:           get_writable_file
-Paramters:      void
+Parameters:      void
 Description:    Gets a temporary file which can be written to, under the data
                 directory.
 Returns:        A ``char *`` on the heap that contains a valid path to a file
@@ -94,7 +94,7 @@ get_writable_file(void)
 
 /*===  FUNCTION  ============================================================*
 Name:           clean_writable_file
-Paramters:      char *: filename
+Parameters:      char *: filename
 Description:    Unlink ``file`` and free the memory holding the path.
 Returns:        void
  *===========================================================================*/
@@ -111,7 +111,7 @@ clean_writable_file(char *filepath)
 
 /*===  FUNCTION  ============================================================*
 Name:           crc32_file
-Paramters:      char *: filename
+Parameters:      char *: filename
 Description:    Calculate (using zlib) crc32 checksum.
 Returns:        const char *: The crc32 sum, or NULL on error.
  *===========================================================================*/

@@ -19,7 +19,7 @@
 
 /*===  FUNCTION  ============================================================*
 Name:           qes_match_hamming
-Paramters:      const char *seq1, *seq2: Two strings to compare.
+Parameters:     const char *seq1, *seq2: Two strings to compare.
                 size_t len: Compare ``len`` chars. If 0, guess length with
                 strlen (may be unsafe).
 Description:    Find the hamming distance between two strings. The strings are
@@ -32,7 +32,7 @@ extern int_fast32_t qes_match_hamming(const char *seq1, const char *seq2, size_t
 
 /*===  FUNCTION  ============================================================*
 Name:           qes_match_hamming_max
-Paramters:      const char *seq1, *seq2: Two strings to compare.
+Parameters:     const char *seq1, *seq2: Two strings to compare.
                 size_t len: Compare ``len`` chars. If 0, guess length with
                 strlen (may be unsafe).
                 int_fast32_t max: Stop counting at ``max``, return ``max + 1``.

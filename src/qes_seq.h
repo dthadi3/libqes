@@ -33,7 +33,7 @@ struct qes_seq {
 
 /*===  FUNCTION  ============================================================*
 Name:           qes_seq_create
-Paramters:      void
+Parameters:     void
 Description:    Create a ``struct qes_seq`` object on the heap, creating and
                 initialising all members. qes_seq_create_no_X functions do not
                 create or initialise the members in their names.
@@ -47,7 +47,7 @@ void qes_seq_init               (struct qes_seq        *seq);
 
 /*===  FUNCTION  ============================================================*
 Name:           qes_seq_ok
-Paramters:      struct qes_seq *: seq to check
+Parameters:     struct qes_seq *: seq to check
 Description:    Check if ``seq`` is a usable struct qes_seq struct. qes_seq_ok_no-X
                 functions permit the member(s) in their names to be unusable.
 Returns:        1 if usable, 0 otherwise.
@@ -119,7 +119,7 @@ qes_seq_n_bytes (const struct qes_seq *seq)
 
 /*===  FUNCTION  ============================================================*
 Name:           qes_seq_fill_header
-Paramters:      struct qes_seq *seqobj: Seq object that will receive the header.
+Parameters:     struct qes_seq *seqobj: Seq object that will receive the header.
 Description:    Fills the name and comment members of a ``struct qes_seq`` from the
                 header line of a fasta/fastq file.
 Returns:        int: 1 on success, otherwise 0 for failure.
@@ -129,7 +129,7 @@ extern int qes_seq_fill_header(struct qes_seq *seqobj, char *header, size_t len)
 
 /*===  FUNCTION  ============================================================*
 Name:           qes_seq_fill_X
-Paramters:      These functions take a ``struct qes_seq``, a char array and
+Parameters:     These functions take a ``struct qes_seq``, a char array and
                 the length of the char array as a size_t.
 Description:    Fill a struct qes_seq's name, comment, seq or qual member from
                 a char array. If a non-zero value is given to ``len``, it is
@@ -150,7 +150,7 @@ extern int qes_seq_fill(struct qes_seq *seqobj, const char *name,
 
 /*===  FUNCTION  ============================================================*
 Name:           qes_seq_print
-Paramters:      const struct qes_seq *: seq to print
+Parameters:     const struct qes_seq *: seq to print
                 qes_seqfile_format_t: file format to print in.
                 FILE *: open file stream to print to.
 Description:    Print ``seq`` in formatted per ``format`` to ``stream``.
@@ -161,7 +161,7 @@ int qes_seq_print              (const struct qes_seq   *seq,
 
 /*===  FUNCTION  ============================================================*
 Name:           qes_seq_destroy
-Paramters:      struct qes_seq *: seq to destroy.
+Parameters:     struct qes_seq *: seq to destroy.
 Description:    Deallocate and set to NULL a struct qes_seq on the heap.
 Returns:        void.
  *===========================================================================*/
