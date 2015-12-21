@@ -36,7 +36,7 @@
  * ============================================================================
  */
 
-inline char
+inline int
 qes_sequtil_translate_codon (const char *codon)
 {
     if (codon == NULL || strnlen(codon, 4) != 3) {

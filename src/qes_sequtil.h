@@ -32,7 +32,7 @@
 #include <qes_util.h>
 
 
-extern char qes_sequtil_translate_codon(const char *codon);
+extern int qes_sequtil_translate_codon(const char *codon);
 extern char *qes_sequtil_revcomp(const char *seq, size_t len);
 extern void qes_sequtil_revcomp_inplace(char *seq, size_t len);
 
