@@ -123,6 +123,11 @@ SET(LIBQES_DEPENDS_CFLAGS
 
 SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${LIBQES_DEPENDS_CFLAGS}")
 
+
+#####################
+## Set CMake Paths ##
+#####################
+
 # Set include dirs
 INCLUDE_DIRECTORIES(
     ${CMAKE_BINARY_DIR}
