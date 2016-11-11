@@ -41,8 +41,6 @@
 #include <string.h>
 #include <strings.h>
 #include "qes_config.h"
-#include "qes_compat.h"
-#include "qes_libgnu.h"
 
 
 /*
@@ -84,7 +82,7 @@ extern const char *libqes_version;
 /* STMT_BEGIN and STMT_END are used to wrap blocks inside macros so that
  * the macro can be used as if it were a single C statement. */
 #ifdef __GNUC__
-    #define STMT_BEGIN (void) ({
+    #define STMT_BEGIN (void) __extension__ ({
     #define STMT_END })
 #elif defined(sun) || defined(__sun__)
     #define STMT_BEGIN if (1) {

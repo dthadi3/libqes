@@ -110,7 +110,7 @@ int qes_logger_add_destination_formatted(struct qes_logger *logger,
     qes_logger_add_destination_formatted(log, stream, level,                \
                                          &qes_log_formatter_plain)
 void _qes_logger_destroy(struct qes_logger *logger);
-#define qes_logger_destroy(l) ({ _qes_logger_destroy(l); l = NULL; })
+#define qes_logger_destroy(l) STMT_BEGIN _qes_logger_destroy(l); l = NULL; STMT_END
 
 
 struct qes_log_entry *qes_log_entry_create(void);
@@ -129,7 +129,7 @@ int qes_log_entry_format_va(struct qes_log_entry *entry,
 int qes_logger_write_entry(struct qes_logger *logger,
                            struct qes_log_entry *entry);
 void _qes_log_entry_destroy(struct qes_log_entry *log_entry);
-#define qes_log_entry_destroy(l) ({ _qes_log_entry_destroy(l); l = NULL; })
+#define qes_log_entry_destroy(l) STMT_BEGIN _qes_log_entry_destroy(l); l = NULL; STMT_END
 
 
 int qes_log_message(struct qes_logger *logger, enum qes_log_level level,
