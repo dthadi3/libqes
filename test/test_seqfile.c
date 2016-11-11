@@ -309,7 +309,7 @@ test_qes_seqfile_read_vs_kseq (void *ptr)
     free(fname);
     /* Try again, with fasta */
     seq = qes_seq_create();
-    fname = find_data_file("test.fasta");
+    fname = find_data_file("test_large.fasta.gz");
     tt_assert(fname != NULL);
     sf = qes_seqfile_create(fname, "r");
 #ifdef ZLIB_FOUND

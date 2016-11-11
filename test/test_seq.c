@@ -260,7 +260,7 @@ test_qes_seq_print(void *ptr)
     res = qes_seq_fill(seq, "TEST", "Comment 1", "AGCT", "IIII");
     tt_int_op(res, ==, 0);
     /* Print the seq to the output file */
-    res = qes_seq_print(seq, fp);
+    res = qes_seq_print(seq, fp, false, 0);
     tt_int_op(res, ==, 0);
     /* Check printing */
     truthfile = find_data_file("truth/qes_seq_print.fq");
@@ -280,7 +280,7 @@ test_qes_seq_print(void *ptr)
     res = qes_seq_fill(seq, "TEST", "Comment 1", "AGCT", "");
     tt_int_op(res, ==, 0);
     /* Print the seq to the output file */
-    res = qes_seq_print(seq, fp);
+    res = qes_seq_print(seq, fp, true, 0);
     tt_int_op(res, ==, 0);
     /* Check printing */
     truthfile = find_data_file("truth/qes_seq_print.fa");
@@ -292,8 +292,8 @@ test_qes_seq_print(void *ptr)
     fp = NULL;
 
     /* error cases  */
-    tt_int_op(qes_seq_print(NULL, stdout), ==, 1);
-    tt_int_op(qes_seq_print(seq, NULL), ==, 1);
+    tt_int_op(qes_seq_print(NULL, stdout, false, 0), ==, 1);
+    tt_int_op(qes_seq_print(seq, NULL, false, 0), ==, 1);
 
 end:
     qes_seq_destroy(seq);
