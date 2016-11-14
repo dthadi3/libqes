@@ -66,7 +66,7 @@ INCLUDE(CPack)
 ##########################
 
 
-SET(WARN_FLAGS "${WARN_FLAGS} -Wall -Wextra -Wpedantic")
+SET(WARN_FLAGS "${WARN_FLAGS} -Wall -Wextra -pedantic")
 
 SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=gnu99 -D_GNU_SOURCE ${WARN_FLAGS}")
 
