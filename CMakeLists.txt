@@ -1,9 +1,19 @@
 CMAKE_MINIMUM_REQUIRED(VERSION 2.8)
 PROJECT(libqes C)
 
+if (NOT DEFINED LIBQES_IS_SUBPROJECT)
+  if ("^${CMAKE_SOURCE_DIR}$" STREQUAL "^${PROJECT_SOURCE_DIR}$")
+    set (LIBQES_IS_SUBPROJECT FALSE)
+  else ()
+    set (LIBQES_IS_SUBPROJECT TRUE)
+    message(STATUS "Detected that LIBQES is used a subproject.")
+  endif ()
+endif ()
+
+
 # Append cmake-modules to module path
 SET(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH}
-    "${CMAKE_CURRENT_SOURCE_DIR}/cmake-modules")
+    "${PROJECT_SOURCE_DIR}/cmake-modules")
 
 
 IF (EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/version")
@@ -22,10 +32,12 @@ ENDIF()
 
 # Set this before you include libqes as a CMake subproject, so that we know not
 # to add cmake to the install rule
-IF (LIBQES_AS_SUBMODULE)
-    SET(LIBQES_DONT_INSTALL True)
-ELSE()
-    SET(LIBQES_DONT_INSTALL False)
+IF (LIBQES_IS_SUBPROJECT)
+    IF(NOT DEFINED LIBQES_DONT_INSTALL)
+        SET(LIBQES_DONT_INSTALL True)
+    ELSE()
+        SET(LIBQES_DONT_INSTALL False)
+    ENDIF()
 ENDIF()
 
 OPTION(NO_OPENMP "Disable OpenMP" False)
@@ -142,6 +154,6 @@ LINK_DIRECTORIES(${CMAKE_BINARY_DIR}/lib)
 
 # Traverse to library source and tests
 ADD_SUBDIRECTORY(src)
-if (NOT LIBQES_AS_SUBMODULE)
+if (NOT LIBQES_IS_SUBPROJECT)
     ADD_SUBDIRECTORY(test)
 endif()
