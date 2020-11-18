@@ -1,5 +1,9 @@
 language: c
 
+arch:
+  - AMD64
+  - ppc64le
+
 sudo: required
 dist: trusty
 
